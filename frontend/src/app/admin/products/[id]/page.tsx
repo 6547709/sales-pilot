@@ -18,6 +18,7 @@ import {
   parsePersonas,
   type Case,
   type Product,
+  type SalesScript,
 } from "@/lib/api";
 import {
   mergePersonasFromForm,
@@ -25,7 +26,7 @@ import {
   splitPersonasForForm,
   type PersonaExtraRow,
 } from "@/lib/personas-presets";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, MessageSquare, Pencil, Trash2, X } from "lucide-react";
 
 function emptyPresetRecord(): Record<string, string> {
   return Object.fromEntries(PERSONA_PRESET_ROLES.map((r) => [r, ""]));
@@ -51,6 +52,11 @@ export default function AdminProductEditPage() {
     { id: number; label: string; slug: string; is_active: boolean }[]
   >([]);
   const [cases, setCases] = useState<Case[]>([]);
+  const [scripts, setScripts] = useState<SalesScript[]>([]);
+  const [editingScriptId, setEditingScriptId] = useState<number | null>(null);
+  const [editingScenario, setEditingScenario] = useState("");
+  const [editingContent, setEditingContent] = useState("");
+  const [newScript, setNewScript] = useState({ scenario: "", content: "" });
   const [newCase, setNewCase] = useState({
     client_name: "",
     pain_points: "",
@@ -68,10 +74,17 @@ export default function AdminProductEditPage() {
     else setCases([]);
   }, [id]);
 
+  const refreshScripts = useCallback(async () => {
+    const sr = await apiFetch(`/api/v1/admin/products/${id}/scripts`);
+    if (sr.ok) setScripts(await sr.json());
+    else setScripts([]);
+  }, [id]);
+
   const load = useCallback(async () => {
-    const [pr, cr] = await Promise.all([
+    const [pr, cr, sr] = await Promise.all([
       apiFetch(`/api/v1/admin/products/${id}`),
       apiFetch(`/api/v1/admin/products/${id}/cases`),
+      apiFetch(`/api/v1/admin/products/${id}/scripts`),
     ]);
     if (!pr.ok) {
       setProduct(null);
@@ -94,6 +107,8 @@ export default function AdminProductEditPage() {
     setExtraPersonas(extra);
     if (cr.ok) setCases(await cr.json());
     else setCases([]);
+    if (sr.ok) setScripts(await sr.json());
+    else setScripts([]);
   }, [id]);
 
   useEffect(() => {
@@ -131,6 +146,71 @@ export default function AdminProductEditPage() {
       method: "DELETE",
     });
     if (res.ok) router.replace("/admin/products");
+  }
+
+  async function saveEditingScript(scriptId: number) {
+    setMsg("");
+    const res = await apiFetch(`/api/v1/admin/scripts/${scriptId}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        scenario: editingScenario.trim(),
+        content: editingContent,
+      }),
+    });
+    if (res.ok) {
+      setEditingScriptId(null);
+      setEditingScenario("");
+      setEditingContent("");
+      setMsg("话术已保存");
+      await refreshScripts();
+    } else {
+      const e = await res.json().catch(() => ({}));
+      setMsg(e.error || "话术保存失败");
+    }
+  }
+
+  async function deleteScript(scriptId: number) {
+    if (!confirm("确定删除该话术？")) return;
+    setMsg("");
+    const res = await apiFetch(`/api/v1/admin/scripts/${scriptId}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      if (editingScriptId === scriptId) {
+        setEditingScriptId(null);
+        setEditingScenario("");
+        setEditingContent("");
+      }
+      setMsg("已删除话术");
+      await refreshScripts();
+    } else {
+      const e = await res.json().catch(() => ({}));
+      setMsg(e.error || "删除失败");
+    }
+  }
+
+  async function createScript() {
+    const scenario = newScript.scenario.trim();
+    if (!scenario) {
+      setMsg("请填写话术场景");
+      return;
+    }
+    setMsg("");
+    const res = await apiFetch(`/api/v1/admin/products/${id}/scripts`, {
+      method: "POST",
+      body: JSON.stringify({
+        scenario,
+        content: newScript.content,
+      }),
+    });
+    if (res.ok) {
+      setNewScript({ scenario: "", content: "" });
+      setMsg("已新增话术");
+      await refreshScripts();
+    } else {
+      const e = await res.json().catch(() => ({}));
+      setMsg(e.error || "新增失败");
+    }
   }
 
   if (!product) {
@@ -741,6 +821,151 @@ export default function AdminProductEditPage() {
               }}
             >
               添加案例
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-primary/15">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            销售话术
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            话术以「场景 + 正文」拆分维护；保存后立即作用于前台产品详情页的「销售话术」区块。
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {scripts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">暂无话术</p>
+          ) : (
+            <ul className="space-y-4">
+              {scripts.map((s) => {
+                const isEditing = editingScriptId === s.id;
+                return (
+                  <li key={s.id} className="rounded-lg border border-border/60 bg-background p-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        话术 #{s.id}
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {isEditing ? (
+                          <>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => saveEditingScript(s.id)}
+                            >
+                              保存本条
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingScriptId(null);
+                                setEditingScenario("");
+                                setEditingContent("");
+                              }}
+                            >
+                              <X className="mr-1 h-4 w-4" />
+                              取消
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setEditingScriptId(s.id);
+                                setEditingScenario(s.scenario || "");
+                                setEditingContent(s.content || "");
+                              }}
+                            >
+                              <Pencil className="mr-1 h-4 w-4" />
+                              编辑
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteScript(s.id)}
+                            >
+                              <Trash2 className="mr-1 h-4 w-4" />
+                              删除
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3">
+                      <div className="space-y-1.5">
+                        <Label>场景</Label>
+                        {isEditing ? (
+                          <Input
+                            value={editingScenario}
+                            onChange={(e) => setEditingScenario(e.target.value)}
+                          />
+                        ) : (
+                          <p className="text-sm font-semibold text-primary">
+                            {s.scenario || "（未命名场景）"}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>正文</Label>
+                        {isEditing ? (
+                          <Textarea
+                            rows={6}
+                            value={editingContent}
+                            onChange={(e) => setEditingContent(e.target.value)}
+                          />
+                        ) : (
+                          <p className="whitespace-pre-wrap text-sm text-foreground/90">
+                            {s.content || "—"}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <Separator />
+
+          <div>
+            <p className="mb-3 text-sm font-medium">新增话术</p>
+            <div className="grid gap-3">
+              <div className="space-y-1.5">
+                <Label>场景</Label>
+                <Input
+                  placeholder="例如：开场破冰 / 异议：价格 / 竞品对比…"
+                  value={newScript.scenario}
+                  onChange={(e) =>
+                    setNewScript((prev) => ({ ...prev, scenario: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>正文</Label>
+                <Textarea
+                  rows={6}
+                  value={newScript.content}
+                  onChange={(e) =>
+                    setNewScript((prev) => ({ ...prev, content: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+            <Button className="mt-3" type="button" variant="outline" onClick={createScript}>
+              添加话术
             </Button>
           </div>
         </CardContent>
