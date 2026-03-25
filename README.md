@@ -17,10 +17,11 @@ sales-pilot/
 ├── .github/workflows/ # CI：推镜像到 GHCR（推荐，无需本地构建）
 ├── backend/           # Go API（cmd/server）
 ├── frontend/          # Next.js 应用
-├── nginx/             # 同域反代：/api → 后端，/ → 前端
+├── nginx/             # 同域反代配置 + Dockerfile（CI 构建 sales-pilot-nginx）
 ├── docs/              # 补充文档
 ├── build-and-push.sh  # 可选：本地多架构推 Docker Hub
-└── docker-compose.yml
+├── docker-compose.yml # 本地开发：含 build
+└── docker-compose.nas.yml # NAS/生产：仅拉取 GHCR 公网镜像
 ```
 
 ### GitHub Actions → GHCR（推荐）
@@ -31,6 +32,9 @@ sales-pilot/
 |------|-----------------------------------------------|
 | 后端 | `ghcr.io/OWNER/sales-pilot-backend` |
 | 前端 | `ghcr.io/OWNER/sales-pilot-frontend` |
+| Nginx（内嵌 `default.conf`） | `ghcr.io/OWNER/sales-pilot-nginx` |
+
+说明：根目录 `docker-compose.yml` 里的 Nginx 曾使用**官方** `nginx:1.26-bookworm` 并**挂载**本地 `nginx/default.conf`，因此仓库里原先没有「应用 Nginx」镜像。要在 NAS 上**只拉公网镜像、不挂载配置文件**，需使用 CI 构建的 **`sales-pilot-nginx`**（把配置打进镜像）。数据库仍使用 **Docker Hub 官方** `postgres:17-bookworm`，无需在 GHCR 再构建一份。
 
 **版本标签（便于追踪）**：
 
@@ -45,9 +49,33 @@ sales-pilot/
 ```bash
 docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-backend:0.1.1
 docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-frontend:0.1.1
+docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-nginx:0.1.1
 ```
 
 工作流文件：`.github/workflows/docker-publish.yml`。若仓库为私有，需在 GitHub 上为 Package 设置可见性或使用带 `read:packages` 的 token 拉取。
+
+### NAS 部署（`docker-compose.nas.yml`）
+
+在 NAS 上准备目录，放入仓库中的 **`docker-compose.nas.yml`**，并创建 **`.env`**（示例）：
+
+```env
+GHCR_OWNER=6547709
+IMAGE_TAG=latest
+JWT_SECRET=请改为强随机串
+APP_BASE_URL=http://你的NAS_IP或域名
+FRONTEND_ORIGIN=http://你的NAS_IP或域名
+HTTP_PORT=80
+```
+
+拉取私有 GHCR 包前需登录（[创建 classic PAT](https://github.com/settings/tokens)，勾选 `read:packages`）：
+
+```bash
+echo <PAT> | docker login ghcr.io -u <GitHub用户名> --password-stdin
+docker compose -f docker-compose.nas.yml pull
+docker compose -f docker-compose.nas.yml up -d
+```
+
+更新镜像时修改 `IMAGE_TAG` 或保持 `latest` 后再次 `pull` + `up -d`。
 
 ## 本地一键启动（推荐）
 

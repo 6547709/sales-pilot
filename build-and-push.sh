@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 多架构构建并推送到 Docker Hub：docker.io/${REGISTRY}/sales-pilot-{backend,frontend}:${VERSION}
+# 多架构构建并推送到 Docker Hub：docker.io/${REGISTRY}/sales-pilot-{backend,frontend,nginx}:${VERSION}
 #
 # 使用前：
 #   1. docker login docker.io
@@ -37,6 +37,14 @@ docker buildx build --platform "${PLATFORMS}" \
   -f frontend/Dockerfile frontend \
   --push
 
+echo ">>> 构建并推送 ${PLATFORMS} -> ${IMAGE_PREFIX}/sales-pilot-nginx:${VERSION}"
+docker buildx build --platform "${PLATFORMS}" \
+  -t "${IMAGE_PREFIX}/sales-pilot-nginx:${VERSION}" \
+  -t "${IMAGE_PREFIX}/sales-pilot-nginx:latest" \
+  -f nginx/Dockerfile nginx \
+  --push
+
 echo "已推送："
 echo "  ${IMAGE_PREFIX}/sales-pilot-backend:${VERSION} (及 :latest)"
 echo "  ${IMAGE_PREFIX}/sales-pilot-frontend:${VERSION} (及 :latest)"
+echo "  ${IMAGE_PREFIX}/sales-pilot-nginx:${VERSION} (及 :latest)"
