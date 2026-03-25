@@ -1,5 +1,5 @@
 # NAS / 生产：全部使用公网镜像（GHCR 应用镜像 + Docker Hub 官方 PostgreSQL）
-# 注意：当前 GitHub Actions 仅构建 linux/amd64；若在 ARM NAS 上部署，需自行构建/推送 arm64 镜像或改用 amd64 主机。
+# 应用镜像为 linux/amd64，请在 x86_64/amd64 主机或对应模拟环境下运行。
 # 使用前在同级目录创建 .env（或导出环境变量），至少设置 JWT_SECRET。
 #
 # 必填/常用变量：

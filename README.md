@@ -19,7 +19,7 @@ sales-pilot/
 ├── frontend/          # Next.js 应用
 ├── nginx/             # 同域反代配置 + Dockerfile（CI 构建 sales-pilot-nginx）
 ├── docs/              # 补充文档
-├── build-and-push.sh  # 可选：本地多架构推 Docker Hub
+├── build-and-push.sh  # 可选：本地推 Docker Hub（默认 linux/amd64）
 ├── docker-compose.yml     # 本地开发：含 build
 ├── docker-compose.nas.yml # NAS/生产：仅拉取 GHCR 公网镜像
 └── .env.example           # 环境变量模板（复制为 .env）
@@ -27,7 +27,7 @@ sales-pilot/
 
 ### GitHub Actions → GHCR（推荐）
 
-推送到 **`main`** 时由 Actions 构建 **linux/amd64** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。（不再在 CI 中构建 arm64，以缩短构建时间；ARM 设备可本地用 `build-and-push.sh` 推多架构，或自建 ARM Runner。）
+推送到 **`main`** 时由 Actions 构建 **linux/amd64（单架构）** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。
 
 | 镜像 | 示例地址（将 `OWNER` 换为你的 GitHub 用户名） |
 |------|-----------------------------------------------|
@@ -110,7 +110,7 @@ JWT_SECRET="$(openssl rand -hex 32)" HTTP_PORT=8080 docker compose up --build -d
 
 - `docker compose up --build` 会给镜像打上**项目名 + 服务名**的本地标签（如 `sales-pilot-backend:latest`），**不会**自动加上 Docker Hub 的 `用户名/` 前缀。
 - 推送到 Hub 需单独执行 `build-and-push.sh`（或自行 `docker buildx build -t docker.io/用户名/... --push`）。
-- 多架构 **`buildx build --push`** 会把 manifest 推到远端，本地 `docker images` 往往**仍不会出现** `liguoqiang/...`（多架构清单不 `--load` 到本机）；属正常现象，可在 Hub 网页查看，或执行 `docker pull docker.io/liguoqiang/sales-pilot-backend:latest` 再查看本地镜像。
+- 使用 **`buildx build --push`** 后，本地 `docker images` 可能**仍不出现** `liguoqiang/...`（未 `--load`）；可在 Hub 网页查看，或 `docker pull docker.io/liguoqiang/sales-pilot-backend:latest`。
 
 ### Docker Hub：本地脚本（可选）
 
@@ -127,12 +127,12 @@ chmod +x build-and-push.sh
 |------|------|------|
 | `VERSION` | 版本号标签 | `0.1.0` |
 | `REGISTRY` | Docker Hub **用户名**（非完整域名） | `liguoqiang` |
-| `PLATFORMS` | 目标平台 | `linux/amd64,linux/arm64` |
+| `PLATFORM` | 目标平台（单值） | `linux/amd64` |
 | `NEXT_PUBLIC_API_URL` | 前端构建时 API 基址；同域反代可留空 | 空 |
 
 示例：`VERSION=0.2.0 REGISTRY=你的用户名 ./build-and-push.sh`
 
-首次运行会创建名为 `multiarch-builder` 的 buildx 实例；在非 arm64 机器上构建 arm64 时，需 Docker Desktop 或已安装 QEMU/binfmt（一般已就绪）。
+首次运行会创建名为 `sales-pilot-builder` 的 buildx 实例。
 
 ## 本地开发（前后端分离）
 
