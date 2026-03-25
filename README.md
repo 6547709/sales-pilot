@@ -20,8 +20,9 @@ sales-pilot/
 ├── nginx/             # 同域反代配置 + Dockerfile（CI 构建 sales-pilot-nginx）
 ├── docs/              # 补充文档
 ├── build-and-push.sh  # 可选：本地多架构推 Docker Hub
-├── docker-compose.yml # 本地开发：含 build
-└── docker-compose.nas.yml # NAS/生产：仅拉取 GHCR 公网镜像
+├── docker-compose.yml     # 本地开发：含 build
+├── docker-compose.nas.yml # NAS/生产：仅拉取 GHCR 公网镜像
+└── .env.example           # 环境变量模板（复制为 .env）
 ```
 
 ### GitHub Actions → GHCR（推荐）
@@ -56,16 +57,7 @@ docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-nginx:0.1.1
 
 ### NAS 部署（`docker-compose.nas.yml`）
 
-在 NAS 上准备目录，放入仓库中的 **`docker-compose.nas.yml`**，并创建 **`.env`**（示例）：
-
-```env
-GHCR_OWNER=6547709
-IMAGE_TAG=latest
-JWT_SECRET=请改为强随机串
-APP_BASE_URL=http://你的NAS_IP或域名
-FRONTEND_ORIGIN=http://你的NAS_IP或域名
-HTTP_PORT=80
-```
+在 NAS 上准备目录，放入仓库中的 **`docker-compose.nas.yml`**，将 **`.env.example`** 复制为 **`.env`** 并按注释填写（完整说明见 `.env.example`）。
 
 拉取私有 GHCR 包前需登录（[创建 classic PAT](https://github.com/settings/tokens)，勾选 `read:packages`）：
 
