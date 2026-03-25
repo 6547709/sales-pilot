@@ -39,6 +39,84 @@ import {
   Zap,
 } from "lucide-react";
 
+/** 生成 tel: 链接用：去掉空格与常见连字符 */
+function normalizeTelHref(phone: string) {
+  return phone.trim().replace(/[\s\u00a0-]/g, "");
+}
+
+function ContactPhoneLink({ value }: { value?: string | null }) {
+  const display = value?.trim();
+  if (!display) return <span className="text-muted-foreground">—</span>;
+  return (
+    <a
+      href={`tel:${normalizeTelHref(display)}`}
+      className="text-primary underline-offset-2 hover:underline"
+    >
+      {display}
+    </a>
+  );
+}
+
+function ContactEmailLink({ value }: { value?: string | null }) {
+  const display = value?.trim();
+  if (!display) return <span className="text-muted-foreground">—</span>;
+  return (
+    <a href={`mailto:${display}`} className="break-all text-primary underline-offset-2 hover:underline">
+      {display}
+    </a>
+  );
+}
+
+/** 内联复制：icon = 单条旁小按钮；text = 「复制全部」类按钮 */
+function CopyTextControl({
+  text,
+  mode,
+  label = "复制全部",
+  className,
+}: {
+  text: string;
+  mode: "icon" | "text";
+  label?: string;
+  className?: string;
+}) {
+  const [done, setDone] = useState(false);
+  const handle = () => {
+    if (!text.trim()) return;
+    void navigator.clipboard.writeText(text).then(() => {
+      setDone(true);
+      window.setTimeout(() => setDone(false), 2000);
+    });
+  };
+  if (!text.trim()) return null;
+  if (mode === "icon") {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        className={cn("shrink-0 text-muted-foreground hover:text-foreground", className)}
+        title={done ? "已复制" : "复制"}
+        aria-label={done ? "已复制" : "复制"}
+        onClick={handle}
+      >
+        <Copy className="size-3.5" />
+      </Button>
+    );
+  }
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="xs"
+      className={cn("gap-1", className)}
+      onClick={handle}
+    >
+      <Copy className="size-3" />
+      {done ? "已复制" : label}
+    </Button>
+  );
+}
+
 const sectionNav = [
   { id: "overview", label: "概览" },
   { id: "contacts", label: "联络" },
@@ -104,17 +182,29 @@ export default function ProductDetailPage() {
   const highlights = parseJsonArray(prod.highlights);
   const questions = parseJsonArray(prod.discovery_questions);
   const personas = parsePersonas(prod.target_personas);
-  const scriptText = scripts
+  const highlightsJoined = highlights.join("\n\n");
+  const questionsJoined = questions.join("\n\n");
+  const scriptsJoined = scripts
     .map((s) => `【${s.scenario}】\n${s.content}`)
+    .join("\n\n");
+  const personasJoined = Object.entries(personas)
+    .map(([k, v]) => `${k}\n${v}`)
     .join("\n\n");
 
   function scrollToSection(sid: string) {
     document.getElementById(sid)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function copyScripts() {
-    void navigator.clipboard.writeText(scriptText || prod.description || "");
+  function formatCaseText(c: Case) {
+    return [
+      c.client_name,
+      `痛点：${c.pain_points}`,
+      `方案：${c.solution}`,
+      `价值：${c.value_delivered}`,
+    ].join("\n");
   }
+
+  const casesJoined = cases.map((c) => formatCaseText(c)).join("\n\n---\n\n");
 
   const cardMotion = {
     initial: { opacity: 0, y: 12 },
@@ -122,7 +212,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="relative pb-24 lg:pb-10">
+    <div className="relative pb-10">
       <div className="mx-auto max-w-[1200px] px-4 py-6 sm:py-8">
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Link
@@ -249,15 +339,11 @@ export default function ProductDetailPage() {
                       </li>
                       <li className="flex items-start gap-2">
                         <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <span>
-                          {prod.sales_contact_phone?.trim() || "—"}
-                        </span>
+                        <ContactPhoneLink value={prod.sales_contact_phone} />
                       </li>
                       <li className="flex items-start gap-2">
                         <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <span className="break-all">
-                          {prod.sales_contact_email?.trim() || "—"}
-                        </span>
+                        <ContactEmailLink value={prod.sales_contact_email} />
                       </li>
                     </ul>
                   </div>
@@ -274,15 +360,11 @@ export default function ProductDetailPage() {
                       </li>
                       <li className="flex items-start gap-2 text-sm">
                         <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <span>
-                          {prod.presales_contact_phone?.trim() || "—"}
-                        </span>
+                        <ContactPhoneLink value={prod.presales_contact_phone} />
                       </li>
                       <li className="flex items-start gap-2 text-sm">
                         <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <span className="break-all">
-                          {prod.presales_contact_email?.trim() || "—"}
-                        </span>
+                        <ContactEmailLink value={prod.presales_contact_email} />
                       </li>
                     </ul>
                   </div>
@@ -295,19 +377,25 @@ export default function ProductDetailPage() {
               <motion.section id="highlights" {...cardMotion} className="md:col-span-1">
                 <Card className="h-full">
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      三大亮点
-                    </CardTitle>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        三大亮点
+                      </CardTitle>
+                      <CopyTextControl text={highlightsJoined} mode="text" label="复制三条" />
+                    </div>
                   </CardHeader>
                   <CardContent className="grid gap-2">
                     {highlights.map((h, i) => (
                       <div
                         key={i}
-                        className="rounded-lg border border-border/80 bg-muted/30 p-3 text-sm leading-relaxed"
+                        className="flex gap-1 rounded-lg border border-border/80 bg-muted/30 p-3 text-sm leading-relaxed"
                       >
-                        <span className="font-semibold text-primary">{i + 1}. </span>
-                        {h}
+                        <div className="min-w-0 flex-1">
+                          <span className="font-semibold text-primary">{i + 1}. </span>
+                          {h}
+                        </div>
+                        <CopyTextControl text={h} mode="icon" />
                       </div>
                     ))}
                   </CardContent>
@@ -318,21 +406,25 @@ export default function ProductDetailPage() {
               <motion.section id="questions" {...cardMotion} className="md:col-span-1">
                 <Card className="h-full">
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Lightbulb className="h-5 w-5 text-primary" />
-                      黄金三问
-                    </CardTitle>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Lightbulb className="h-5 w-5 text-primary" />
+                        黄金三问
+                      </CardTitle>
+                      <CopyTextControl text={questionsJoined} mode="text" label="复制三问" />
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {questions.map((q, i) => (
                       <div
                         key={i}
-                        className="flex gap-3 rounded-lg border p-3 text-sm"
+                        className="flex gap-2 rounded-lg border p-3 text-sm"
                       >
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                           {i + 1}
                         </span>
-                        <p className="leading-relaxed text-foreground/90">{q}</p>
+                        <p className="min-w-0 flex-1 leading-relaxed text-foreground/90">{q}</p>
+                        <CopyTextControl text={q} mode="icon" />
                       </div>
                     ))}
                   </CardContent>
@@ -344,22 +436,31 @@ export default function ProductDetailPage() {
               <motion.section id="personas" {...cardMotion}>
                 <Card className="h-full">
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Users className="h-5 w-5 text-primary" />
-                      目标画像
-                    </CardTitle>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Users className="h-5 w-5 text-primary" />
+                        目标画像
+                      </CardTitle>
+                      <CopyTextControl text={personasJoined} mode="text" label="复制全部画像" />
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {Object.entries(personas).map(([k, v]) => (
-                      <div
-                        key={k}
-                        className="rounded-lg border border-dashed p-3 text-sm"
-                      >
-                        <span className="font-semibold text-primary">{k}</span>
-                        <Separator className="my-2" />
-                        <p className="text-muted-foreground">{v}</p>
-                      </div>
-                    ))}
+                    {Object.entries(personas).map(([k, v]) => {
+                      const block = `${k}\n${v}`;
+                      return (
+                        <div
+                          key={k}
+                          className="flex gap-1 rounded-lg border border-dashed p-3 text-sm"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <span className="font-semibold text-primary">{k}</span>
+                            <Separator className="my-2" />
+                            <p className="text-muted-foreground">{v}</p>
+                          </div>
+                          <CopyTextControl text={block} mode="icon" />
+                        </div>
+                      );
+                    })}
                   </CardContent>
                 </Card>
               </motion.section>
@@ -367,10 +468,17 @@ export default function ProductDetailPage() {
               <motion.section id="triggers" {...cardMotion}>
                 <Card className="h-full">
                   <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Zap className="h-5 w-5 text-primary" />
-                      触发事件
-                    </CardTitle>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Zap className="h-5 w-5 text-primary" />
+                        触发事件
+                      </CardTitle>
+                      <CopyTextControl
+                        text={prod.trigger_events || ""}
+                        mode="text"
+                        label="复制本段"
+                      />
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
@@ -384,10 +492,17 @@ export default function ProductDetailPage() {
             <motion.section id="competitor" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Target className="h-5 w-5 text-primary" />
-                    竞品分析
-                  </CardTitle>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Target className="h-5 w-5 text-primary" />
+                      竞品分析
+                    </CardTitle>
+                    <CopyTextControl
+                      text={prod.competitor_analysis || ""}
+                      mode="text"
+                      label="复制原文"
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-xl border bg-muted/20 p-4">
@@ -402,10 +517,17 @@ export default function ProductDetailPage() {
             <motion.section id="roi" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    ROI 指标
-                  </CardTitle>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                      ROI 指标
+                    </CardTitle>
+                    <CopyTextControl
+                      text={prod.roi_metrics || ""}
+                      mode="text"
+                      label="复制本段"
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">
@@ -418,10 +540,13 @@ export default function ProductDetailPage() {
             <motion.section id="scripts" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    销售话术
-                  </CardTitle>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <MessageSquare className="h-5 w-5 text-primary" />
+                      销售话术
+                    </CardTitle>
+                    <CopyTextControl text={scriptsJoined} mode="text" label="复制全部话术" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="grid gap-3 sm:grid-cols-2">
@@ -430,9 +555,15 @@ export default function ProductDetailPage() {
                         key={s.id}
                         className="rounded-xl border bg-card p-4 shadow-sm"
                       >
-                        <p className="text-sm font-semibold text-primary">
-                          {s.scenario}
-                        </p>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="min-w-0 flex-1 text-sm font-semibold text-primary">
+                            {s.scenario}
+                          </p>
+                          <CopyTextControl
+                            text={`【${s.scenario}】\n${s.content}`}
+                            mode="icon"
+                          />
+                        </div>
                         <Separator className="my-2" />
                         <p className="text-sm leading-relaxed text-foreground/90">
                           {s.content}
@@ -447,10 +578,13 @@ export default function ProductDetailPage() {
             <motion.section id="cases" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <ClipboardList className="h-5 w-5 text-primary" />
-                    客户案例
-                  </CardTitle>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ClipboardList className="h-5 w-5 text-primary" />
+                      客户案例
+                    </CardTitle>
+                    <CopyTextControl text={casesJoined} mode="text" label="复制全部案例" />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="grid gap-4 md:grid-cols-2">
@@ -459,7 +593,10 @@ export default function ProductDetailPage() {
                         key={c.id}
                         className="rounded-xl border border-primary/10 bg-gradient-to-br from-muted/40 to-background p-4"
                       >
-                        <p className="font-semibold">{c.client_name}</p>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="min-w-0 flex-1 font-semibold">{c.client_name}</p>
+                          <CopyTextControl text={formatCaseText(c)} mode="icon" />
+                        </div>
                         <p className="mt-2 text-xs text-muted-foreground">
                           痛点
                         </p>
@@ -475,35 +612,6 @@ export default function ProductDetailPage() {
               </Card>
             </motion.section>
           </div>
-        </div>
-      </div>
-
-      {/* 移动端底栏 */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 p-3 backdrop-blur supports-[padding:max(0px)]:pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden">
-        <div className="mx-auto flex max-w-lg gap-2">
-          <Button className="flex-1 gap-2" onClick={copyScripts}>
-            <Copy className="h-4 w-4" />
-            复制话术
-          </Button>
-          <a
-            href={
-              process.env.NEXT_PUBLIC_DIAL_NUMBER
-                ? `tel:${process.env.NEXT_PUBLIC_DIAL_NUMBER}`
-                : "#"
-            }
-            onClick={(e) => {
-              if (!process.env.NEXT_PUBLIC_DIAL_NUMBER) {
-                e.preventDefault();
-                alert("可在 NEXT_PUBLIC_DIAL_NUMBER 配置热线。");
-              }
-            }}
-            className={cn(
-              buttonVariants({ variant: "secondary" }),
-              "inline-flex flex-1 items-center justify-center",
-            )}
-          >
-            一键拨号
-          </a>
         </div>
       </div>
     </div>
