@@ -27,7 +27,7 @@ sales-pilot/
 
 ### GitHub Actions → GHCR（推荐）
 
-推送到 **`main`** 时自动构建 **linux/amd64、linux/arm64** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。
+推送到 **`main`** 时由 Actions 构建 **linux/amd64** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。（不再在 CI 中构建 arm64，以缩短构建时间；ARM 设备可本地用 `build-and-push.sh` 推多架构，或自建 ARM Runner。）
 
 | 镜像 | 示例地址（将 `OWNER` 换为你的 GitHub 用户名） |
 |------|-----------------------------------------------|

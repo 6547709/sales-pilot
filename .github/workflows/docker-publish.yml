@@ -1,5 +1,6 @@
-# 在 GitHub Actions 中构建 linux/amd64 + linux/arm64 镜像并推送到 GHCR（无需本地 docker build）
+# 在 GitHub Actions 中仅构建 linux/amd64 并推送到 GHCR（避免 QEMU 模拟 arm64，显著缩短尤其是 frontend 的 Next 构建时间）
 # 版本号：0.1.<run_number>（本工作流每次运行 +1）+ sha-<短提交> + main 分支打 latest
+# 若需 arm64 镜像，可在本机使用 build-and-push.sh 或自建 ARM Runner 工作流
 name: Docker publish (GHCR)
 
 on:
@@ -9,6 +10,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  # 与 ubuntu-latest 原生架构一致，无需 setup-qemu
+  DOCKER_PLATFORM: linux/amd64
 
 # 同一 ref 上多次推送时，只保留最新一次运行（避免排队）
 concurrency:
@@ -34,7 +37,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
       - name: 镜像标签与元数据
@@ -53,7 +55,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ env.DOCKER_PLATFORM }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -85,7 +87,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
       - name: 镜像标签与元数据
@@ -104,7 +105,7 @@ jobs:
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ env.DOCKER_PLATFORM }}
           push: true
           build-args: |
             NEXT_PUBLIC_API_URL=
@@ -137,7 +138,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
       - name: 镜像标签与元数据
@@ -156,7 +156,7 @@ jobs:
         with:
           context: ./nginx
           file: ./nginx/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ env.DOCKER_PLATFORM }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
