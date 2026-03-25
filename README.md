@@ -14,12 +14,40 @@
 
 ```
 sales-pilot/
-├── backend/          # Go API（cmd/server）
-├── frontend/         # Next.js 应用
-├── nginx/            # 同域反代：/api → 后端，/ → 前端
-├── docs/             # 补充文档
+├── .github/workflows/ # CI：推镜像到 GHCR（推荐，无需本地构建）
+├── backend/           # Go API（cmd/server）
+├── frontend/          # Next.js 应用
+├── nginx/             # 同域反代：/api → 后端，/ → 前端
+├── docs/              # 补充文档
+├── build-and-push.sh  # 可选：本地多架构推 Docker Hub
 └── docker-compose.yml
 ```
+
+### GitHub Actions → GHCR（推荐）
+
+推送到 **`main`** 时自动构建 **linux/amd64、linux/arm64** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。
+
+| 镜像 | 示例地址（将 `OWNER` 换为你的 GitHub 用户名） |
+|------|-----------------------------------------------|
+| 后端 | `ghcr.io/OWNER/sales-pilot-backend` |
+| 前端 | `ghcr.io/OWNER/sales-pilot-frontend` |
+
+**版本标签（便于追踪）**：
+
+| 标签 | 含义 |
+|------|------|
+| `0.1.<run_number>` | 递增序号：本工作流「第 N 次成功运行」+1（同一推送内多个 commit 只触发一次构建） |
+| `sha-<短提交>` | 对应本次构建的 Git 提交 |
+| `latest` | 仅 **`main`** 分支构建会更新 |
+
+拉取示例（需 [登录 ghcr.io](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry)）：
+
+```bash
+docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-backend:0.1.1
+docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-frontend:0.1.1
+```
+
+工作流文件：`.github/workflows/docker-publish.yml`。若仓库为私有，需在 GitHub 上为 Package 设置可见性或使用带 `read:packages` 的 token 拉取。
 
 ## 本地一键启动（推荐）
 
@@ -57,6 +85,34 @@ JWT_SECRET="$(openssl rand -hex 32)" HTTP_PORT=8080 docker compose up --build -d
 ```
 
 前端在镜像构建时使用相对路径请求 API（`NEXT_PUBLIC_API_URL` 为空），与 Nginx 同域部署一致。
+
+### 为何本地看不到 `docker.io/liguoqiang/...` 镜像？
+
+- `docker compose up --build` 会给镜像打上**项目名 + 服务名**的本地标签（如 `sales-pilot-backend:latest`），**不会**自动加上 Docker Hub 的 `用户名/` 前缀。
+- 推送到 Hub 需单独执行 `build-and-push.sh`（或自行 `docker buildx build -t docker.io/用户名/... --push`）。
+- 多架构 **`buildx build --push`** 会把 manifest 推到远端，本地 `docker images` 往往**仍不会出现** `liguoqiang/...`（多架构清单不 `--load` 到本机）；属正常现象，可在 Hub 网页查看，或执行 `docker pull docker.io/liguoqiang/sales-pilot-backend:latest` 再查看本地镜像。
+
+### Docker Hub：本地脚本（可选）
+
+若未使用 GitHub Actions，可自行本地构建并推 **Docker Hub**。需已登录：`docker login docker.io`
+
+```bash
+chmod +x build-and-push.sh
+./build-and-push.sh
+```
+
+默认推送 `docker.io/liguoqiang/sales-pilot-backend` 与 `sales-pilot-frontend`，标签为 `0.1.0` 与 `latest`。可通过环境变量调整：
+
+| 变量 | 说明 | 默认 |
+|------|------|------|
+| `VERSION` | 版本号标签 | `0.1.0` |
+| `REGISTRY` | Docker Hub **用户名**（非完整域名） | `liguoqiang` |
+| `PLATFORMS` | 目标平台 | `linux/amd64,linux/arm64` |
+| `NEXT_PUBLIC_API_URL` | 前端构建时 API 基址；同域反代可留空 | 空 |
+
+示例：`VERSION=0.2.0 REGISTRY=你的用户名 ./build-and-push.sh`
+
+首次运行会创建名为 `multiarch-builder` 的 buildx 实例；在非 arm64 机器上构建 arm64 时，需 Docker Desktop 或已安装 QEMU/binfmt（一般已就绪）。
 
 ## 本地开发（前后端分离）
 
