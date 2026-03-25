@@ -22,6 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal("数据库连接失败: ", err)
 	}
+	seed.EnsureTopology(db)
+	seed.FixLegacyTopologyHints(db)
 	seed.Run(db)
 
 	r := gin.New()

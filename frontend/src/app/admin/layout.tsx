@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppFrame } from "@/components/app-frame";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { fetchMe, type User } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -22,7 +22,7 @@ export default function AdminLayout({
     }
     fetchMe().then((u) => {
       if (!u) router.replace("/login");
-      else if (u.role !== "admin") router.replace("/products");
+      else if (u.role !== "admin") router.replace("/");
       else {
         setUser(u);
         setReady(true);
@@ -30,11 +30,13 @@ export default function AdminLayout({
     });
   }, [router]);
 
-  if (!ready) {
+  if (!ready || !user) {
     return (
-      <p className="p-8 text-center text-muted-foreground">校验权限…</p>
+      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        校验权限…
+      </div>
     );
   }
 
-  return <AppFrame user={user}>{children}</AppFrame>;
+  return <AdminShell user={user}>{children}</AdminShell>;
 }

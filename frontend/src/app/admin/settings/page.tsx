@@ -14,6 +14,8 @@ import { apiFetch } from "@/lib/api";
 
 type AuthSettings = {
   id: number;
+  /** 旧库可能缺省，按 true 处理 */
+  local_login_enabled?: boolean;
   ldap_enabled: boolean;
   ldap_config: string;
   oidc_enabled: boolean;
@@ -30,7 +32,10 @@ export default function AdminSettingsPage() {
     apiFetch("/api/v1/admin/auth-settings").then(async (r) => {
       if (!r.ok) return;
       const data = await r.json();
-      setSt(data);
+      setSt({
+        ...data,
+        local_login_enabled: data.local_login_enabled !== false,
+      });
       setLdapJson(
         typeof data.ldap_config === "string"
           ? data.ldap_config
@@ -45,6 +50,7 @@ export default function AdminSettingsPage() {
   }, []);
 
   async function save() {
+    if (!st) return;
     setMsg("");
     let ldapParsed: unknown;
     let oidcParsed: unknown;
@@ -58,6 +64,7 @@ export default function AdminSettingsPage() {
     const res = await apiFetch("/api/v1/admin/auth-settings", {
       method: "PATCH",
       body: JSON.stringify({
+        local_login_enabled: st.local_login_enabled !== false,
         ldap_enabled: st?.ldap_enabled,
         ldap_config: ldapParsed,
         oidc_enabled: st?.oidc_enabled,
@@ -79,6 +86,28 @@ export default function AdminSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <h1 className="text-2xl font-bold text-primary">认证配置</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>本地账号</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="lle"
+              checked={st.local_login_enabled}
+              onChange={(e) =>
+                setSt({ ...st, local_login_enabled: e.target.checked })
+              }
+            />
+            <Label htmlFor="lle">允许用户名密码登录</Label>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            关闭后，将无法使用本地用户名密码登录；仅可通过已启用的 LDAP /
+            OIDC 进入系统。请至少保留一种登录方式。
+          </p>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>LDAP</CardTitle>

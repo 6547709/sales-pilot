@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { fetchMe } from "@/lib/api";
 import { setToken } from "@/lib/auth";
 
 function CallbackInner() {
@@ -16,7 +17,9 @@ function CallbackInner() {
       return;
     }
     setToken(token);
-    router.replace("/products");
+    fetchMe().then((u) => {
+      router.replace(u?.role === "admin" ? "/admin" : "/");
+    });
   }, [sp, router]);
 
   return (

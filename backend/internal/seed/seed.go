@@ -47,7 +47,7 @@ func Run(db *gorm.DB) {
 		"redirect_url":  "http://localhost:8080/api/v1/auth/oidc/callback",
 	})
 	st := models.AuthSettings{
-		ID: 1, LdapEnabled: false, LdapConfig: datatypes.JSON(ldapEx),
+		ID: 1, LocalLoginEnabled: true, LdapEnabled: false, LdapConfig: datatypes.JSON(ldapEx),
 		OidcEnabled: false, OidcConfig: datatypes.JSON(oidcEx),
 	}
 	_ = db.Create(&st).Error
@@ -70,9 +70,26 @@ func Run(db *gorm.DB) {
 
 	competitor := "## 竞品对比（埋雷）\n\n| 维度 | 我们（OpenShift + KubeVirt） | 私有云大厂 A/B |\n|------|------------------------------|----------------|\n| 生态 | 开放 Kubernetes 生态，可移植 | 闭源栈深绑定，迁移成本高 |\n| 混合云 | 与主流公有云一致体验 | 难以在公有云复现同等架构 |\n| 风险 | 由于我们拥有 **开放标准与跨云一致性**，所以能避免客户遇到 **单一厂商锁定与合规不可控** 的风险；竞品往往无法同时解决「虚拟机遗留」与「云原生扩展」的 Y 类痛点。|\n"
 
+	var solCat models.SolutionCategory
+	var solPtr *uint
+	catLabel := "云原生 / 虚拟化迁移"
+	if err := db.Where("slug = ?", "cloud-k8s").First(&solCat).Error; err == nil {
+		solPtr = &solCat.ID
+		catLabel = solCat.Label
+	}
+
 	p := models.Product{
-		Name:        "VMware 迁移至 OpenShift 方案",
-		Category:    "云原生 / 虚拟化迁移",
+		Name:               "VMware 迁移至 OpenShift 方案",
+		Category:           catLabel,
+		SolutionCategoryID: solPtr,
+		VendorMarket:       "foreign",
+		ManufacturerName:   "红帽软件（示例）",
+		SalesContactName:   "张销售",
+		SalesContactPhone:  "13800000000",
+		SalesContactEmail:  "sales@example.com",
+		PresalesContactName:  "李售前",
+		PresalesContactPhone: "13900000000",
+		PresalesContactEmail: "presales@example.com",
 		Description: "面向 VMware 存量客户，提供可落地的 OpenShift 迁移与并行运行路径，强调合规、成本与统一管控。",
 		Highlights:         datatypes.JSON(highlights),
 		TargetPersonas:     datatypes.JSON(personas),

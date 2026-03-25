@@ -37,23 +37,49 @@ func (s *Server) RegisterRoutes(r *gin.Engine) {
 
 	api.GET("/auth/oidc/start", s.getOidcStart)
 	api.GET("/auth/oidc/callback", s.getOidcCallback)
+	api.GET("/auth/login-options", s.getLoginOptions)
 
-	authorized := api.Group("")
-	authorized.Use(middleware.JWTAuth(s.Cfg.JWTSecret))
+	// 登录后可读：JWT Bearer 或管理端 X-API-Key（与 AdminAuth 一致，普通用户仅 Bearer）
+	session := api.Group("")
+	session.Use(middleware.AdminAuth(s.Cfg.JWTSecret, s.DB))
 	{
-		authorized.GET("/me", s.getMe)
-		authorized.GET("/products", s.listProducts)
-		authorized.GET("/products/search", s.searchProducts)
-		authorized.GET("/products/:id", s.getProduct)
-		authorized.GET("/products/:id/scripts", s.listScripts)
-		authorized.GET("/products/:id/cases", s.listCases)
+		session.GET("/me", s.getMe)
+		session.GET("/topology", s.getTopology)
+		session.GET("/solution-categories", s.listSolutionCategories)
+		session.GET("/products", s.listProducts)
+		session.GET("/products/search", s.searchProducts)
+		session.GET("/products/:id", s.getProduct)
+		session.GET("/products/:id/scripts", s.listScripts)
+		session.GET("/products/:id/cases", s.listCases)
 	}
 
 	admin := api.Group("/admin")
-	admin.Use(middleware.JWTAuth(s.Cfg.JWTSecret), middleware.RequireAdmin())
+	admin.Use(middleware.AdminAuth(s.Cfg.JWTSecret, s.DB), middleware.RequireAdmin())
 	{
+		admin.GET("/api-keys", s.adminListAPIKeys)
+		admin.POST("/api-keys", s.adminCreateAPIKey)
+		admin.DELETE("/api-keys/:id", s.adminRevokeAPIKey)
+
 		admin.GET("/auth-settings", s.getAuthSettings)
 		admin.PATCH("/auth-settings", s.patchAuthSettings)
+
+		admin.GET("/users/local", s.adminListLocalUsers)
+		admin.POST("/users/local", s.adminCreateLocalUser)
+		admin.PUT("/users/local/:id", s.adminUpdateLocalUser)
+		admin.PUT("/users/local/:id/password", s.adminResetLocalUserPassword)
+		admin.DELETE("/users/local/:id", s.adminDeleteLocalUser)
+
+		admin.GET("/backup/export", s.adminExportBackup)
+		admin.POST("/backup/import", s.adminImportBackup)
+
+		// 供 AI / MCP 拉取产品维护字段与端点说明（机器可读）
+		admin.GET("/meta/product-maintain", s.adminProductMaintainMeta)
+
+		admin.GET("/products", s.adminListProducts)
+		admin.GET("/products/:id/cases", s.adminListCasesByProduct)
+		admin.GET("/products/:id/scripts", s.adminListScriptsByProduct)
+		admin.GET("/products/:id", s.adminGetProduct)
+		admin.PATCH("/products/:id/draft", s.adminPatchProductDraft)
 		admin.POST("/products", s.createProduct)
 		admin.PUT("/products/:id", s.updateProduct)
 		admin.DELETE("/products/:id", s.deleteProduct)
@@ -63,6 +89,35 @@ func (s *Server) RegisterRoutes(r *gin.Engine) {
 		admin.POST("/products/:id/cases", s.createCase)
 		admin.PUT("/cases/:id", s.updateCase)
 		admin.DELETE("/cases/:id", s.deleteCase)
+
+		admin.GET("/topology/layers", s.adminListLayers)
+		admin.POST("/topology/layers", s.adminCreateLayer)
+		admin.PUT("/topology/layers/:id", s.adminUpdateLayer)
+		admin.DELETE("/topology/layers/:id", s.adminDeleteLayer)
+		admin.POST("/topology/categories", s.adminCreateCategory)
+		admin.PUT("/topology/categories/:id", s.adminUpdateCategory)
+		admin.DELETE("/topology/categories/:id", s.adminDeleteCategory)
+		admin.POST("/topology/vendors", s.adminCreateVendor)
+		admin.PUT("/topology/vendors/:id", s.adminUpdateVendor)
+		admin.DELETE("/topology/vendors/:id", s.adminDeleteVendor)
+	}
+}
+
+// applyVendorMarketFilter 与首页「国内/国外」分区一致：仅当查询 domestic|foreign 时过滤；all 与空视为不区分
+func applyVendorMarketFilter(db *gorm.DB, raw string) *gorm.DB {
+	m := strings.TrimSpace(strings.ToLower(raw))
+	if m != "domestic" && m != "foreign" {
+		return db
+	}
+	return db.Where("LOWER(COALESCE(NULLIF(TRIM(vendor_market), ''), 'all')) IN ?", []string{"all", m})
+}
+
+func normalizeVendorMarket(v string) string {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case "domestic", "foreign":
+		return strings.ToLower(strings.TrimSpace(v))
+	default:
+		return "all"
 	}
 }
 
@@ -75,6 +130,11 @@ func (s *Server) postLocalLogin(c *gin.Context) {
 	var req loginReq
 	if err := c.ShouldBindJSON(&req); err != nil || req.Username == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	var stAuth models.AuthSettings
+	if err := s.DB.FirstOrCreate(&stAuth, models.AuthSettings{ID: 1}).Error; err == nil && !stAuth.LocalLoginEnabled {
+		c.JSON(http.StatusForbidden, gin.H{"error": "本地账号登录已关闭，请使用企业 SSO 或 LDAP"})
 		return
 	}
 	var u models.User
@@ -242,6 +302,24 @@ func (s *Server) getOidcCallback(c *gin.Context) {
 	c.Redirect(http.StatusFound, redir)
 }
 
+// getLoginOptions 公开：供登录页决定是否展示本地 / LDAP / SSO 入口
+func (s *Server) getLoginOptions(c *gin.Context) {
+	var st models.AuthSettings
+	if err := s.DB.FirstOrCreate(&st, models.AuthSettings{ID: 1}).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"local_enabled": true,
+			"ldap_enabled":  false,
+			"oidc_enabled":  false,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"local_enabled": st.LocalLoginEnabled,
+		"ldap_enabled":  st.LdapEnabled,
+		"oidc_enabled":  st.OidcEnabled,
+	})
+}
+
 func (s *Server) getMe(c *gin.Context) {
 	cl, ok := middleware.Claims(c)
 	if !ok {
@@ -267,10 +345,11 @@ func (s *Server) getAuthSettings(c *gin.Context) {
 
 func (s *Server) patchAuthSettings(c *gin.Context) {
 	var body struct {
-		LdapEnabled *bool            `json:"ldap_enabled"`
-		LdapConfig  *datatypes.JSON `json:"ldap_config"`
-		OidcEnabled *bool            `json:"oidc_enabled"`
-		OidcConfig  *datatypes.JSON `json:"oidc_config"`
+		LocalLoginEnabled *bool            `json:"local_login_enabled"`
+		LdapEnabled       *bool            `json:"ldap_enabled"`
+		LdapConfig        *datatypes.JSON `json:"ldap_config"`
+		OidcEnabled       *bool            `json:"oidc_enabled"`
+		OidcConfig        *datatypes.JSON `json:"oidc_config"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
@@ -280,6 +359,9 @@ func (s *Server) patchAuthSettings(c *gin.Context) {
 	if err := s.DB.FirstOrCreate(&st, models.AuthSettings{ID: 1}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	if body.LocalLoginEnabled != nil {
+		st.LocalLoginEnabled = *body.LocalLoginEnabled
 	}
 	if body.LdapEnabled != nil {
 		st.LdapEnabled = *body.LdapEnabled
@@ -301,8 +383,17 @@ func (s *Server) patchAuthSettings(c *gin.Context) {
 }
 
 func (s *Server) listProducts(c *gin.Context) {
+	qb := s.DB.Model(&models.Product{}).Where("is_draft = ?", false)
+	qb = applyVendorMarketFilter(qb, c.Query("vendor_market"))
+	if sid := strings.TrimSpace(c.Query("solution_category_id")); sid != "" {
+		qb = qb.Where("solution_category_id = ?", sid)
+	}
+	if mf := strings.TrimSpace(c.Query("manufacturer")); mf != "" {
+		qb = qb.Where("LOWER(TRIM(manufacturer_name)) = LOWER(?)", mf)
+	}
+	qb = qb.Order("updated_at desc")
 	var list []models.Product
-	if err := s.DB.Order("updated_at desc").Find(&list).Error; err != nil {
+	if err := qb.Find(&list).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -311,19 +402,32 @@ func (s *Server) listProducts(c *gin.Context) {
 
 func (s *Server) searchProducts(c *gin.Context) {
 	q := strings.TrimSpace(strings.ToLower(c.Query("q")))
-	if q == "" {
+	sid := strings.TrimSpace(c.Query("solution_category_id"))
+	if q == "" && sid == "" {
 		s.listProducts(c)
 		return
 	}
-	cacheKey := "search:" + q
+	vm := strings.TrimSpace(c.Query("vendor_market"))
+	mfg := strings.TrimSpace(c.Query("manufacturer"))
+	cacheKey := "search:" + q + ":sc:" + sid + ":vm:" + vm + ":mfg:" + mfg
 	if b, hit := s.SearchCache.Get(cacheKey); hit {
 		c.Data(http.StatusOK, "application/json; charset=utf-8", b)
 		return
 	}
+	db := s.DB.Model(&models.Product{}).Where("is_draft = ?", false)
+	db = applyVendorMarketFilter(db, vm)
+	if mfg != "" {
+		db = db.Where("LOWER(TRIM(manufacturer_name)) = LOWER(?)", mfg)
+	}
+	if q != "" {
+		pat := "%" + q + "%"
+		db = db.Where("LOWER(name) LIKE ? OR LOWER(category) LIKE ? OR LOWER(description) LIKE ?", pat, pat, pat)
+	}
+	if sid != "" {
+		db = db.Where("solution_category_id = ?", sid)
+	}
 	var list []models.Product
-	pat := "%" + q + "%"
-	if err := s.DB.Where("LOWER(name) LIKE ? OR LOWER(category) LIKE ? OR LOWER(description) LIKE ?", pat, pat, pat).
-		Order("updated_at desc").Find(&list).Error; err != nil {
+	if err := db.Order("updated_at desc").Find(&list).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -335,11 +439,86 @@ func (s *Server) searchProducts(c *gin.Context) {
 func (s *Server) getProduct(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	var p models.Product
-	if err := s.DB.First(&p, id).Error; err != nil {
+	if err := s.DB.Preload("SolutionCategory").First(&p, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
+	if p.IsDraft {
 		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
 		return
 	}
 	c.JSON(http.StatusOK, p)
+}
+
+func (s *Server) adminListProducts(c *gin.Context) {
+	var list []models.Product
+	if err := s.DB.Preload("SolutionCategory").Order("updated_at desc").Find(&list).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func (s *Server) adminGetProduct(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	var p models.Product
+	if err := s.DB.Preload("SolutionCategory").First(&p, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
+	c.JSON(http.StatusOK, p)
+}
+
+func (s *Server) adminListCasesByProduct(c *gin.Context) {
+	pid, _ := strconv.Atoi(c.Param("id"))
+	var list []models.Case
+	if err := s.DB.Where("product_id = ?", pid).Order("id asc").Find(&list).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func (s *Server) adminListScriptsByProduct(c *gin.Context) {
+	pid, _ := strconv.Atoi(c.Param("id"))
+	var list []models.SalesScript
+	if err := s.DB.Where("product_id = ?", pid).Order("id asc").Find(&list).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func (s *Server) adminPatchProductDraft(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	var body struct {
+		IsDraft *bool `json:"is_draft"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.IsDraft == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "请提供 is_draft 布尔字段"})
+		return
+	}
+	var p models.Product
+	if err := s.DB.First(&p, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
+	if err := s.DB.Model(&models.Product{}).Where("id = ?", id).Update("is_draft", *body.IsDraft).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	_ = s.DB.Preload("SolutionCategory").First(&p, id).Error
+	c.JSON(http.StatusOK, p)
+}
+
+func (s *Server) syncProductCategoryFromSolution(p *models.Product) {
+	if p.SolutionCategoryID == nil || *p.SolutionCategoryID == 0 {
+		return
+	}
+	var cat models.SolutionCategory
+	if err := s.DB.First(&cat, *p.SolutionCategoryID).Error; err == nil {
+		p.Category = cat.Label
+	}
 }
 
 func (s *Server) createProduct(c *gin.Context) {
@@ -348,10 +527,13 @@ func (s *Server) createProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	p.VendorMarket = normalizeVendorMarket(p.VendorMarket)
+	s.syncProductCategoryFromSolution(&p)
 	if err := s.DB.Create(&p).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	_ = s.DB.Preload("SolutionCategory").First(&p, p.ID).Error
 	c.JSON(http.StatusCreated, p)
 }
 
@@ -367,15 +549,34 @@ func (s *Server) updateProduct(c *gin.Context) {
 		return
 	}
 	p.ID = uint(id)
-	if err := s.DB.Model(&models.Product{}).Where("id = ?", id).Updates(map[string]any{
-		"name": p.Name, "category": p.Category, "description": p.Description,
-		"highlights": p.Highlights, "target_personas": p.TargetPersonas, "trigger_events": p.TriggerEvents,
-		"discovery_questions": p.DiscoveryQuestions, "competitor_analysis": p.CompetitorAnalysis, "roi_metrics": p.ROIMetrics,
-	}).Error; err != nil {
+	p.VendorMarket = normalizeVendorMarket(p.VendorMarket)
+	s.syncProductCategoryFromSolution(&p)
+	up := map[string]any{
+		"name":                    p.Name,
+		"category":                p.Category,
+		"solution_category_id":      p.SolutionCategoryID,
+		"vendor_market":             p.VendorMarket,
+		"manufacturer_name":         p.ManufacturerName,
+		"sales_contact_name":        p.SalesContactName,
+		"sales_contact_phone":       p.SalesContactPhone,
+		"sales_contact_email":       p.SalesContactEmail,
+		"presales_contact_name":     p.PresalesContactName,
+		"presales_contact_phone":    p.PresalesContactPhone,
+		"presales_contact_email":    p.PresalesContactEmail,
+		"description":               p.Description,
+		"highlights":                p.Highlights,
+		"target_personas":           p.TargetPersonas,
+		"trigger_events":            p.TriggerEvents,
+		"discovery_questions":       p.DiscoveryQuestions,
+		"competitor_analysis":       p.CompetitorAnalysis,
+		"roi_metrics":               p.ROIMetrics,
+		"is_draft":                  p.IsDraft,
+	}
+	if err := s.DB.Model(&models.Product{}).Where("id = ?", id).Updates(up).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	_ = s.DB.First(&p, id).Error
+	_ = s.DB.Preload("SolutionCategory").First(&p, id).Error
 	c.JSON(http.StatusOK, p)
 }
 
@@ -392,6 +593,15 @@ func (s *Server) deleteProduct(c *gin.Context) {
 
 func (s *Server) listScripts(c *gin.Context) {
 	pid, _ := strconv.Atoi(c.Param("id"))
+	var prod models.Product
+	if err := s.DB.Select("id", "is_draft").First(&prod, pid).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
+	if prod.IsDraft {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
 	var list []models.SalesScript
 	if err := s.DB.Where("product_id = ?", pid).Find(&list).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -443,6 +653,15 @@ func (s *Server) deleteScript(c *gin.Context) {
 
 func (s *Server) listCases(c *gin.Context) {
 	pid, _ := strconv.Atoi(c.Param("id"))
+	var prod models.Product
+	if err := s.DB.Select("id", "is_draft").First(&prod, pid).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
+	if prod.IsDraft {
+		c.JSON(http.StatusNotFound, gin.H{"error": "未找到"})
+		return
+	}
 	var list []models.Case
 	if err := s.DB.Where("product_id = ?", pid).Find(&list).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

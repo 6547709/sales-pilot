@@ -42,3 +42,10 @@ func (c *SearchCache) Set(key string, body []byte) {
 	c.items[key] = entry{body: append([]byte(nil), body...), expiresAt: time.Now().Add(c.ttl)}
 	c.mu.Unlock()
 }
+
+// Clear 清空（备份恢复后避免脏缓存）
+func (c *SearchCache) Clear() {
+	c.mu.Lock()
+	c.items = make(map[string]entry)
+	c.mu.Unlock()
+}

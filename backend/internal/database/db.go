@@ -17,6 +17,10 @@ func Connect(dsn string) (*gorm.DB, error) {
 	}
 	if err := db.AutoMigrate(
 		&models.User{},
+		&models.AdminAPIKey{},
+		&models.TopologyLayer{},
+		&models.SolutionCategory{},
+		&models.SolutionVendor{},
 		&models.Product{},
 		&models.SalesScript{},
 		&models.Case{},
