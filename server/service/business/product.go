@@ -18,6 +18,18 @@ func (s *ProductService) GetProduct(id uint) (product *business.Product, err err
 	return
 }
 
+// GetScriptsByProductID 获取产品的销售话术
+func (s *ProductService) GetScriptsByProductID(productID uint) (scripts []business.SalesScript, err error) {
+	err = global.GVA_DB.Where("product_id = ?", productID).Find(&scripts).Error
+	return
+}
+
+// GetCasesByProductID 获取产品的客户案例
+func (s *ProductService) GetCasesByProductID(productID uint) (cases []business.Case, err error) {
+	err = global.GVA_DB.Where("product_id = ?", productID).Find(&cases).Error
+	return
+}
+
 func (s *ProductService) GetProductList(info *request.PageInfo) (list []business.Product, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

@@ -61,7 +61,14 @@ func (b *ProductApi) GetProduct(c *gin.Context) {
 		response.FailWithMessage("获取失败: "+err.Error(), c)
 		return
 	}
-	response.OkWithDetailed(product, "获取成功", c)
+	// 获取关联的销售话术和客户案例
+	scripts, _ := ProductServiceApp.GetScriptsByProductID(parseUint(id))
+	cases, _ := ProductServiceApp.GetCasesByProductID(parseUint(id))
+	response.OkWithDetailed(gin.H{
+		"product": product,
+		"scripts": scripts,
+		"cases":  cases,
+	}, "获取成功", c)
 }
 
 func (b *ProductApi) GetProductList(c *gin.Context) {
