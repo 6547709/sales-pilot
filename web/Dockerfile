@@ -13,7 +13,8 @@ FROM base AS build
 COPY --from=prod-deps /app/node_modules /app/node_modules
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm run build
 
-FROM nginx:alpine
+FROM nginx:stable-trixie
 LABEL MAINTAINER="sales-pilot"
+RUN rm -f /etc/nginx/conf.d/default.conf
 COPY --from=base  /app/.docker-compose/nginx/conf.d/my.conf /etc/nginx/conf.d/my.conf
 COPY --from=build  /app/dist /usr/share/nginx/html

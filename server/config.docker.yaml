@@ -49,7 +49,7 @@ captcha:
     key-long: 6
     img-width: 240
     img-height: 80
-    open-captcha: 0
+    open-captcha: 999999
     open-captcha-timeout: 3600
 
 pgsql:

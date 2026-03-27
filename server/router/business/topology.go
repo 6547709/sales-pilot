@@ -6,13 +6,15 @@ import (
 
 type TopologyRouter struct{}
 
-func (s *TopologyRouter) InitTopologyRouter(Router *gin.RouterGroup) {
-	topologyRouter := Router.Group("topology")
+func (s *TopologyRouter) InitTopologyRouter(privateRouter, publicRouter *gin.RouterGroup) {
+	// 公开接口 - 首页全景图
+	topologyPublicRouter := publicRouter.Group("topology")
 	{
-		topologyRouter.GET("/full", topologyApi.GetFullTopology) // 供首页全景图使用
+		topologyPublicRouter.GET("/full", topologyApi.GetFullTopology) // 供首页全景图使用
 	}
 
-	layerRouter := Router.Group("topology/layer")
+	// 私有接口 - 拓扑管理（需要鉴权）
+	layerRouter := privateRouter.Group("topology/layer")
 	{
 		layerRouter.POST("", topologyApi.CreateLayer)
 		layerRouter.PUT("", topologyApi.UpdateLayer)
@@ -20,7 +22,7 @@ func (s *TopologyRouter) InitTopologyRouter(Router *gin.RouterGroup) {
 		layerRouter.GET("/all", topologyApi.GetLayers)
 	}
 
-	categoryRouter := Router.Group("topology/category")
+	categoryRouter := privateRouter.Group("topology/category")
 	{
 		categoryRouter.POST("", topologyApi.CreateCategory)
 		categoryRouter.PUT("", topologyApi.UpdateCategory)
@@ -28,7 +30,7 @@ func (s *TopologyRouter) InitTopologyRouter(Router *gin.RouterGroup) {
 		categoryRouter.GET("/by-layer", topologyApi.GetCategoriesByLayer)
 	}
 
-	vendorRouter := Router.Group("topology/vendor")
+	vendorRouter := privateRouter.Group("topology/vendor")
 	{
 		vendorRouter.POST("", topologyApi.CreateVendor)
 		vendorRouter.PUT("", topologyApi.UpdateVendor)
