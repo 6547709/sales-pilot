@@ -4,82 +4,93 @@
       <section
         class="relative overflow-hidden rounded-xl border border-slate-200/80 bg-white px-5 py-6 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
       >
-        
         <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p class="text-xs tracking-[0.2em] text-slate-500 dark:text-slate-400">DASHBOARD</p>
             <h1 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100 lg:text-2xl">
-              欢迎回来，开始今天的Coding节奏
+              销售赋能平台
             </h1>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
-              {{ today }} · 已为你聚合核心业务数据、插件动态和系统公告
+              {{ today }} · 业务数据总览
             </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <el-button type="primary" @click="goLicense">购买商业授权</el-button>
-            <el-button @click="goPluginMarket">插件市场</el-button>
           </div>
         </div>
       </section>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <gva-card>
-          <gva-chart :type="1" title="访问人数" />
-        </gva-card>
-        <gva-card>
-          <gva-chart :type="2" title="新增客户" />
-        </gva-card>
-        <gva-card>
-          <gva-chart :type="3" title="解决数量" />
-        </gva-card>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon" style="background: #409eff20; color: #409eff;">
+              <el-icon><Goods /></el-icon>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ stats.product_count || 0 }}</span>
+              <span class="stat-label">产品数量</span>
+            </div>
+          </div>
+        </el-card>
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon" style="background: #67c23a20; color: #67c23a;">
+              <el-icon><ChatDotRound /></el-icon>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ stats.script_count || 0 }}</span>
+              <span class="stat-label">销售话术</span>
+            </div>
+          </div>
+        </el-card>
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon" style="background: #e6a23c20; color: #e6a23c;">
+              <el-icon><Briefcase /></el-icon>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ stats.case_count || 0 }}</span>
+              <span class="stat-label">客户案例</span>
+            </div>
+          </div>
+        </el-card>
+        <el-card shadow="hover" class="stat-card">
+          <div class="stat-content">
+            <div class="stat-icon" style="background: #f56c6c20; color: #f56c6c;">
+              <el-icon><Folder /></el-icon>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">{{ stats.category_count || 0 }}</span>
+              <span class="stat-label">解决方案分类</span>
+            </div>
+          </div>
+        </el-card>
       </div>
 
       <div class="grid grid-cols-1 items-stretch gap-4 xl:grid-cols-12">
         <div class="grid grid-cols-1 gap-4 content-start xl:col-span-8 xl:h-full">
-          <gva-card title="内容数据">
-            <gva-chart :type="4" />
-          </gva-card>
+          <el-card header="快捷入口">
+            <div class="quick-links">
+              <el-button type="primary" @click="goPage('/admin/product')">产品管理</el-button>
+              <el-button type="success" @click="goPage('/admin/script')">销售话术</el-button>
+              <el-button type="warning" @click="goPage('/admin/case')">客户案例</el-button>
+              <el-button type="danger" @click="goPage('/admin/topology')">拓扑管理</el-button>
+              <el-button @click="goPage('/admin/solutionCategory')">解决方案分类</el-button>
+              <el-button @click="goPage('/admin/apiKey')">API密钥</el-button>
+            </div>
+          </el-card>
 
-          <gva-card title="最新插件">
-            <gva-plugin-table />
-          </gva-card>
-
-          <gva-card title="最新更新">
-            <gva-table />
-          </gva-card>
+          <el-card header="访问首页">
+            <div class="home-link-section">
+              <p class="text-sm text-gray-600 mb-3">查看公开首页（全景图 - 产品赋能）</p>
+              <el-button type="primary" plain @click="goHome">打开首页</el-button>
+            </div>
+          </el-card>
         </div>
 
         <div class="flex flex-col gap-4 xl:col-span-4 xl:h-full">
-          <gva-card title="快捷功能" show-action custom-class="min-h-[300px]">
-            <gva-quick-link />
-          </gva-card>
-          <gva-card title="公告" show-action custom-class="min-h-[300px]">
-            <gva-notice />
-          </gva-card>
-          <gva-card title="文档" show-action custom-class="min-h-[120px]">
-            <gva-wiki />
-          </gva-card>
-          <div
-            class="relative min-h-[200px] flex-1 overflow-hidden rounded-lg border border-slate-200 bg-slate-900 p-5 text-white shadow-sm dark:border-slate-700"
-          >
-            
-            <div class="relative">
-              <div class="inline-flex rounded-full bg-white/10 px-3 py-1 text-xs">商业授权</div>
-              <h3 class="mt-3 text-lg font-semibold">解锁完整商用支持与专属服务</h3>
-              <p class="mt-2 text-sm text-slate-200/90">
-                购买授权后可获得专属支持通道、插件优惠与商用合规保障，帮助团队更稳定地推进项目交付。
-              </p>
-              <div class="mt-4 flex flex-wrap gap-2 text-xs">
-                <span class="rounded-full bg-white/10 px-2.5 py-1">专属技术支持</span>
-                <span class="rounded-full bg-white/10 px-2.5 py-1">插件优惠权益</span>
-                <span class="rounded-full bg-white/10 px-2.5 py-1">商用授权凭证</span>
-              </div>
-              <div class="mt-5 flex items-center gap-3">
-                <el-button type="primary" @click="goLicense">立即购买</el-button>
-                <el-button link class="!text-cyan-300" @click="goPluginMarket">查看插件市场</el-button>
-              </div>
+          <el-card header="拓扑层级">
+            <div class="layer-info">
+              <p>当前系统共有 <strong>{{ stats.layer_count || 0 }}</strong> 个拓扑层级</p>
             </div>
-          </div>
+          </el-card>
         </div>
       </div>
     </div>
@@ -87,42 +98,103 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import {
-    GvaPluginTable,
-    GvaTable,
-    GvaChart,
-    GvaWiki,
-    GvaNotice,
-    GvaQuickLink,
-    GvaCard
-  } from './components'
+  import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { Goods, ChatDotRound, Briefcase, Folder } from '@element-plus/icons-vue'
+  import { getStatisticsOverview } from '@/api/business/statistics'
+  import { ElMessage } from 'element-plus'
 
-  const today = computed(() => {
-    try {
-      const d = new Date()
-      return d.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      })
-    } catch (e) {
-      return new Date().toISOString().slice(0, 10)
-    }
+  const router = useRouter()
+  const stats = ref({})
+
+  const today = new Date().toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   })
 
-  const goLicense = () => {
-    window.open('https://plugin.gin-vue-admin.com/license', '_blank', 'noopener,noreferrer')
+  const loadStats = async () => {
+    try {
+      const res = await getStatisticsOverview()
+      if (res.code === 0) {
+        stats.value = res.data
+      } else {
+        ElMessage.error('加载统计数据失败')
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
-  const goPluginMarket = () => {
-    window.open('https://plugin.gin-vue-admin.com', '_blank', 'noopener,noreferrer')
+  const goPage = (path) => {
+    router.push(path)
   }
+
+  const goHome = () => {
+    router.push('/home')
+  }
+
+  onMounted(() => {
+    loadStats()
+  })
 
   defineOptions({
     name: 'Dashboard'
   })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.stat-card {
+  :deep(.el-card__body) {
+    padding: 16px;
+  }
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.home-link-section {
+  text-align: left;
+}
+
+.layer-info {
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+}
+</style>
 

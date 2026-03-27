@@ -9,6 +9,8 @@ type ApiGroup struct {
 	TopologyApi
 	SolutionCategoryApi
 	APIKeyApi
+	StatisticsApi
+	BackupApi
 }
 
 var (
@@ -18,6 +20,8 @@ var (
 	TopologyApiApp            = new(TopologyApi)
 	SolutionCategoryApiApp    = new(SolutionCategoryApi)
 	APIKeyApiApp              = new(APIKeyApi)
+	StatisticsApiApp          = new(StatisticsApi)
+	BackupApiApp              = new(BackupApi)
 )
 
 var (

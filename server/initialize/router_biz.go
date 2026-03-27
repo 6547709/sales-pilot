@@ -25,4 +25,6 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 	businessRouter.InitTopologyRouter(privateGroup) // 拓扑管理（需要鉴权）
 	businessRouter.InitSolutionCategoryRouter(privateGroup) // 解决方案分类（需要鉴权）
 	businessRouter.InitAPIKeyRouter(privateGroup) // API密钥（需要鉴权）
+	businessRouter.InitStatisticsRouter(privateGroup) // 统计（需要鉴权）
+	businessRouter.InitBackupRouter(privateGroup) // 备份（需要鉴权）
 }

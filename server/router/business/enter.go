@@ -11,6 +11,8 @@ type RouterGroup struct {
 	TopologyRouter
 	SolutionCategoryRouter
 	APIKeyRouter
+	StatisticsRouter
+	BackupRouter
 }
 
 var (
@@ -20,6 +22,8 @@ var (
 	topologyApi             = businessApi.TopologyApiApp
 	solutionCategoryApi     = businessApi.SolutionCategoryApiApp
 	apiKeyApi               = businessApi.APIKeyApiApp
+	statisticsApi           = businessApi.StatisticsApiApp
+	backupApi               = businessApi.BackupApiApp
 )
 
 var (
@@ -29,4 +33,6 @@ var (
 	TopologyRouterApp           = new(TopologyRouter)
 	SolutionCategoryRouterApp   = new(SolutionCategoryRouter)
 	APIKeyRouterApp            = new(APIKeyRouter)
+	StatisticsRouterApp        = new(StatisticsRouter)
+	BackupRouterApp            = new(BackupRouter)
 )

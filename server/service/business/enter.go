@@ -7,6 +7,7 @@ type ServiceGroup struct {
 	TopologyService
 	SolutionCategoryService
 	APIKeyService
+	BackupService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -18,4 +19,5 @@ var (
 	TopologyServiceApp           = new(TopologyService)
 	SolutionCategoryServiceApp   = new(SolutionCategoryService)
 	APIKeyServiceApp            = new(APIKeyService)
+	BackupServiceApp            = new(BackupService)
 )
