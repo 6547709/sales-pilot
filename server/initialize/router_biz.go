@@ -16,4 +16,13 @@ func initBizRouter(routers ...*gin.RouterGroup) {
 	publicGroup := routers[1]
 
 	holder(publicGroup, privateGroup)
+
+	// 注册业务路由
+	businessRouter := router.RouterGroupApp.Business
+	businessRouter.InitProductRouter(privateGroup) // 产品管理（需要鉴权）
+	businessRouter.InitSalesScriptRouter(privateGroup) // 销售话术（需要鉴权）
+	businessRouter.InitCaseRouter(privateGroup) // 客户案例（需要鉴权）
+	businessRouter.InitTopologyRouter(privateGroup) // 拓扑管理（需要鉴权）
+	businessRouter.InitSolutionCategoryRouter(privateGroup) // 解决方案分类（需要鉴权）
+	businessRouter.InitAPIKeyRouter(privateGroup) // API密钥（需要鉴权）
 }
