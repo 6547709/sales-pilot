@@ -16,7 +16,7 @@
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:18-bookworm
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -30,7 +30,7 @@ services:
       retries: 10
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     volumes:
       - redis_data:/data
     healthcheck:
