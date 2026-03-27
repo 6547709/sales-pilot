@@ -52,13 +52,13 @@ jobs:
       - name: 构建并推送 backend
         uses: docker/build-push-action@v6
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: ./server
+          file: ./server/Dockerfile
           platforms: ${{ env.DOCKER_PLATFORM }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # mode=min：仅导出最终镜像相关层，避免 mode=max 把 node_modules/.next 等巨量中间层写入 GHA 缓存（上传常占 4～8 分钟）
+          # mode=min：仅导出最终镜像相关层，避免 mode=max 把 node_modules 等巨量中间层写入 GHA 缓存（上传常占 4～8 分钟）
           cache-from: type=gha
           cache-to: type=gha,mode=min
 
@@ -102,12 +102,10 @@ jobs:
       - name: 构建并推送 frontend
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: ./web
+          file: ./web/Dockerfile
           platforms: ${{ env.DOCKER_PLATFORM }}
           push: true
-          build-args: |
-            NEXT_PUBLIC_API_URL=
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
