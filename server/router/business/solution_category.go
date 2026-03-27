@@ -9,10 +9,10 @@ type SolutionCategoryRouter struct{}
 func (s *SolutionCategoryRouter) InitSolutionCategoryRouter(Router *gin.RouterGroup) {
 	catRouter := Router.Group("solution-category")
 	{
-		catRouter.POST("", SolutionCategoryApiApp.Create)
-		catRouter.PUT("", SolutionCategoryApiApp.Update)
-		catRouter.DELETE("", SolutionCategoryApiApp.Delete)
-		catRouter.GET("/:id", SolutionCategoryApiApp.Get)
-		catRouter.GET("/all", SolutionCategoryApiApp.GetAll)
+		catRouter.POST("", solutionCategoryApi.Create)
+		catRouter.PUT("", solutionCategoryApi.Update)
+		catRouter.DELETE("", solutionCategoryApi.Delete)
+		catRouter.GET("/:id", solutionCategoryApi.Get)
+		catRouter.GET("/all", solutionCategoryApi.GetAll)
 	}
 }

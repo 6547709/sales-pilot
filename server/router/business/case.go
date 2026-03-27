@@ -9,10 +9,10 @@ type CaseRouter struct{}
 func (s *CaseRouter) InitCaseRouter(Router *gin.RouterGroup) {
 	caseRouter := Router.Group("case")
 	{
-		caseRouter.POST("", CaseApiApp.CreateCase)
-		caseRouter.PUT("", CaseApiApp.UpdateCase)
-		caseRouter.DELETE("", CaseApiApp.DeleteCase)
-		caseRouter.GET("/:id", CaseApiApp.GetCase)
-		caseRouter.GET("/product", CaseApiApp.GetCasesByProductID)
+		caseRouter.POST("", caseApi.CreateCase)
+		caseRouter.PUT("", caseApi.UpdateCase)
+		caseRouter.DELETE("", caseApi.DeleteCase)
+		caseRouter.GET("/:id", caseApi.GetCase)
+		caseRouter.GET("/product", caseApi.GetCasesByProductID)
 	}
 }

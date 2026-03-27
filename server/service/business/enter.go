@@ -1,5 +1,16 @@
 package business
 
+type ServiceGroup struct {
+	ProductService
+	SalesScriptService
+	CaseService
+	TopologyService
+	SolutionCategoryService
+	APIKeyService
+}
+
+var ServiceGroupApp = new(ServiceGroup)
+
 var (
 	ProductServiceApp           = new(ProductService)
 	SalesScriptServiceApp       = new(SalesScriptService)

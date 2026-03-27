@@ -9,25 +9,25 @@ type TopologyRouter struct{}
 func (s *TopologyRouter) InitTopologyRouter(Router *gin.RouterGroup) {
 	layerRouter := Router.Group("topology/layer")
 	{
-		layerRouter.POST("", TopologyApiApp.CreateLayer)
-		layerRouter.PUT("", TopologyApiApp.UpdateLayer)
-		layerRouter.DELETE("", TopologyApiApp.DeleteLayer)
-		layerRouter.GET("/all", TopologyApiApp.GetLayers)
+		layerRouter.POST("", topologyApi.CreateLayer)
+		layerRouter.PUT("", topologyApi.UpdateLayer)
+		layerRouter.DELETE("", topologyApi.DeleteLayer)
+		layerRouter.GET("/all", topologyApi.GetLayers)
 	}
 
 	categoryRouter := Router.Group("topology/category")
 	{
-		categoryRouter.POST("", TopologyApiApp.CreateCategory)
-		categoryRouter.PUT("", TopologyApiApp.UpdateCategory)
-		categoryRouter.DELETE("", TopologyApiApp.DeleteCategory)
-		categoryRouter.GET("/by-layer", TopologyApiApp.GetCategoriesByLayer)
+		categoryRouter.POST("", topologyApi.CreateCategory)
+		categoryRouter.PUT("", topologyApi.UpdateCategory)
+		categoryRouter.DELETE("", topologyApi.DeleteCategory)
+		categoryRouter.GET("/by-layer", topologyApi.GetCategoriesByLayer)
 	}
 
 	vendorRouter := Router.Group("topology/vendor")
 	{
-		vendorRouter.POST("", TopologyApiApp.CreateVendor)
-		vendorRouter.PUT("", TopologyApiApp.UpdateVendor)
-		vendorRouter.DELETE("", TopologyApiApp.DeleteVendor)
-		vendorRouter.GET("/by-category", TopologyApiApp.GetVendorsByCategory)
+		vendorRouter.POST("", topologyApi.CreateVendor)
+		vendorRouter.PUT("", topologyApi.UpdateVendor)
+		vendorRouter.DELETE("", topologyApi.DeleteVendor)
+		vendorRouter.GET("/by-category", topologyApi.GetVendorsByCategory)
 	}
 }

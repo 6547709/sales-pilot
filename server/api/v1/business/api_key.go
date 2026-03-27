@@ -3,7 +3,6 @@ package business
 import (
 	"time"
 
-	"github.com/flipped-aurora/gin-vue-admin/server/model/business"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"

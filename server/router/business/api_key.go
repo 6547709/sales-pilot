@@ -9,10 +9,10 @@ type APIKeyRouter struct{}
 func (s *APIKeyRouter) InitAPIKeyRouter(Router *gin.RouterGroup) {
 	apiKeyRouter := Router.Group("api-key")
 	{
-		apiKeyRouter.POST("", APIKeyApiApp.Create)
-		apiKeyRouter.GET("/list", APIKeyApiApp.GetAPIKeys)
-		apiKeyRouter.POST("/revoke", APIKeyApiApp.Revoke)
-		apiKeyRouter.DELETE("", APIKeyApiApp.Delete)
-		apiKeyRouter.POST("/validate", APIKeyApiApp.Validate)
+		apiKeyRouter.POST("", apiKeyApi.Create)
+		apiKeyRouter.GET("/list", apiKeyApi.GetAPIKeys)
+		apiKeyRouter.POST("/revoke", apiKeyApi.Revoke)
+		apiKeyRouter.DELETE("", apiKeyApi.Delete)
+		apiKeyRouter.POST("/validate", apiKeyApi.Validate)
 	}
 }
