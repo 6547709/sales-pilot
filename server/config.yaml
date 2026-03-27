@@ -2,7 +2,7 @@
 
 # jwt configuration
 jwt:
-    signing-key: qmPlus
+    signing-key: "please-change-me-to-a-random-string-in-production"
     expires-time: 7d
     buffer-time: 1d
     issuer: qmPlus
