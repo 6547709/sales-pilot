@@ -14,6 +14,8 @@ function isPublicMarketingPath(pathname: string) {
 
 /**
  * 企业内部：除登录与 SSO 回调外，首页与方案库等均需已登录。
+ *
+ * 优化：token 存在时先显示内容，后台异步验证；token 不存在时才跳转登录页。
  */
 export function MarketingAuthLayout({
   children,
@@ -23,25 +25,40 @@ export function MarketingAuthLayout({
   const pathname = usePathname();
   const router = useRouter();
   const isPublic = isPublicMarketingPath(pathname);
-  const [ready, setReady] = useState(isPublic);
+
+  // ready 状态：null=待验证, false=验证中/无token, true=已验证
+  const [ready, setReady] = useState<boolean | null>(isPublic ? true : null);
 
   useEffect(() => {
     if (isPublic) {
       setReady(true);
       return;
     }
-    setReady(false);
-    if (!getToken()) {
+
+    const token = getToken();
+    if (!token) {
+      // 无 token，立即跳转登录页
+      setReady(false);
       router.replace("/login");
       return;
     }
-    fetchMe().then((u) => {
-      if (!u) router.replace("/login");
-      else setReady(true);
-    });
+
+    // token 存在，先标记为就绪显示内容，后台异步验证
+    setReady(true);
+
+    // 后台验证 token 有效性，如果失效则跳转登录页
+    fetchMe()
+      .then((u) => {
+        if (!u) {
+          router.replace("/login");
+        }
+      })
+      .catch(() => {
+        router.replace("/login");
+      });
   }, [pathname, isPublic, router]);
 
-  if (!ready) {
+  if (ready !== true) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         校验登录…
