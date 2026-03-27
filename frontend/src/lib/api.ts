@@ -112,7 +112,6 @@ export async function fetchProducts(): Promise<Product[]> {
 export function clearProductsCache() {
   productsCache = null;
 }
-}
 
 export async function fetchSolutionCategories(
   activeOnly?: boolean,
