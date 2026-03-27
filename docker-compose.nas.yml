@@ -1,56 +1,70 @@
-# NAS / 生产：全部使用公网镜像（GHCR 应用镜像 + Docker Hub 官方 PostgreSQL）
+# NAS / 生产部署：全部使用公网镜像（GHCR 应用镜像 + Docker Hub 官方 PostgreSQL）
 # 应用镜像为 linux/amd64，请在 x86_64/amd64 主机或对应模拟环境下运行。
-# 使用前在同级目录创建 .env（或导出环境变量），至少设置 JWT_SECRET。
 #
-# 必填/常用变量：
-#   GHCR_OWNER     GitHub 用户名（小写），与 ghcr.io/<owner>/... 一致，默认 6547709
-#   IMAGE_TAG      镜像标签，与 CI 推送一致，如 0.1.42、latest、sha-xxx
+# 使用方法：
+# 1. 复制 .env.example 为 .env，填入 JWT_SECRET 等配置
+# 2. 在 server/ 目录放入 config.docker.yaml（挂载到容器 /app/config.yaml）
+# 3. docker compose -f docker-compose.nas.yml up -d
+#
+# 必填/常用变量（见 .env）：
 #   JWT_SECRET     务必改为强随机串
-#   APP_BASE_URL   浏览器访问根地址，如 http://192.168.1.10 或 https://app.example.com
+#   APP_BASE_URL   浏览器访问根地址
 #   FRONTEND_ORIGIN 与 APP_BASE_URL 通常相同（CORS）
 #   HTTP_PORT      宿主机 HTTP 端口，默认 80
+#   GHCR_OWNER     GitHub 用户名，默认 6547709
+#   IMAGE_TAG      镜像标签，默认 latest
 
 services:
-  db:
-    image: postgres:17-bookworm
+  postgres:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: sales
-      POSTGRES_PASSWORD: sales
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sales_pilot
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sales -d sales_pilot"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  backend:
-    image: ghcr.io/${GHCR_OWNER:-6547709}/sales-pilot-backend:${IMAGE_TAG:-latest}
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: ghcr.io/${GHCR_OWNER:-6547709}/sales-pilot-server:${IMAGE_TAG:-latest}
+    volumes:
+      # 重要：需要提供 config.docker.yaml 或挂载包含正确数据库配置的 config.yaml
+      - ./server/config.docker.yaml:/app/config.yaml:ro
     environment:
-      DATABASE_URL: postgres://sales:sales@db:5432/sales_pilot?sslmode=disable
-      JWT_SECRET: ${JWT_SECRET:-please-change-me}
-      APP_BASE_URL: ${APP_BASE_URL:-http://localhost}
-      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
-      GIN_MODE: release
+      GVA_CONFIG: /app/config.yaml
     depends_on:
-      db:
+      postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
-  frontend:
-    image: ghcr.io/${GHCR_OWNER:-6547709}/sales-pilot-frontend:${IMAGE_TAG:-latest}
-    environment:
-      NODE_ENV: production
+  web:
+    image: ghcr.io/${GHCR_OWNER:-6547709}/sales-pilot-web:${IMAGE_TAG:-latest}
     depends_on:
-      - backend
+      - server
 
   nginx:
     image: ghcr.io/${GHCR_OWNER:-6547709}/sales-pilot-nginx:${IMAGE_TAG:-latest}
     ports:
       - "${HTTP_PORT:-80}:80"
     depends_on:
-      - frontend
-      - backend
+      - web
+      - server
 
 volumes:
   pgdata:
+  redis_data:

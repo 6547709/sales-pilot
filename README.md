@@ -1,153 +1,149 @@
 # Sales Pilot
 
-面向销售与方案场景的 Web 应用：公开站点（方案/产品展示、登录）与管理后台（产品、用户、拓扑、备份、API 密钥等），后端为 Go + PostgreSQL，前端为 Next.js。
+面向销售与方案团队的 Web 应用：公开站点（全景图→解决方案→产品）与管理后台（产品、销售话术、客户案例、拓扑、备份等）。
 
 ## 技术栈
 
 | 层级 | 技术 |
 |------|------|
-| 前端 | Next.js 16、React 19、Tailwind CSS |
-| 后端 | Go 1.23、Gin、GORM、PostgreSQL |
-| 编排 | Docker Compose（PostgreSQL + API + Next + Nginx 同域反代） |
+| 前端 | Vue 3 + Element Plus + Vite（基于 gin-vue-admin） |
+| 后端 | Go + Gin + GORM（基于 gin-vue-admin） |
+| 数据库 | PostgreSQL 15 |
+| 缓存 | Redis 7 |
+| 编排 | Docker Compose |
 
 ## 仓库结构
 
 ```
 sales-pilot/
-├── .github/workflows/ # CI：推镜像到 GHCR（推荐，无需本地构建）
-├── backend/           # Go API（cmd/server）
-├── frontend/          # Next.js 应用
-├── nginx/             # 同域反代配置 + Dockerfile（CI 构建 sales-pilot-nginx）
-├── docs/              # 补充文档
-├── build-and-push.sh  # 可选：本地推 Docker Hub（默认 linux/amd64）
-├── docker-compose.yml     # 本地开发：含 build
-├── docker-compose.nas.yml # NAS/生产：仅拉取 GHCR 公网镜像
-└── .env.example           # 环境变量模板（复制为 .env）
+├── .github/workflows/      # CI：推镜像到 GHCR
+├── server/                # Go 后端（API、Service、Model、Router）
+│   ├── api/               # API 路由处理层
+│   ├── service/           # 业务逻辑层
+│   ├── model/             # 数据模型
+│   ├── router/            # 路由注册
+│   ├── source/            # 数据库初始化数据
+│   └── config.yaml        # 后端配置
+├── web/                   # Vue 前端
+│   ├── src/view/          # 页面组件
+│   ├── src/api/           # API 调用
+│   └── Dockerfile         # 前端镜像构建
+├── nginx/                 # 生产 Nginx 反向代理配置
+├── docker-compose.yml     # 本地开发（含 build）
+├── docker-compose.nas.yml # NAS/生产部署（仅拉取 GHCR 镜像）
+└── .env.example           # 环境变量模板
 ```
 
-### GitHub Actions → GHCR（推荐）
+## 快速部署
 
-推送到 **`main`** 时由 Actions 构建 **linux/amd64（单架构）** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。
-
-| 镜像 | 示例地址（将 `OWNER` 换为你的 GitHub 用户名） |
-|------|-----------------------------------------------|
-| 后端 | `ghcr.io/OWNER/sales-pilot-backend` |
-| 前端 | `ghcr.io/OWNER/sales-pilot-frontend` |
-| Nginx（内嵌 `default.conf`） | `ghcr.io/OWNER/sales-pilot-nginx` |
-
-说明：根目录 `docker-compose.yml` 里的 Nginx 曾使用**官方** `nginx:1.26-bookworm` 并**挂载**本地 `nginx/default.conf`，因此仓库里原先没有「应用 Nginx」镜像。要在 NAS 上**只拉公网镜像、不挂载配置文件**，需使用 CI 构建的 **`sales-pilot-nginx`**（把配置打进镜像）。数据库仍使用 **Docker Hub 官方** `postgres:17-bookworm`，无需在 GHCR 再构建一份。
-
-**版本标签（便于追踪）**：
-
-| 标签 | 含义 |
-|------|------|
-| `0.1.<run_number>` | 递增序号：本工作流「第 N 次成功运行」+1（同一推送内多个 commit 只触发一次构建） |
-| `sha-<短提交>` | 对应本次构建的 Git 提交 |
-| `latest` | 仅 **`main`** 分支构建会更新 |
-
-拉取示例（需 [登录 ghcr.io](https://docs.github.com/packages/working-with-a-github-packages-registry/working-with-the-container-registry)）：
-
-```bash
-docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-backend:0.1.1
-docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-frontend:0.1.1
-docker pull ghcr.io/<你的GitHub用户名>/sales-pilot-nginx:0.1.1
-```
-
-工作流文件：`.github/workflows/docker-publish.yml`。若仓库为私有，需在 GitHub 上为 Package 设置可见性或使用带 `read:packages` 的 token 拉取。
-
-### NAS 部署（`docker-compose.nas.yml`）
-
-在 NAS 上准备目录，放入仓库中的 **`docker-compose.nas.yml`**，将 **`.env.example`** 复制为 **`.env`** 并按注释填写（完整说明见 `.env.example`）。
-
-拉取私有 GHCR 包前需登录（[创建 classic PAT](https://github.com/settings/tokens)，勾选 `read:packages`）：
-
-```bash
-echo <PAT> | docker login ghcr.io -u <GitHub用户名> --password-stdin
-docker compose -f docker-compose.nas.yml pull
-docker compose -f docker-compose.nas.yml up -d
-```
-
-更新镜像时修改 `IMAGE_TAG` 或保持 `latest` 后再次 `pull` + `up -d`。
-
-## 本地一键启动（推荐）
-
-需要已安装 [Docker](https://docs.docker.com/get-docker/) 与 Docker Compose。
-
-在项目根目录执行：
+### 方式一：本地开发（Docker 一键启动）
 
 ```bash
 docker compose up --build -d
 ```
 
-浏览器访问 **http://localhost**（默认映射宿主 **80** 端口）。
+访问 **http://localhost:5173**
 
-常用命令：
+- 后端 API：http://localhost:8888
+-Swagger 文档：http://localhost:8888/swagger/index.html
 
-```bash
-docker compose logs -f    # 查看日志
-docker compose down       # 停止（数据卷保留）
-docker compose down -v    # 停止并删除数据卷（清空数据库）
-```
+### 方式二：NAS / 生产部署（推荐）
 
-### Compose 环境变量（可选）
+1. 在 NAS 上准备目录，放入 `docker-compose.nas.yml` 和 `.env`（复制自 `.env.example`）
+2. 登录 GHCR（拉取私有镜像需要）：
+   ```bash
+   echo <PAT> | docker login ghcr.io -u <GitHub用户名> --password-stdin
+   ```
+3. 拉取并启动：
+   ```bash
+   docker compose -f docker-compose.nas.yml pull
+   docker compose -f docker-compose.nas.yml up -d
+   ```
+
+## 数据库初始化
+
+后端启动时**自动执行**以下初始化（无需手动操作）：
+
+1. **AutoMigrate** — 根据 Model 定义自动创建/更新表结构
+2. **初始化数据** — 预置拓扑层级、分类等基础数据（仅在表为空时插入）
+
+初始化内容：
+
+| 数据 | 说明 |
+|------|------|
+| 拓扑层级 | 5 层（L5→L1：云平台层→物理环境层） |
+| 拓扑分类 | 34 个（7 安全 + 7 运维 + 20 中心层级） |
+| 解决方案分类 | 6 类（安全合规、云计算与基础设施等） |
+
+如需重新初始化，删除对应表数据后重启后端即可自动重插。
+
+## 组件说明
+
+| 组件 | 镜像 | 说明 |
+|------|------|------|
+| PostgreSQL | postgres:15-alpine | 数据库，默认用户 `postgres`，密码 `postgres`，库名 `sales_pilot` |
+| Redis | redis:7-alpine | Session 缓存 |
+| Server | 本地 build 或 GHCR | Go API 服务，监听 8888 |
+| Web | 本地 build 或 GHCR | Vue 单页应用，Nginx 80 端口 |
+
+## 环境变量
 
 | 变量 | 说明 | 默认 |
 |------|------|------|
-| `HTTP_PORT` | Nginx 对外端口 | `80` |
-| `JWT_SECRET` | JWT 签名密钥，**生产环境务必修改** | `please-change-me` |
-| `APP_BASE_URL` | 对外基址（OIDC 回调等） | `http://localhost` |
-| `FRONTEND_ORIGIN` | CORS 允许的前端来源 | `http://localhost` |
+| `JWT_SECRET` | JWT 签名密钥，**生产必须修改** | `please-change-me` |
+| `APP_BASE_URL` | 外部访问地址（OIDC 回调等） | `http://localhost` |
+| `FRONTEND_ORIGIN` | CORS 允许来源 | `http://localhost` |
+| `HTTP_PORT` | 宿主机 HTTP 端口 | `80` |
 
-示例：
+## 公开功能（无需登录）
 
-```bash
-JWT_SECRET="$(openssl rand -hex 32)" HTTP_PORT=8080 docker compose up --build -d
+| 路径 | 功能 |
+|------|------|
+| `/home` | 首页全景图，按架构层级浏览解决方案 |
+| `/home/product/:id` | 产品详情页（含销售话术、客户案例） |
+
+## 管理后台（需登录）
+
+| 路径 | 功能 |
+|------|------|
+| `/dashboard` | 业务数据统计 |
+| `/product` | 产品管理（增删改查、销售话术、客户案例） |
+| `/topology` | 拓扑层级与分类管理 |
+| `/solutionCategory` | 解决方案分类管理 |
+| `/statistics` | 数据统计 |
+| `/backup` | 数据备份导入/导出 |
+
+**默认管理员账号：** `admin` / `123456`（建议首次登录后修改密码）
+
+## GitHub Actions CI/CD
+
+推送到 **`main`** 分支自动构建 **linux/amd64** 镜像推送到 GHCR。
+
+镜像地址：
+```
+ghcr.io/6547709/sales-pilot-server:latest
+ghcr.io/6547709/sales-pilot-web:latest
 ```
 
-前端在镜像构建时使用相对路径请求 API（`NEXT_PUBLIC_API_URL` 为空），与 Nginx 同域部署一致。
+## 常见问题
 
-### 为何本地看不到 `docker.io/liguoqiang/...` 镜像？
+**Q: 访问 http://localhost:5173 无响应？**
+检查容器状态：`docker compose ps`，确认所有容器 running。
 
-- `docker compose up --build` 会给镜像打上**项目名 + 服务名**的本地标签（如 `sales-pilot-backend:latest`），**不会**自动加上 Docker Hub 的 `用户名/` 前缀。
-- 推送到 Hub 需单独执行 `build-and-push.sh`（或自行 `docker buildx build -t docker.io/用户名/... --push`）。
-- 使用 **`buildx build --push`** 后，本地 `docker images` 可能**仍不出现** `liguoqiang/...`（未 `--load`）；可在 Hub 网页查看，或 `docker pull docker.io/liguoqiang/sales-pilot-backend:latest`。
+**Q: 后端启动失败，提示数据库连接错误？**
+确认 PostgreSQL 容器已就绪（`docker compose up -d postgres` 先启动数据库），等待 `service_healthy` 后再启动 server。
 
-### Docker Hub：本地脚本（可选）
-
-若未使用 GitHub Actions，可自行本地构建并推 **Docker Hub**。需已登录：`docker login docker.io`
-
+**Q: 如何查看后端日志？**
 ```bash
-chmod +x build-and-push.sh
-./build-and-push.sh
+docker compose logs -f server
 ```
 
-默认推送 `docker.io/liguoqiang/sales-pilot-backend` 与 `sales-pilot-frontend`，标签为 `0.1.0` 与 `latest`。可通过环境变量调整：
-
-| 变量 | 说明 | 默认 |
-|------|------|------|
-| `VERSION` | 版本号标签 | `0.1.0` |
-| `REGISTRY` | Docker Hub **用户名**（非完整域名） | `liguoqiang` |
-| `PLATFORM` | 目标平台（单值） | `linux/amd64` |
-| `NEXT_PUBLIC_API_URL` | 前端构建时 API 基址；同域反代可留空 | 空 |
-
-示例：`VERSION=0.2.0 REGISTRY=你的用户名 ./build-and-push.sh`
-
-首次运行会创建名为 `sales-pilot-builder` 的 buildx 实例。
-
-## 本地开发（前后端分离）
-
-1. 准备 PostgreSQL，连接串与后端一致（见 `backend/internal/config/config.go` 中 `DATABASE_URL` 默认值），或自行导出环境变量。
-2. **注意**：默认 `docker-compose.yml` 中的 `db` 服务未将 `5432` 映射到宿主机；若只用 Compose 起数据库、在本机跑 `go run`，需为 `db` 增加 `ports: ["5432:5432"]`，否则本机进程无法通过 `localhost:5432` 连接容器内数据库。
-3. 后端：`cd backend && go run ./cmd/server`（默认 `:8080`）。
-4. 前端：`cd frontend && npm install && npm run dev`（默认 [http://localhost:3000](http://localhost:3000)）。未设置 `NEXT_PUBLIC_API_URL` 时，前端会请求 `http://localhost:8080`。
-
-敏感配置请使用根目录 `.env` / `frontend/.env.local` 等（已列入 `.gitignore`），勿提交密钥。
+**Q: 如何清空数据库重新开始？**
+```bash
+docker compose down -v   # 删除数据卷
+docker compose up -d      # 重新创建，数据会被自动初始化
+```
 
 ## 相关文档
 
-- [AI 产品维护 API 说明](docs/api-ai-product-maintenance.md)
-- [Nginx 外部部署说明](docs/nginx-external.md)
-
-## 上游仓库
-
-<https://github.com/6547709/sales-pilot>
+- [AI 产品维护 API 说明](docs/superpowers/api-ai-product-maintenance.md)

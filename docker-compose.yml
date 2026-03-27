@@ -1,5 +1,6 @@
-# Sales-Pilot 开发/生产环境 Docker Compose
-# 基于 gin-vue-admin 架构：Go + Gin 后端 + Vue + Element Plus 前端 + PostgreSQL + Redis
+# Sales-Pilot 本地开发环境
+# 包含：PostgreSQL + Redis + Go API + Vue 前端
+# 启动：docker compose up --build -d
 
 services:
   postgres:
@@ -36,12 +37,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
-    environment:
-      # Viper 配置文件路径
-      CONFIG_FILE: config.yaml
     volumes:
-      # 挂载本地代码便于开发时热重载
-      - ./server:/app
+      - ./server/config.docker.yaml:/app/config.yaml
     depends_on:
       postgres:
         condition: service_healthy
@@ -55,11 +52,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:80"
-    environment:
-      NODE_ENV: production
-    volumes:
-      - ./web:/app
-      - /app/node_modules
     depends_on:
       - server
     restart: unless-stopped

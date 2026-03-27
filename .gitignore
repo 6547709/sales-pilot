@@ -8,6 +8,7 @@
 # Go
 *.exe
 *.test
+server/server
 
 # Node / Vue
 node_modules/
