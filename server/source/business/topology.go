@@ -58,64 +58,75 @@ func (i *initBusiness) InitializeData(ctx context.Context) (next context.Context
 		return ctx, nil
 	}
 
-	// 1. 创建拓扑层级
+	// 1. 创建拓扑层级（5层，从上到下 level 5→1）
 	layers := []business.TopologyLayer{
-		{SortOrder: 1, Level: 1, Name: "身份与访问", Title: "身份与访问", Subtitle: "身份认证、权限管理、合规审计"},
-		{SortOrder: 2, Level: 2, Name: "安全边界", Title: "安全边界", Subtitle: "防火墙、入侵检测、零信任"},
-		{SortOrder: 3, Level: 3, Name: "计算资源", Title: "计算资源", Subtitle: "服务器、容器、Serverless"},
-		{SortOrder: 4, Level: 4, Name: "存储资源", Title: "存储资源", Subtitle: "对象存储、块存储、文件存储"},
-		{SortOrder: 5, Level: 5, Name: "数据层", Title: "数据层", Subtitle: "数据库、大数据、数据湖"},
-		{SortOrder: 6, Level: 6, Name: "应用层", Title: "应用层", Subtitle: "应用服务、中间件、API"},
-		{SortOrder: 7, Level: 7, Name: "运维体系", Title: "运维体系", Subtitle: "监控、自动化、运维工具"},
+		{Level: 5, Title: "云平台层 · 应用与服务", Subtitle: "中间件与智能化", SortOrder: 0},
+		{Level: 4, Title: "云平台层 · 基础设施", Subtitle: "虚拟化与容器底座", SortOrder: 1},
+		{Level: 3, Title: "网络与连接层", Subtitle: "连通与调度", SortOrder: 2},
+		{Level: 2, Title: "基础硬件层", Subtitle: "算力与存储", SortOrder: 3},
+		{Level: 1, Title: "物理环境层", Subtitle: "机房基础设施", SortOrder: 4},
 	}
 
 	if err = db.Create(&layers).Error; err != nil {
 		return ctx, errors.Wrap(err, "拓扑层级初始化失败")
 	}
 
-	// 建立层级ID映射
-	layerMap := make(map[string]uint)
+	// 建立层级ID映射（按 level 映射）
+	layerMap := make(map[int]uint)
 	for _, l := range layers {
-		layerMap[l.Name] = l.ID
+		layerMap[l.Level] = l.ID
 	}
 
-	// 2. 创建拓扑分类
+	// 2. 创建拓扑分类（34个）
 	categories := []business.TopologyCategory{
-		// 身份与访问
-		{LayerID: layerMap["身份与访问"], Name: "IAM", Slug: "iam", Label: "身份与访问管理", IconKey: "security", Keywords: "[\"身份\",\"权限\",\"SSO\",\"MFA\"]", Hint: "统一身份认证与权限管理"},
-		{LayerID: layerMap["身份与访问"], Name: "IDaaS", Slug: "idaas", Label: "云身份服务", IconKey: "cloud", Keywords: "[\"IDaaS\",\"云身份\",\"OIDC\",\"SAML\"]", Hint: "云原生身份即服务"},
-		{LayerID: layerMap["身份与访问"], Name: "PAM", Slug: "pam", Label: "特权身份管理", IconKey: "key", Keywords: "[\"特权账号\",\"堡垒机\",\"密钥\"]", Hint: "特权账号与密钥管理"},
+		// 安全体系 (column_type=security) id 1-7
+		{ColumnType: "security", Name: "sec-host", Slug: "sec-host", Label: "主机安全", IconKey: "ServerCog", Keywords: "[\"主机\",\"EDR\",\"安全代理\"]", SortOrder: 0, IsActive: true},
+		{ColumnType: "security", Name: "sec-boundary", Slug: "sec-boundary", Label: "边界安全", IconKey: "Shield", Keywords: "[\"边界\",\"防火墙\",\"WAF\",\"南北向\"]", SortOrder: 1, IsActive: true},
+		{ColumnType: "security", Name: "sec-secret", Slug: "sec-secret", Label: "机密管理", IconKey: "Lock", Keywords: "[\"机密\",\"Vault\",\"密钥\",\"证书\"]", SortOrder: 2, IsActive: true},
+		{ColumnType: "security", Name: "sec-identity", Slug: "sec-identity", Label: "身份认证", IconKey: "Fingerprint", Keywords: "[\"身份\",\"IAM\",\"SSO\",\"零信任\"]", SortOrder: 3, IsActive: true},
+		{ColumnType: "security", Name: "sec-zerotrust", Slug: "sec-zerotrust", Label: "零信任", IconKey: "ShieldCheck", Keywords: "[\"零信任\",\"ZTNA\",\"微隔离\"]", SortOrder: 4, IsActive: true},
+		{ColumnType: "security", Name: "sec-encrypt", Slug: "sec-encrypt", Label: "数据加密", IconKey: "Lock", Keywords: "[\"加密\",\"KMS\",\"脱敏\"]", SortOrder: 5, IsActive: true},
+		{ColumnType: "security", Name: "sec-situation", Slug: "sec-situation", Label: "态势感知", IconKey: "Radar", Keywords: "[\"态势\",\"SOC\",\"SIEM\",\"XDR\"]", SortOrder: 6, IsActive: true},
 
-		// 安全边界
-		{LayerID: layerMap["安全边界"], Name: "Firewall", Slug: "firewall", Label: "防火墙", IconKey: "shield", Keywords: "[\"防火墙\",\"WAF\",\"NGFW\"]", Hint: "网络与应用防火墙"},
-		{LayerID: layerMap["安全边界"], Name: "IDS/IPS", Slug: "ids-ips", Label: "入侵检测/防御", IconKey: "warning", Keywords: "[\"IDS\",\"IPS\",\"入侵检测\",\"威胁防护\"]", Hint: "入侵检测与防御系统"},
-		{LayerID: layerMap["安全边界"], Name: "SASE", Slug: "sase", Label: "SASE", IconKey: "connection", Keywords: "[\"SASE\",\"零信任\",\"SD-WAN\"]", Hint: "安全访问服务边缘"},
+		// 运维体系 (column_type=ops) id 8-14
+		{ColumnType: "ops", Name: "ops-aiops", Slug: "ops-aiops", Label: "AIOps", IconKey: "Brain", Keywords: "[\"AIOps\",\"智能运维\",\"根因\"]", SortOrder: 0, IsActive: true},
+		{ColumnType: "ops", Name: "ops-cmdb", Slug: "ops-cmdb", Label: "CMDB", IconKey: "Database", Keywords: "[\"CMDB\",\"配置项\",\"资产\"]", SortOrder: 1, IsActive: true},
+		{ColumnType: "ops", Name: "ops-probe", Slug: "ops-probe", Label: "拨测", IconKey: "Activity", Keywords: "[\"拨测\",\"可用性\",\"探测\"]", SortOrder: 2, IsActive: true},
+		{ColumnType: "ops", Name: "ops-trace", Slug: "ops-trace", Label: "全链路监控", IconKey: "LineChart", Keywords: "[\"链路\",\"APM\",\"Tracing\"]", SortOrder: 3, IsActive: true},
+		{ColumnType: "ops", Name: "ops-log", Slug: "ops-log", Label: "日志分析", IconKey: "FileStack", Keywords: "[\"日志\",\"ELK\",\"可观测\"]", SortOrder: 4, IsActive: true},
+		{ColumnType: "ops", Name: "ops-auto", Slug: "ops-auto", Label: "自动化运维", IconKey: "Workflow", Keywords: "[\"自动化\",\"编排\",\"Ansible\"]", SortOrder: 5, IsActive: true},
+		{ColumnType: "ops", Name: "ops-dr", Slug: "ops-dr", Label: "灾备", IconKey: "CloudCog", Keywords: "[\"灾备\",\"RTO\",\"RPO\",\"双活\"]", SortOrder: 6, IsActive: true},
 
-		// 计算资源
-		{LayerID: layerMap["计算资源"], Name: "Server", Slug: "server", Label: "服务器", IconKey: "server", Keywords: "[\"服务器\",\"物理机\",\"虚拟化\"]", Hint: "x86服务器与虚拟化平台"},
-		{LayerID: layerMap["计算资源"], Name: "Container", Slug: "container", Label: "容器平台", IconKey: "box", Keywords: "[\"容器\",\"K8s\",\"Docker\",\"编排\"]", Hint: "Kubernetes与容器编排"},
-		{LayerID: layerMap["计算资源"], Name: "Function", Slug: "function", Label: "Serverless", IconKey: "cloud", Keywords: "[\"Serverless\",\"函数计算\",\"FaaS\"]", Hint: "函数即服务"},
+		// 中心层级 (column_type=central) id 15-34，按 layer_id 分组
+		// Level 5 - 云平台层·应用与服务 (layer_id=1)
+		{LayerID: layerMap[5], ColumnType: "central", Name: "app-web", Slug: "app-web", Label: "Web / 中间件", IconKey: "Server", Keywords: "[\"中间件\",\"Web\",\"应用服务器\"]", SortOrder: 0, IsActive: true},
+		{LayerID: layerMap[5], ColumnType: "central", Name: "app-db", Slug: "app-db", Label: "数据库", IconKey: "Database", Keywords: "[\"数据库\",\"PostgreSQL\",\"MySQL\"]", SortOrder: 1, IsActive: true},
+		{LayerID: layerMap[5], ColumnType: "central", Name: "app-ai-mw", Slug: "app-ai-mw", Label: "AI 中间件", IconKey: "Brain", Keywords: "[\"向量\",\"Embedding\",\"RAG\"]", SortOrder: 2, IsActive: true},
+		{LayerID: layerMap[5], ColumnType: "central", Name: "app-agent", Slug: "app-agent", Label: "AI / Agent / MCP", IconKey: "Sparkles", Keywords: "[\"Agent\",\"MCP\",\"Dify\",\"智能体\"]", SortOrder: 3, IsActive: true},
 
-		// 存储资源
-		{LayerID: layerMap["存储资源"], Name: "ObjectStorage", Slug: "object", Label: "对象存储", IconKey: "folder", Keywords: "[\"对象存储\",\"OSS\",\"S3\",\"MinIO\"]", Hint: "非结构化数据存储"},
-		{LayerID: layerMap["存储资源"], Name: "BlockStorage", Slug: "block", Label: "块存储", IconKey: "database", Keywords: "[\"块存储\",\"云盘\",\"SAN\"]", Hint: "块设备与云硬盘"},
-		{LayerID: layerMap["存储资源"], Name: "FileStorage", Slug: "file", Label: "文件存储", IconKey: "document", Keywords: "[\"文件存储\",\"NAS\",\"HDFS\"]", Hint: "文件存储与共享"},
+		// Level 4 - 云平台层·基础设施 (layer_id=2)
+		{LayerID: layerMap[4], ColumnType: "central", Name: "cloud-virt", Slug: "cloud-virt", Label: "虚拟化", IconKey: "Box", Keywords: "[\"虚拟化\",\"VMware\",\"迁移\",\"KubeVirt\"]", SortOrder: 0, IsActive: true},
+		{LayerID: layerMap[4], ColumnType: "central", Name: "cloud-k8s", Slug: "cloud-k8s", Label: "容器云", IconKey: "LayoutGrid", Keywords: "[\"容器\",\"Kubernetes\",\"OpenShift\",\"K8s\"]", SortOrder: 1, IsActive: true},
+		{LayerID: layerMap[4], ColumnType: "central", Name: "cloud-ai", Slug: "cloud-ai", Label: "AI 云", IconKey: "Bot", Keywords: "[\"AI 云\",\"模型服务\",\"MLOps\"]", SortOrder: 2, IsActive: true},
+		{LayerID: layerMap[4], ColumnType: "central", Name: "cloud-multi", Slug: "cloud-multi", Label: "多云管理", IconKey: "Cloud", Keywords: "[\"多云\",\"混合云\",\"CMP\"]", SortOrder: 3, IsActive: true},
 
-		// 数据层
-		{LayerID: layerMap["数据层"], Name: "RDBMS", Slug: "rdbms", Label: "关系数据库", IconKey: "database", Keywords: "[\"MySQL\",\"PostgreSQL\",\"Oracle\",\"SQL Server\"]", Hint: "关系型数据库"},
-		{LayerID: layerMap["数据层"], Name: "NoSQL", Slug: "nosql", Label: "NoSQL数据库", IconKey: "collection", Keywords: "[\"MongoDB\",\"Redis\",\"Elasticsearch\",\"NoSQL\"]", Hint: "非关系型数据库"},
-		{LayerID: layerMap["数据层"], Name: "DataLake", Slug: "datalake", Label: "数据湖", IconKey: "folder-opened", Keywords: "[\"数据湖\",\"Delta Lake\",\"Iceberg\",\"仓\"]", Hint: "大数据存储与分析"},
+		// Level 3 - 网络与连接层 (layer_id=3)
+		{LayerID: layerMap[3], ColumnType: "central", Name: "net-core", Slug: "net-core", Label: "核心网络", IconKey: "Network", Keywords: "[\"核心网\",\"骨干\",\"路由\"]", SortOrder: 0, IsActive: true},
+		{LayerID: layerMap[3], ColumnType: "central", Name: "net-sdn", Slug: "net-sdn", Label: "SDN / SD-WAN", IconKey: "Router", Keywords: "[\"SDN\",\"SD-WAN\",\"广域网\"]", SortOrder: 1, IsActive: true},
+		{LayerID: layerMap[3], ColumnType: "central", Name: "net-lb", Slug: "net-lb", Label: "负载均衡", IconKey: "Scale", Keywords: "[\"负载均衡\",\"F5\",\"Ingress\"]", SortOrder: 2, IsActive: true},
+		{LayerID: layerMap[3], ColumnType: "central", Name: "net-dns", Slug: "net-dns", Label: "DNS / IPAM", IconKey: "Globe2", Keywords: "[\"DNS\",\"IPAM\",\"地址管理\"]", SortOrder: 3, IsActive: true},
 
-		// 应用层
-		{LayerID: layerMap["应用层"], Name: "APIGateway", Slug: "api-gateway", Label: "API网关", IconKey: "connection", Keywords: "[\"API网关\",\"Kong\",\"网关\",\"路由\"]", Hint: "API管理与流量控制"},
-		{LayerID: layerMap["应用层"], Name: "MQ", Slug: "mq", Label: "消息队列", IconKey: "chat-line-square", Keywords: "[\"Kafka\",\"RabbitMQ\",\"RocketMQ\",\"消息队列\"]", Hint: "异步消息与事件驱动"},
-		{LayerID: layerMap["应用层"], Name: "JobScheduler", Slug: "scheduler", Label: "任务调度", IconKey: "timer", Keywords: "[\"定时任务\",\"调度\",\"Crontab\",\"XXL-Job\"]", Hint: "任务调度与定时任务"},
+		// Level 2 - 基础硬件层 (layer_id=4)
+		{LayerID: layerMap[2], ColumnType: "central", Name: "hw-compute", Slug: "hw-compute", Label: "计算", IconKey: "Server", Keywords: "[\"服务器\",\"计算\",\"x86\"]", SortOrder: 0, IsActive: true},
+		{LayerID: layerMap[2], ColumnType: "central", Name: "hw-san", Slug: "hw-san", Label: "SAN 存储", IconKey: "HardDrive", Keywords: "[\"SAN\",\"块存储\"]", SortOrder: 1, IsActive: true},
+		{LayerID: layerMap[2], ColumnType: "central", Name: "hw-obj", Slug: "hw-obj", Label: "文件 / 对象", IconKey: "Layers3", Keywords: "[\"对象存储\",\"NAS\",\"文件\"]", SortOrder: 2, IsActive: true},
+		{LayerID: layerMap[2], ColumnType: "central", Name: "hw-gpu", Slug: "hw-gpu", Label: "GPU", IconKey: "Sparkles", Keywords: "[\"GPU\",\"算力\",\"推理\",\"训练\"]", SortOrder: 3, IsActive: true},
 
-		// 运维体系
-		{LayerID: layerMap["运维体系"], Name: "Monitor", Slug: "monitor", Label: "监控告警", IconKey: "monitor", Keywords: "[\"Prometheus\",\"Grafana\",\"Zabbix\",\"监控\"]", Hint: "监控与可视化"},
-		{LayerID: layerMap["运维体系"], Name: "Log", Slug: "log", Label: "日志分析", IconKey: "document", Keywords: "[\"日志\",\"ELK\",\"Loki\",\"日志分析\"]", Hint: "日志采集与分析"},
-		{LayerID: layerMap["运维体系"], Name: "CI/CD", Slug: "cicd", Label: "持续交付", IconKey: "refresh", Keywords: "[\"CI/CD\",\"Jenkins\",\"GitLab\",\"ArgoCD\"]", Hint: "持续集成与部署"},
-		{LayerID: layerMap["运维体系"], Name: "IaC", Slug: "iac", Label: "基础设施即代码", IconKey: "setting", Keywords: "[\"Terraform\",\"Ansible\",\"IaC\",\"基础设施\"]", Hint: "基础设施代码化"},
+		// Level 1 - 物理环境层 (layer_id=5)
+		{LayerID: layerMap[1], ColumnType: "central", Name: "phy-dc", Slug: "phy-dc", Label: "数据中心", IconKey: "Building2", Keywords: "[\"数据中心\",\"机房\",\"IDC\"]", SortOrder: 0, IsActive: true},
+		{LayerID: layerMap[1], ColumnType: "central", Name: "phy-ups", Slug: "phy-ups", Label: "UPS / PDU", IconKey: "Zap", Keywords: "[\"UPS\",\"PDU\",\"供电\"]", SortOrder: 1, IsActive: true},
+		{LayerID: layerMap[1], ColumnType: "central", Name: "phy-hvac", Slug: "phy-hvac", Label: "精密空调", IconKey: "ThermometerSnowflake", Keywords: "[\"空调\",\"制冷\",\"PUE\"]", SortOrder: 2, IsActive: true},
+		{LayerID: layerMap[1], ColumnType: "central", Name: "phy-cable", Slug: "phy-cable", Label: "综合布线", IconKey: "Cable", Keywords: "[\"布线\",\"光纤\",\"铜缆\"]", SortOrder: 3, IsActive: true},
 	}
 
 	if err = db.Create(&categories).Error; err != nil {

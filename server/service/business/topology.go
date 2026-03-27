@@ -95,21 +95,32 @@ func (s *TopologyService) GetFullTopology() (*business.TopologyFullResponse, err
 	}
 
 	var categories []business.TopologyCategory
-	if err := global.GVA_DB.Find(&categories).Error; err != nil {
+	if err := global.GVA_DB.Order("sort_order ASC").Find(&categories).Error; err != nil {
 		return nil, err
 	}
 
-	// 按 layer_id 分组
+	// 按 column_type 分组
+	var securityCats, opsCats []business.TopologyCategory
 	catsByLayer := make(map[uint][]business.TopologyCategory)
 	for _, cat := range categories {
-		catsByLayer[cat.LayerID] = append(catsByLayer[cat.LayerID], cat)
+		switch cat.ColumnType {
+		case "security":
+			securityCats = append(securityCats, cat)
+		case "ops":
+			opsCats = append(opsCats, cat)
+		case "central":
+			catsByLayer[cat.LayerID] = append(catsByLayer[cat.LayerID], cat)
+		}
 	}
 
 	// 构建响应
 	resp := &business.TopologyFullResponse{
+		Security:      securityCats,
+		Ops:           opsCats,
 		CentralLayers: []business.TopologyLayerBlock{},
 	}
 
+	// 按 sort_order 排序的中心层级
 	for _, layer := range layers {
 		block := business.TopologyLayerBlock{
 			Layer:      layer,
