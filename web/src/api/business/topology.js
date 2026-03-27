@@ -192,3 +192,17 @@ export const getVendorsByCategory = (params) => {
     params
   })
 }
+
+// ===================== Public APIs (No Auth Required) =====================
+// @Tags Topology
+// @Summary 获取完整拓扑结构（供首页全景图使用）
+// @accept application/json
+// @Produce application/json
+// @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
+// @Router /topology/full [get]
+export const getFullTopology = () => {
+  return service({
+    url: '/topology/full',
+    method: 'get'
+  })
+}

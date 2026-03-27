@@ -175,3 +175,13 @@ func (b *TopologyApi) GetVendorsByCategory(c *gin.Context) {
 	}
 	response.OkWithDetailed(vendors, "获取成功", c)
 }
+
+// GetFullTopology 获取完整拓扑结构（供首页全景图使用）
+func (b *TopologyApi) GetFullTopology(c *gin.Context) {
+	topology, err := TopologyServiceApp.GetFullTopology()
+	if err != nil {
+		response.FailWithMessage("获取拓扑失败: "+err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(topology, "获取成功", c)
+}

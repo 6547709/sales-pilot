@@ -7,6 +7,9 @@ type TopologyLayer struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `gorm:"size:128;not null" json:"name"`
 	SortOrder int       `gorm:"default:0" json:"sort_order"`
+	Level     int       `gorm:"default:0" json:"level"`         // 层级深度（用于排序）
+	Title     string    `gorm:"size:128" json:"title"`          // 显示标题
+	Subtitle  string    `gorm:"size:256" json:"subtitle"`       // 副标题
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -20,6 +23,11 @@ type TopologyCategory struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	LayerID   uint      `gorm:"index;not null" json:"layer_id"`
 	Name      string    `gorm:"size:128;not null" json:"name"`
+	Slug      string    `gorm:"size:128" json:"slug"`            // URL slug
+	Label     string    `gorm:"size:128" json:"label"`          // 显示名称
+	IconKey   string    `gorm:"size:64" json:"icon_key"`        // 图标 key
+	Keywords  string    `gorm:"type:text" json:"keywords"`       // JSON array of keywords
+	Hint      string    `gorm:"size:256" json:"hint"`           // 提示信息
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -42,4 +50,15 @@ type TopologyVendor struct {
 
 func (TopologyVendor) TableName() string {
 	return "topology_vendors"
+}
+
+// TopologyLayerBlock 层级区块（包含层级信息和该层级的所有分类）
+type TopologyLayerBlock struct {
+	Layer      TopologyLayer      `json:"layer"`
+	Categories []TopologyCategory `json:"categories"`
+}
+
+// TopologyFullResponse 完整拓扑响应
+type TopologyFullResponse struct {
+	CentralLayers []TopologyLayerBlock `json:"central_layers"`
 }

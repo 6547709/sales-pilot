@@ -105,6 +105,28 @@ func (b *ProductApi) GetPublicProductList(c *gin.Context) {
 	}, "获取成功", c)
 }
 
+// GetAllPublicProducts 获取所有公开产品（供首页使用）
+func (b *ProductApi) GetAllPublicProducts(c *gin.Context) {
+	list, err := ProductServiceApp.GetAllPublicProducts()
+	if err != nil {
+		response.FailWithMessage("获取失败: "+err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(list, "获取成功", c)
+}
+
+// GetProductsByCategory 获取指定分类的产品（供首页使用）
+func (b *ProductApi) GetProductsByCategory(c *gin.Context) {
+	categoryID := parseUint(c.Query("solution_category_id"))
+	vendorMarket := c.Query("vendor_market")
+	list, err := ProductServiceApp.GetProductsByCategory(categoryID, vendorMarket)
+	if err != nil {
+		response.FailWithMessage("获取失败: "+err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(list, "获取成功", c)
+}
+
 func parseUint(s string) uint {
 	var u uint
 	for _, c := range s {

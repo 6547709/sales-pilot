@@ -86,3 +86,37 @@ func (s *TopologyService) UpdateVendor(vendor *business.TopologyVendor) error {
 func (s *TopologyService) DeleteVendor(id uint) error {
 	return global.GVA_DB.Delete(&business.TopologyVendor{}, id).Error
 }
+
+// GetFullTopology 返回完整的拓扑结构（供首页全景图使用）
+func (s *TopologyService) GetFullTopology() (*business.TopologyFullResponse, error) {
+	var layers []business.TopologyLayer
+	if err := global.GVA_DB.Order("sort_order ASC").Find(&layers).Error; err != nil {
+		return nil, err
+	}
+
+	var categories []business.TopologyCategory
+	if err := global.GVA_DB.Find(&categories).Error; err != nil {
+		return nil, err
+	}
+
+	// 按 layer_id 分组
+	catsByLayer := make(map[uint][]business.TopologyCategory)
+	for _, cat := range categories {
+		catsByLayer[cat.LayerID] = append(catsByLayer[cat.LayerID], cat)
+	}
+
+	// 构建响应
+	resp := &business.TopologyFullResponse{
+		CentralLayers: []business.TopologyLayerBlock{},
+	}
+
+	for _, layer := range layers {
+		block := business.TopologyLayerBlock{
+			Layer:      layer,
+			Categories: catsByLayer[layer.ID],
+		}
+		resp.CentralLayers = append(resp.CentralLayers, block)
+	}
+
+	return resp, nil
+}

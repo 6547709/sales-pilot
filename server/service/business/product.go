@@ -65,3 +65,21 @@ func (s *ProductService) GetPublicProductList(info *request.PageInfo, vendorMark
 	err = db.Order("updated_at DESC").Limit(limit).Offset(offset).Find(&list).Error
 	return
 }
+
+// GetAllPublicProducts 获取所有公开产品（供首页全景图使用，不分页）
+func (s *ProductService) GetAllPublicProducts() (list []business.Product, err error) {
+	err = global.GVA_DB.Where("is_draft = ?", false).Order("updated_at DESC").Find(&list).Error
+	return
+}
+
+// GetProductsByCategory 获取指定分类的公开产品
+func (s *ProductService) GetProductsByCategory(categoryID uint, vendorMarket string) (list []business.Product, err error) {
+	db := global.GVA_DB.Model(&business.Product{}).Where("is_draft = ?", false).Where("solution_category_id = ?", categoryID)
+
+	if vendorMarket == "domestic" || vendorMarket == "foreign" {
+		db = db.Where("vendor_market IN ?", []string{"all", vendorMarket})
+	}
+
+	err = db.Order("updated_at DESC").Find(&list).Error
+	return
+}

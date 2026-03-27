@@ -7,6 +7,11 @@ import (
 type TopologyRouter struct{}
 
 func (s *TopologyRouter) InitTopologyRouter(Router *gin.RouterGroup) {
+	topologyRouter := Router.Group("topology")
+	{
+		topologyRouter.GET("/full", topologyApi.GetFullTopology) // 供首页全景图使用
+	}
+
 	layerRouter := Router.Group("topology/layer")
 	{
 		layerRouter.POST("", topologyApi.CreateLayer)

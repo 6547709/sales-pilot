@@ -15,5 +15,7 @@ func (s *ProductRouter) InitProductRouter(Router *gin.RouterGroup) {
 		productRouter.GET("/:id", productApi.GetProduct)
 		productRouter.POST("/list", productApi.GetProductList)
 		productRouter.POST("/public/list", productApi.GetPublicProductList)
+		productRouter.GET("/public/all", productApi.GetAllPublicProducts)      // 供首页使用
+		productRouter.GET("/public/by-category", productApi.GetProductsByCategory) // 按分类获取
 	}
 }
