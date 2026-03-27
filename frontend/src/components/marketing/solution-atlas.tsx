@@ -12,6 +12,7 @@ import {
 import {
   apiFetch,
   fetchTopology,
+  fetchProducts,
   type Product,
   type TopologyCategoryNode,
   type TopologyResponse,
@@ -19,8 +20,9 @@ import {
 import { topologyIcon } from "@/lib/topology-icons";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Compass, Loader2, Sparkles } from "lucide-react";
+import { ChevronRight, Compass, Sparkles } from "lucide-react";
 
 type Props = {
   initialSolutionId?: string;
@@ -155,20 +157,17 @@ export function SolutionAtlas({
   >(() => new Map());
 
   useEffect(() => {
-    fetchTopology()
-      .then(setTopology)
-      .catch(() => setLoadErr("无法加载拓扑，请确认后端已启动并已执行数据库迁移。"));
-  }, []);
-
-  useEffect(() => {
-    apiFetch("/api/v1/products")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((list: unknown) =>
-        setProductChipMap(
-          buildProductChipMap(Array.isArray(list) ? (list as Product[]) : []),
-        ),
-      )
-      .catch(() => setProductChipMap(new Map()));
+    // 并行加载拓扑和产品数据，利用缓存加速
+    Promise.all([
+      fetchTopology()
+        .then(setTopology)
+        .catch(() => setLoadErr("无法加载拓扑，请确认后端已启动并已执行数据库迁移。")),
+      fetchProducts()
+        .then((list) =>
+          setProductChipMap(buildProductChipMap(list)),
+        )
+        .catch(() => setProductChipMap(new Map())),
+    ]);
   }, []);
 
   useEffect(() => {
@@ -238,9 +237,39 @@ export function SolutionAtlas({
 
   if (!topology) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center gap-2 text-muted-foreground">
-        <Loader2 className="h-5 w-5 animate-spin" />
-        加载架构拓扑…
+      <div className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(0,82,204,0.12),transparent)]" />
+        <div className="relative mx-auto max-w-[1400px] px-4 py-8 sm:py-12">
+          <div className="mb-8 text-center sm:mb-10">
+            <Skeleton className="mb-3 h-6 w-24 mx-auto" />
+            <Skeleton className="h-10 w-80 mx-auto sm:w-96" />
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,240px)_1fr_minmax(0,240px)] lg:gap-4 xl:gap-6">
+            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background">
+              <Skeleton className="mb-1 h-5 w-20" />
+              <Skeleton className="mb-4 h-3 w-36" />
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              {[...Array(2)].map((_, i) => (
+                <Skeleton key={i} className="h-28 w-full rounded-2xl" />
+              ))}
+            </div>
+            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background">
+              <Skeleton className="mb-1 h-5 w-20" />
+              <Skeleton className="mb-4 h-3 w-36" />
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-10 w-full" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

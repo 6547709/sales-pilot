@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { apiFetch, fetchTopology, type Product } from "@/lib/api";
 import {
   vendorMarketBadgeClass,
@@ -151,7 +152,21 @@ export function ProductSpotlight({
         </div>
 
         {loading ? (
-          <p className="text-sm text-muted-foreground">加载方案…</p>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <li key={i}>
+                <Card className="h-full">
+                  <CardHeader>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="mt-2 h-4 w-1/2" />
+                  </CardHeader>
+                </Card>
+              </li>
+            ))}
+          </ul>
         ) : list.length === 0 ? (
           <p className="rounded-xl border border-dashed bg-background/80 p-8 text-center text-sm text-muted-foreground">
             暂无匹配方案。请尝试其他解决方案，或到方案库搜索。

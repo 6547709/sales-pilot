@@ -89,10 +89,29 @@ export type TopologyResponse = {
   central_layers: TopologyLayerBlock[];
 };
 
+// 内存缓存，避免重复请求
+let topologyCache: TopologyResponse | null = null;
+let productsCache: Product[] | null = null;
+
 export async function fetchTopology(): Promise<TopologyResponse> {
+  if (topologyCache) return topologyCache;
   const r = await apiFetch("/api/v1/topology");
   if (!r.ok) throw new Error("加载拓扑失败");
-  return r.json() as Promise<TopologyResponse>;
+  topologyCache = await r.json() as TopologyResponse;
+  return topologyCache;
+}
+
+export async function fetchProducts(): Promise<Product[]> {
+  if (productsCache) return productsCache;
+  const r = await apiFetch("/api/v1/products");
+  if (!r.ok) throw new Error("加载产品失败");
+  productsCache = await r.json() as Product[];
+  return productsCache;
+}
+
+export function clearProductsCache() {
+  productsCache = null;
+}
 }
 
 export async function fetchSolutionCategories(
