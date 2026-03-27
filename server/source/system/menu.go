@@ -62,6 +62,7 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 		{MenuLevel: 0, Hidden: false, ParentId: 0, Path: "https://www.gin-vue-admin.com", Name: "https://www.gin-vue-admin.com", Component: "/", Sort: 0, Meta: Meta{Title: "官方网站", Icon: "customer-gva"}},
 		{MenuLevel: 0, Hidden: false, ParentId: 0, Path: "state", Name: "state", Component: "view/system/state.vue", Sort: 8, Meta: Meta{Title: "服务器状态", Icon: "cloudy"}},
 		{MenuLevel: 0, Hidden: false, ParentId: 0, Path: "plugin", Name: "plugin", Component: "view/routerHolder.vue", Sort: 6, Meta: Meta{Title: "插件系统", Icon: "cherry"}},
+		{MenuLevel: 0, Hidden: false, ParentId: 0, Path: "business", Name: "business", Component: "view/business/index.vue", Sort: 2, Meta: Meta{Title: "业务管理", Icon: "shopping"}},
 	}
 
 	// 先创建父级菜单（ParentId = 0 的菜单）
@@ -113,6 +114,14 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["plugin"], Path: "pubPlug", Name: "pubPlug", Component: "view/systemTools/pubPlug/pubPlug.vue", Sort: 3, Meta: Meta{Title: "打包插件", Icon: "files"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["plugin"], Path: "plugin-email", Name: "plugin-email", Component: "plugin/email/view/index.vue", Sort: 4, Meta: Meta{Title: "邮件插件", Icon: "message"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["plugin"], Path: "anInfo", Name: "anInfo", Component: "plugin/announcement/view/info.vue", Sort: 5, Meta: Meta{Title: "公告管理[示例]", Icon: "scaleToOriginal"}},
+
+		// business子菜单
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "product", Name: "product", Component: "view/business/product/product.vue", Sort: 1, Meta: Meta{Title: "产品管理", Icon: "goods"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "script", Name: "script", Component: "view/business/salesScript/salesScript.vue", Sort: 2, Meta: Meta{Title: "销售话术", Icon: "chat-dot-round"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "case", Name: "case", Component: "view/business/case/case.vue", Sort: 3, Meta: Meta{Title: "客户案例", Icon: "briefcase"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "topology", Name: "topology", Component: "view/business/topology/topology.vue", Sort: 4, Meta: Meta{Title: "拓扑管理", Icon: "connection"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "solutionCategory", Name: "solutionCategory", Component: "view/business/solutionCategory/solutionCategory.vue", Sort: 5, Meta: Meta{Title: "解决方案分类", Icon: "folder"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["business"], Path: "apiKey", Name: "apiKey", Component: "view/business/apiKey/apiKey.vue", Sort: 6, Meta: Meta{Title: "API密钥", Icon: "key"}},
 	}
 
 	// 创建子菜单
