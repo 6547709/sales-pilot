@@ -25,5 +25,8 @@ frontend/.turbo
 .vscode/
 .cursor/
 
+# Worktrees
+.worktrees/
+
 # Docker
 *.local.yml
