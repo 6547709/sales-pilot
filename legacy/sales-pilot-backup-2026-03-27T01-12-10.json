@@ -1,0 +1,1367 @@
+{
+  "version": 1,
+  "exported_at": "2026-03-27T01:12:09Z",
+  "topology_layers": [
+    {
+      "id": 1,
+      "level": 5,
+      "title": "云平台层 · 应用与服务",
+      "subtitle": "中间件与智能化",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:24:56.495841Z",
+      "updated_at": "2026-03-25T02:24:56.495841Z"
+    },
+    {
+      "id": 2,
+      "level": 4,
+      "title": "云平台层 · 基础设施",
+      "subtitle": "虚拟化与容器底座",
+      "sort_order": 1,
+      "created_at": "2026-03-25T02:24:56.499278Z",
+      "updated_at": "2026-03-25T02:24:56.499278Z"
+    },
+    {
+      "id": 3,
+      "level": 3,
+      "title": "网络与连接层",
+      "subtitle": "连通与调度",
+      "sort_order": 2,
+      "created_at": "2026-03-25T02:24:56.500175Z",
+      "updated_at": "2026-03-25T02:24:56.500175Z"
+    },
+    {
+      "id": 4,
+      "level": 2,
+      "title": "基础硬件层",
+      "subtitle": "算力与存储",
+      "sort_order": 3,
+      "created_at": "2026-03-25T02:24:56.500625Z",
+      "updated_at": "2026-03-25T02:24:56.500625Z"
+    },
+    {
+      "id": 5,
+      "level": 1,
+      "title": "物理环境层",
+      "subtitle": "机房基础设施",
+      "sort_order": 4,
+      "created_at": "2026-03-25T02:24:56.500905Z",
+      "updated_at": "2026-03-25T02:24:56.500905Z"
+    }
+  ],
+  "solution_categories": [
+    {
+      "id": 1,
+      "slug": "sec-host",
+      "label": "主机安全",
+      "icon_key": "ServerCog",
+      "column_type": "security",
+      "sort_order": 0,
+      "keywords": [
+        "主机",
+        "EDR",
+        "安全代理"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.502131Z",
+      "updated_at": "2026-03-25T02:24:56.502131Z"
+    },
+    {
+      "id": 2,
+      "slug": "sec-boundary",
+      "label": "边界安全",
+      "icon_key": "Shield",
+      "column_type": "security",
+      "sort_order": 1,
+      "keywords": [
+        "边界",
+        "防火墙",
+        "WAF",
+        "南北向"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.503063Z",
+      "updated_at": "2026-03-25T02:24:56.503063Z"
+    },
+    {
+      "id": 3,
+      "slug": "sec-secret",
+      "label": "机密管理",
+      "icon_key": "Lock",
+      "column_type": "security",
+      "sort_order": 2,
+      "keywords": [
+        "机密",
+        "Vault",
+        "密钥",
+        "证书"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.503315Z",
+      "updated_at": "2026-03-25T02:24:56.503315Z"
+    },
+    {
+      "id": 4,
+      "slug": "sec-identity",
+      "label": "身份认证",
+      "icon_key": "Fingerprint",
+      "column_type": "security",
+      "sort_order": 3,
+      "keywords": [
+        "身份",
+        "IAM",
+        "SSO",
+        "零信任"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.503525Z",
+      "updated_at": "2026-03-25T02:24:56.503525Z"
+    },
+    {
+      "id": 5,
+      "slug": "sec-zerotrust",
+      "label": "零信任",
+      "icon_key": "ShieldCheck",
+      "column_type": "security",
+      "sort_order": 4,
+      "keywords": [
+        "零信任",
+        "ZTNA",
+        "微隔离"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.504605Z",
+      "updated_at": "2026-03-25T02:24:56.504605Z"
+    },
+    {
+      "id": 6,
+      "slug": "sec-encrypt",
+      "label": "数据加密",
+      "icon_key": "Lock",
+      "column_type": "security",
+      "sort_order": 5,
+      "keywords": [
+        "加密",
+        "KMS",
+        "脱敏"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.50497Z",
+      "updated_at": "2026-03-25T02:24:56.50497Z"
+    },
+    {
+      "id": 7,
+      "slug": "sec-situation",
+      "label": "态势感知",
+      "icon_key": "Radar",
+      "column_type": "security",
+      "sort_order": 6,
+      "keywords": [
+        "态势",
+        "SOC",
+        "SIEM",
+        "XDR"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.505228Z",
+      "updated_at": "2026-03-25T02:24:56.505228Z"
+    },
+    {
+      "id": 8,
+      "slug": "ops-aiops",
+      "label": "AIOps",
+      "icon_key": "Brain",
+      "column_type": "ops",
+      "sort_order": 0,
+      "keywords": [
+        "AIOps",
+        "智能运维",
+        "根因"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.505424Z",
+      "updated_at": "2026-03-25T02:24:56.505424Z"
+    },
+    {
+      "id": 9,
+      "slug": "ops-cmdb",
+      "label": "CMDB",
+      "icon_key": "Database",
+      "column_type": "ops",
+      "sort_order": 1,
+      "keywords": [
+        "CMDB",
+        "配置项",
+        "资产"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.505887Z",
+      "updated_at": "2026-03-25T02:24:56.505887Z"
+    },
+    {
+      "id": 10,
+      "slug": "ops-probe",
+      "label": "拨测",
+      "icon_key": "Activity",
+      "column_type": "ops",
+      "sort_order": 2,
+      "keywords": [
+        "拨测",
+        "可用性",
+        "探测"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.506112Z",
+      "updated_at": "2026-03-25T02:24:56.506112Z"
+    },
+    {
+      "id": 11,
+      "slug": "ops-trace",
+      "label": "全链路监控",
+      "icon_key": "LineChart",
+      "column_type": "ops",
+      "sort_order": 3,
+      "keywords": [
+        "链路",
+        "APM",
+        "Tracing"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.506486Z",
+      "updated_at": "2026-03-25T02:24:56.506486Z"
+    },
+    {
+      "id": 12,
+      "slug": "ops-log",
+      "label": "日志分析",
+      "icon_key": "FileStack",
+      "column_type": "ops",
+      "sort_order": 4,
+      "keywords": [
+        "日志",
+        "ELK",
+        "可观测"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.506691Z",
+      "updated_at": "2026-03-25T02:24:56.506691Z"
+    },
+    {
+      "id": 13,
+      "slug": "ops-auto",
+      "label": "自动化运维",
+      "icon_key": "Workflow",
+      "column_type": "ops",
+      "sort_order": 5,
+      "keywords": [
+        "自动化",
+        "编排",
+        "Ansible"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.506936Z",
+      "updated_at": "2026-03-25T02:24:56.506936Z"
+    },
+    {
+      "id": 14,
+      "slug": "ops-dr",
+      "label": "灾备",
+      "icon_key": "CloudCog",
+      "column_type": "ops",
+      "sort_order": 6,
+      "keywords": [
+        "灾备",
+        "RTO",
+        "RPO",
+        "双活"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.507163Z",
+      "updated_at": "2026-03-25T02:24:56.507163Z"
+    },
+    {
+      "id": 15,
+      "slug": "app-web",
+      "label": "Web / 中间件",
+      "icon_key": "Server",
+      "column_type": "central",
+      "layer_id": 1,
+      "sort_order": 0,
+      "keywords": [
+        "中间件",
+        "Web",
+        "应用服务器"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.507351Z",
+      "updated_at": "2026-03-25T02:24:56.507351Z"
+    },
+    {
+      "id": 16,
+      "slug": "app-db",
+      "label": "数据库",
+      "icon_key": "Database",
+      "column_type": "central",
+      "layer_id": 1,
+      "sort_order": 1,
+      "keywords": [
+        "数据库",
+        "PostgreSQL",
+        "MySQL"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.507798Z",
+      "updated_at": "2026-03-25T02:24:56.507798Z"
+    },
+    {
+      "id": 17,
+      "slug": "app-ai-mw",
+      "label": "AI 中间件",
+      "icon_key": "Brain",
+      "column_type": "central",
+      "layer_id": 1,
+      "sort_order": 2,
+      "keywords": [
+        "向量",
+        "Embedding",
+        "RAG"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.508019Z",
+      "updated_at": "2026-03-25T02:24:56.508019Z"
+    },
+    {
+      "id": 18,
+      "slug": "app-agent",
+      "label": "AI / Agent / MCP",
+      "icon_key": "Sparkles",
+      "column_type": "central",
+      "layer_id": 1,
+      "sort_order": 3,
+      "keywords": [
+        "Agent",
+        "MCP",
+        "Dify",
+        "智能体"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.508227Z",
+      "updated_at": "2026-03-25T03:23:32.848271Z"
+    },
+    {
+      "id": 19,
+      "slug": "cloud-virt",
+      "label": "虚拟化",
+      "icon_key": "Box",
+      "column_type": "central",
+      "layer_id": 2,
+      "sort_order": 0,
+      "keywords": [
+        "虚拟化",
+        "VMware",
+        "迁移",
+        "KubeVirt"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.508426Z",
+      "updated_at": "2026-03-25T02:24:56.508426Z"
+    },
+    {
+      "id": 20,
+      "slug": "cloud-k8s",
+      "label": "容器云",
+      "icon_key": "LayoutGrid",
+      "column_type": "central",
+      "layer_id": 2,
+      "sort_order": 1,
+      "keywords": [
+        "容器",
+        "Kubernetes",
+        "OpenShift",
+        "K8s"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.509865Z",
+      "updated_at": "2026-03-25T02:24:56.509865Z"
+    },
+    {
+      "id": 21,
+      "slug": "cloud-ai",
+      "label": "AI 云",
+      "icon_key": "Bot",
+      "column_type": "central",
+      "layer_id": 2,
+      "sort_order": 2,
+      "keywords": [
+        "AI 云",
+        "模型服务",
+        "MLOps"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.510149Z",
+      "updated_at": "2026-03-25T02:24:56.510149Z"
+    },
+    {
+      "id": 22,
+      "slug": "cloud-multi",
+      "label": "多云管理",
+      "icon_key": "Cloud",
+      "column_type": "central",
+      "layer_id": 2,
+      "sort_order": 3,
+      "keywords": [
+        "多云",
+        "混合云",
+        "CMP"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.510454Z",
+      "updated_at": "2026-03-25T02:24:56.510454Z"
+    },
+    {
+      "id": 23,
+      "slug": "net-core",
+      "label": "核心网络",
+      "icon_key": "Network",
+      "column_type": "central",
+      "layer_id": 3,
+      "sort_order": 0,
+      "keywords": [
+        "核心网",
+        "骨干",
+        "路由"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.510902Z",
+      "updated_at": "2026-03-25T02:24:56.510902Z"
+    },
+    {
+      "id": 24,
+      "slug": "net-sdn",
+      "label": "SDN / SD-WAN",
+      "icon_key": "Router",
+      "column_type": "central",
+      "layer_id": 3,
+      "sort_order": 1,
+      "keywords": [
+        "SDN",
+        "SD-WAN",
+        "广域网"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.511356Z",
+      "updated_at": "2026-03-25T02:24:56.511356Z"
+    },
+    {
+      "id": 25,
+      "slug": "net-lb",
+      "label": "负载均衡",
+      "icon_key": "Scale",
+      "column_type": "central",
+      "layer_id": 3,
+      "sort_order": 2,
+      "keywords": [
+        "负载均衡",
+        "F5",
+        "Ingress"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.511787Z",
+      "updated_at": "2026-03-25T02:24:56.511787Z"
+    },
+    {
+      "id": 26,
+      "slug": "net-dns",
+      "label": "DNS / IPAM",
+      "icon_key": "Globe2",
+      "column_type": "central",
+      "layer_id": 3,
+      "sort_order": 3,
+      "keywords": [
+        "DNS",
+        "IPAM",
+        "地址管理"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.512628Z",
+      "updated_at": "2026-03-25T02:24:56.512628Z"
+    },
+    {
+      "id": 27,
+      "slug": "hw-compute",
+      "label": "计算",
+      "icon_key": "Server",
+      "column_type": "central",
+      "layer_id": 4,
+      "sort_order": 0,
+      "keywords": [
+        "服务器",
+        "计算",
+        "x86"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.513051Z",
+      "updated_at": "2026-03-25T02:24:56.513051Z"
+    },
+    {
+      "id": 28,
+      "slug": "hw-san",
+      "label": "SAN 存储",
+      "icon_key": "HardDrive",
+      "column_type": "central",
+      "layer_id": 4,
+      "sort_order": 1,
+      "keywords": [
+        "SAN",
+        "块存储"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.518344Z",
+      "updated_at": "2026-03-25T02:24:56.518344Z"
+    },
+    {
+      "id": 29,
+      "slug": "hw-obj",
+      "label": "文件 / 对象",
+      "icon_key": "Layers3",
+      "column_type": "central",
+      "layer_id": 4,
+      "sort_order": 2,
+      "keywords": [
+        "对象存储",
+        "NAS",
+        "文件"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.520079Z",
+      "updated_at": "2026-03-25T02:24:56.520079Z"
+    },
+    {
+      "id": 30,
+      "slug": "hw-gpu",
+      "label": "GPU",
+      "icon_key": "Sparkles",
+      "column_type": "central",
+      "layer_id": 4,
+      "sort_order": 3,
+      "keywords": [
+        "GPU",
+        "算力",
+        "推理",
+        "训练"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.520671Z",
+      "updated_at": "2026-03-25T02:24:56.520671Z"
+    },
+    {
+      "id": 31,
+      "slug": "phy-dc",
+      "label": "数据中心",
+      "icon_key": "Building2",
+      "column_type": "central",
+      "layer_id": 5,
+      "sort_order": 0,
+      "keywords": [
+        "数据中心",
+        "机房",
+        "IDC"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.522373Z",
+      "updated_at": "2026-03-25T02:24:56.522373Z"
+    },
+    {
+      "id": 32,
+      "slug": "phy-ups",
+      "label": "UPS / PDU",
+      "icon_key": "Zap",
+      "column_type": "central",
+      "layer_id": 5,
+      "sort_order": 1,
+      "keywords": [
+        "UPS",
+        "PDU",
+        "供电"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.522609Z",
+      "updated_at": "2026-03-25T02:24:56.522609Z"
+    },
+    {
+      "id": 33,
+      "slug": "phy-hvac",
+      "label": "精密空调",
+      "icon_key": "ThermometerSnowflake",
+      "column_type": "central",
+      "layer_id": 5,
+      "sort_order": 2,
+      "keywords": [
+        "空调",
+        "制冷",
+        "PUE"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.522855Z",
+      "updated_at": "2026-03-25T02:24:56.522855Z"
+    },
+    {
+      "id": 34,
+      "slug": "phy-cable",
+      "label": "综合布线",
+      "icon_key": "Cable",
+      "column_type": "central",
+      "layer_id": 5,
+      "sort_order": 3,
+      "keywords": [
+        "布线",
+        "光纤",
+        "铜缆"
+      ],
+      "hint": "",
+      "is_active": true,
+      "created_at": "2026-03-25T02:24:56.523055Z",
+      "updated_at": "2026-03-25T02:24:56.523055Z"
+    }
+  ],
+  "solution_vendors": [
+    {
+      "id": 1,
+      "category_id": 19,
+      "market": "domestic",
+      "name": "SmartX",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:24:56.508619Z",
+      "updated_at": "2026-03-25T02:24:56.508619Z"
+    },
+    {
+      "id": 2,
+      "category_id": 19,
+      "market": "domestic",
+      "name": "华为",
+      "sort_order": 1,
+      "created_at": "2026-03-25T02:24:56.509162Z",
+      "updated_at": "2026-03-25T02:24:56.509162Z"
+    },
+    {
+      "id": 3,
+      "category_id": 19,
+      "market": "foreign",
+      "name": "VMware",
+      "sort_order": 2,
+      "created_at": "2026-03-25T02:24:56.509538Z",
+      "updated_at": "2026-03-25T02:24:56.509538Z"
+    },
+    {
+      "id": 4,
+      "category_id": 25,
+      "market": "foreign",
+      "name": "F5",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:24:56.512216Z",
+      "updated_at": "2026-03-25T02:24:56.512216Z"
+    },
+    {
+      "id": 5,
+      "category_id": 27,
+      "market": "domestic",
+      "name": "H3C",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:24:56.513441Z",
+      "updated_at": "2026-03-25T02:24:56.513441Z"
+    },
+    {
+      "id": 6,
+      "category_id": 27,
+      "market": "domestic",
+      "name": "浪潮",
+      "sort_order": 1,
+      "created_at": "2026-03-25T02:24:56.513902Z",
+      "updated_at": "2026-03-25T02:24:56.513902Z"
+    },
+    {
+      "id": 7,
+      "category_id": 27,
+      "market": "domestic",
+      "name": "华为",
+      "sort_order": 2,
+      "created_at": "2026-03-25T02:24:56.515055Z",
+      "updated_at": "2026-03-25T02:24:56.515055Z"
+    },
+    {
+      "id": 8,
+      "category_id": 27,
+      "market": "foreign",
+      "name": "Dell",
+      "sort_order": 3,
+      "created_at": "2026-03-25T02:24:56.516527Z",
+      "updated_at": "2026-03-25T02:24:56.516527Z"
+    },
+    {
+      "id": 9,
+      "category_id": 27,
+      "market": "foreign",
+      "name": "HPE",
+      "sort_order": 4,
+      "created_at": "2026-03-25T02:24:56.517613Z",
+      "updated_at": "2026-03-25T02:24:56.517613Z"
+    },
+    {
+      "id": 10,
+      "category_id": 30,
+      "market": "domestic",
+      "name": "华为",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:24:56.520952Z",
+      "updated_at": "2026-03-25T02:24:56.520952Z"
+    },
+    {
+      "id": 11,
+      "category_id": 30,
+      "market": "domestic",
+      "name": "寒武纪",
+      "sort_order": 1,
+      "created_at": "2026-03-25T02:24:56.521184Z",
+      "updated_at": "2026-03-25T02:24:56.521184Z"
+    },
+    {
+      "id": 12,
+      "category_id": 30,
+      "market": "foreign",
+      "name": "Nvidia",
+      "sort_order": 2,
+      "created_at": "2026-03-25T02:24:56.521428Z",
+      "updated_at": "2026-03-25T02:24:56.521428Z"
+    },
+    {
+      "id": 13,
+      "category_id": 30,
+      "market": "foreign",
+      "name": "AMD",
+      "sort_order": 3,
+      "created_at": "2026-03-25T02:24:56.521837Z",
+      "updated_at": "2026-03-25T02:24:56.521837Z"
+    },
+    {
+      "id": 14,
+      "category_id": 3,
+      "market": "domestic",
+      "name": "安当",
+      "sort_order": 0,
+      "created_at": "2026-03-25T02:27:35.439224Z",
+      "updated_at": "2026-03-25T02:27:35.439224Z"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@local",
+      "password_hash": "$2a$10$nhEtVnpRfeXOClHkkewCl.sbgwh1ao.VaaDqmvPTrF3v.LCtkoXwm",
+      "auth_provider": "local",
+      "role": "admin",
+      "is_active": true,
+      "last_login": "2026-03-27T01:12:02.740683Z",
+      "created_at": "2026-03-25T01:01:58.749001Z",
+      "updated_at": "2026-03-27T01:12:02.741057Z"
+    },
+    {
+      "id": 2,
+      "username": "demo",
+      "email": "demo@local",
+      "password_hash": "$2a$10$uTheAWvg5nNVEvS8DusZmO0rC2dwKS58PogdC0sJdgWLQ9Dp8wO/e",
+      "auth_provider": "local",
+      "role": "user",
+      "is_active": true,
+      "last_login": "2026-03-25T10:33:14.367521Z",
+      "created_at": "2026-03-25T04:35:19.784479Z",
+      "updated_at": "2026-03-25T10:33:14.367948Z"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "VMware 迁移至 OpenShift 方案",
+      "category": "云原生 / 虚拟化迁移",
+      "manufacturer_name": "",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "面向 VMware 存量客户，提供可落地的 OpenShift 迁移与并行运行路径，强调合规、成本与统一管控。",
+      "highlights": [
+        "彻底解决国产化替代合规风险。",
+        "资源利用率提升 40% 以上，显著降低 TCO。",
+        "原生集成 KubeVirt，容器与虚拟机统一纳管。"
+      ],
+      "target_personas": {
+        "CIO": "关注合规、成本与供应商锁定风险。",
+        "架构师": "关注工作负载形态统一与运维复杂度。",
+        "业务负责人": "关注交付速度与业务连续性。"
+      },
+      "trigger_events": "授权涨价谈判、信创时间表、容器化改造立项、数据中心整合。",
+      "discovery_questions": [
+        "面对 VMware 授权涨价，您是否计算过未来三年的总拥有成本（TCO）变化？",
+        "现有的传统备份方案在恢复容器化业务时，RTO 能够达到分钟级吗？",
+        "您的开发团队是否抱怨过环境交付速度跟不上业务迭代？"
+      ],
+      "competitor_analysis": "## 竞品对比（埋雷）\n\n| 维度 | 我们（OpenShift + KubeVirt） | 私有云大厂 A/B |\n|------|------------------------------|----------------|\n| 生态 | 开放 Kubernetes 生态，可移植 | 闭源栈深绑定，迁移成本高 |\n| 混合云 | 与主流公有云一致体验 | 难以在公有云复现同等架构 |\n| 风险 | 由于我们拥有 **开放标准与跨云一致性**，所以能避免客户遇到 **单一厂商锁定与合规不可控** 的风险；竞品往往无法同时解决「虚拟机遗留」与「云原生扩展」的 Y 类痛点。|\n",
+      "roi_metrics": "典型客户：三年 TCO 下降约 25%–35%（视规模与授权结构）；环境交付从周级缩短到天级。",
+      "vendor_market": "all",
+      "is_draft": false,
+      "updated_at": "2026-03-25T01:01:58.757664Z",
+      "created_at": "2026-03-25T01:01:58.757664Z"
+    },
+    {
+      "id": 2,
+      "name": "未命名方案",
+      "category": "",
+      "manufacturer_name": "",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "",
+      "highlights": [],
+      "target_personas": {},
+      "trigger_events": "",
+      "discovery_questions": [],
+      "competitor_analysis": "",
+      "roi_metrics": "",
+      "vendor_market": "all",
+      "is_draft": true,
+      "updated_at": "2026-03-25T04:18:36.659921Z",
+      "created_at": "2026-03-25T01:31:30.228654Z"
+    },
+    {
+      "id": 3,
+      "name": "VMware",
+      "category": "虚拟化",
+      "solution_category_id": 19,
+      "manufacturer_name": "VMware",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "aaa",
+      "highlights": [],
+      "target_personas": {},
+      "trigger_events": "",
+      "discovery_questions": [],
+      "competitor_analysis": "",
+      "roi_metrics": "",
+      "vendor_market": "foreign",
+      "is_draft": false,
+      "updated_at": "2026-03-25T07:20:05.682387Z",
+      "created_at": "2026-03-25T03:11:10.116622Z"
+    },
+    {
+      "id": 4,
+      "name": "Openshift虚拟化",
+      "category": "虚拟化",
+      "solution_category_id": 19,
+      "manufacturer_name": "Redhat",
+      "sales_contact_name": "董思含",
+      "sales_contact_phone": "13241553434",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "Redhat的Virtualization解决方案属于最新一代虚拟化方案，虽然技术较新，但依托K8S的底座，运维更加容易。",
+      "highlights": [
+        "虚拟机、容器、AI统一平台，解决多平台带来的复杂度问题，且性能优异。",
+        "支持容器的版本，提供不限数量RHEL订阅许可，降低客户采购成本。",
+        "声明式调度架构，更利用企业标准化、自动化管理、AIOps。"
+      ],
+      "target_personas": {
+        "CFO": "降成本",
+        "CIO": "平台统一化、标准化、可持续",
+        "CTO": "平台化，易于使用和技术储备"
+      },
+      "trigger_events": "",
+      "discovery_questions": [
+        "贵公司是否同时有虚拟机、容器和AI平台，多个平台是管理是否容易呢，资源是否可以相互共享呢？",
+        "贵公司的Linux操作系统使用的是什么，CentOS、CentOS-Stream、Ubuntu、RHEL，如果是RHEL每年花费多少钱呢？",
+        "贵公司的虚拟化平台在使用过程中，是否遇到了厂商涨价（VMware）、故障频繁等挑战？"
+      ],
+      "competitor_analysis": "",
+      "roi_metrics": "",
+      "vendor_market": "foreign",
+      "is_draft": false,
+      "updated_at": "2026-03-25T06:34:25.9998Z",
+      "created_at": "2026-03-25T04:19:09.281704Z"
+    },
+    {
+      "id": 5,
+      "name": "Veeam 数据保护平台",
+      "category": "灾备",
+      "solution_category_id": 14,
+      "manufacturer_name": "Veeam",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "## 方案概述\n\n一句话来说，**Veeam 数据保护平台不是简单做备份，而是帮助企业在出问题的时候，真的能把业务尽快恢复回来。**\n\n很多客户今天其实都“有备份”，但真正的风险不在于有没有备份任务，而在于：关键系统出故障时，是否真的能按要求恢复；恢复速度是否够快；恢复过程是否可控；面对勒索软件、误删、误操作和机房故障时，是否有一套让管理层放心的数据保护体系。\n\nVeeam 的价值就在这里：它帮助企业把“备份”升级成“数据韧性能力”。也就是说，不只是把数据存一份，而是让企业在面对故障、安全事件和审计要求时，依然能把关键业务守住。\n\n## 适用场景\n\n- VMware、Hyper-V 等虚拟化平台的数据保护与快速恢复\n- 文件服务器、数据库、关键业务系统的统一备份与恢复\n- 分支机构 + 总部的集中式备份管理\n- 混合云、多云环境下的数据保护与恢复治理\n- 面向勒索软件防护的不可变备份与隔离恢复\n- 面向金融、制造、政企、医疗等行业的合规留存与恢复演练\n\n## 核心价值\n\n### 1. 让备份真正服务业务连续性\n不是“任务完成就算结束”，而是帮助客户把恢复速度、恢复成功率和业务影响纳入统一考虑。\n\n### 2. 统一保护多种工作负载\n很多企业的问题不是没有工具，而是工具太多、太散。Veeam 可以帮助客户把虚拟机、物理机、文件、应用和云工作负载放到一个统一视角下治理。\n\n### 3. 把安全与恢复结合起来\n面对勒索软件，客户最怕的是“有备份也不敢恢复”。Veeam 的价值在于帮助企业建立更可信的副本、更清晰的恢复路径和更强的审计支撑。\n\n## 哪类客户更适合优先考虑\n\n- 已经有备份系统，但恢复演练不充分的客户\n- 业务关键系统多、停机代价高的客户\n- 正在推进混合云、数据中心整合或灾备建设的客户\n- 正在加强勒索软件防护和数据韧性能力的客户\n- 希望减少多套备份工具并存、统一运维视图的客户",
+      "highlights": [
+        "不只是“把数据备份下来”，而是帮助企业在故障发生后更快把业务恢复回来。",
+        "统一覆盖虚拟机、物理机、文件、应用和云工作负载，减少多套工具并存带来的管理复杂度。",
+        "兼顾恢复效率、安全防护和审计要求，适合把数据保护升级为企业级治理能力。"
+      ],
+      "target_personas": {
+        "CIO": "关注关键业务连续性、风险控制和数据保护体系是否真正可管可控。",
+        "业务负责人": "关注系统出问题后，核心业务能不能尽快恢复，避免长时间影响收入和客户体验。",
+        "安全负责人": "关注勒索软件场景下副本是否可信、恢复链路是否安全、审计是否留痕。",
+        "IT 运维负责人": "关注备份是否稳定、恢复是否够快、平台是否容易统一管理。",
+        "基础架构负责人": "关注虚拟化、存储、云平台和关键业务系统的数据保护是否能统一纳管。"
+      },
+      "trigger_events": "业务系统越来越关键，停机代价越来越高；现有备份系统多年未升级，恢复能力缺少验证；VMware、云平台和文件数据分别由不同工具维护，管理复杂；勒索软件事件增加，管理层开始关注数据韧性；监管、审计或灾备演练要求提升，倒逼企业把“备份”升级为“恢复能力建设”。",
+      "discovery_questions": [
+        "贵公司现在的备份体系，如果关键系统今天出问题，业务部门能接受多长时间恢复？这个目标真的演练验证过吗？",
+        "当前虚拟机、文件、数据库和云环境的数据保护，是统一管理还是多套工具分开维护？恢复时会不会出现责任分散、流程变慢的问题？",
+        "如果遇到勒索软件、误删或运维误操作，现有方案除了“有备份”，还能不能让管理层放心地做恢复决策？"
+      ],
+      "competitor_analysis": "## 竞品分析\n\n### 客户为什么会重新看数据保护平台\n很多客户过去买备份产品，更多是为了“满足有备份”这件事；但现在客户越来越关心的是：**出事时能不能恢复、恢复要多久、恢复过程是否可靠。**\n\n### 与传统备份工具相比\n- 传统工具往往更强调任务完成，而不是恢复结果。\n- 当环境从单一虚拟化走向多平台并存时，旧体系容易变成多个孤岛。\n- 真正遇到攻击、误删或业务故障时，恢复链条是否顺畅，才是客户最在意的。\n\n### 与低价替代方案相比\n- 低价方案在采购时看起来更省钱，但一旦恢复能力不足，真正的成本会在停机、加班、业务影响和管理风险中体现出来。\n- 一些替代方案适合简单场景，但在大规模环境、异构平台和更高恢复要求下，后续可能还要继续补工具。\n\n### 销售定位建议\n销售在和客户沟通时，不要把 Veeam 只讲成“备份软件”。\n更好的定位是：\n\n\u003e **这是一个帮助企业把数据保护、恢复效率和业务连续性真正打通的数据韧性平台。**\n\n这样更容易和客户的管理层诉求连接起来，也更容易避开单纯打价格战。",
+      "roi_metrics": "ROI 最容易从四个方向讲清楚：第一，关键系统恢复更快，减少停机带来的业务损失；第二，统一平台后减少多套工具维护、培训和运维协同成本；第三，降低因恢复失败、恢复过慢或安全事件带来的隐性风险；第四，在审计、演练和管理汇报上更容易形成可量化、可展示的数据保护能力。对大多数企业来说，Veeam 的价值不只是省软件钱，而是减少一次重大故障带来的综合损失。",
+      "vendor_market": "foreign",
+      "is_draft": false,
+      "updated_at": "2026-03-25T07:15:58.990629Z",
+      "created_at": "2026-03-25T07:09:19.450965Z"
+    },
+    {
+      "id": 6,
+      "name": "安当 KSP 机密管理平台",
+      "category": "机密管理",
+      "solution_category_id": 3,
+      "manufacturer_name": "安当",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "## 方案概述\n\n一句话来说，**安当 KSP 不是单纯“管密钥”的工具，而是帮助企业把密钥、证书、密码服务和数据保护能力统一纳管的平台。**\n\n很多客户在做数据加密、证书管理、应用安全或合规整改时，真正的问题不是“能不能加密”，而是密钥分散、系统各自为战、审计难、运维复杂、改造周期长。尤其在金融、政务、制造、医疗等对安全和合规要求较高的场景中，客户往往既要考虑国密合规，又要兼顾业务系统集成效率和后续运维可控性。\n\nKSP 的价值在于：把原本分散在不同系统里的密钥管理、证书管理、密码运算和安全服务能力，统一到一个平台里做管理和调度。这样客户不仅更容易满足合规要求，也更容易把数据加密、应用签名验签、证书管理、数据库保护和敏感数据保护真正落到业务系统中。\n\n## 适用场景\n\n- 金融、政务、能源、运营商等行业的密钥集中管理与密码服务治理\n- 应用系统、数据库、文件和非结构化数据的加密保护\n- 证书、CA、Token 等密码资源的统一管理\n- 数据安全、商用密码合规、等保和密评整改场景\n- 私有云、公有云、混合云与多数据中心场景下的密码服务统一支撑\n- 希望通过标准 API 快速对接上层应用和安全系统的客户\n\n## 核心价值\n\n### 1. 把分散的密码资源统一管起来\n客户常见的问题不是没有安全能力，而是能力太分散。KSP 可以帮助客户把密钥、证书、密码服务和策略放到统一平台治理。\n\n### 2. 让数据保护更容易落地\n很多企业知道该做加密，但真正推进时往往卡在集成复杂、运维难、缺少统一能力支撑。KSP 的价值在于把这些能力平台化，降低业务系统接入门槛。\n\n### 3. 同时兼顾安全、合规和业务可用性\n对于客户来说，安全不能只停留在制度上，还要能支撑业务持续运行。KSP 在密钥保护、密码运算、审计留痕和备份恢复上提供统一能力，更适合企业级场景。\n\n## 哪类客户更适合优先考虑\n\n- 正在推进数据安全建设、商用密码整改或密评合规的客户\n- 已有多套加密或证书系统，想统一治理的客户\n- 需要把加密能力快速集成到业务系统、数据库或应用中的客户\n- 对密钥安全级别、审计能力和业务连续性要求较高的客户\n- 希望兼顾国密支持、平台化能力和后续扩展性的客户",
+      "highlights": [
+        "统一管理密钥、证书、密码服务和安全策略，减少多套系统分散建设带来的复杂度。",
+        "既能满足国密与合规要求，又能通过标准接口快速支撑业务系统的数据保护落地。",
+        "兼顾安全性、可运维性和业务连续性，更适合企业级长期建设而不是单点工具采购。"
+      ],
+      "target_personas": {
+        "CIO": "关注安全能力是否平台化、可治理，能否同时满足合规要求和业务持续发展。",
+        "安全负责人": "关注密钥安全、密码合规、审计留痕和敏感数据保护能力是否真正可落地。",
+        "运维负责人": "关注平台是否便于统一运维、权限控制、日志审计和备份恢复。",
+        "基础架构负责人": "关注平台是否能统一支撑应用、数据库、云和数据中心等多场景需求。",
+        "应用架构负责人": "关注系统接入是否方便，是否能通过标准 API 快速完成安全集成。"
+      },
+      "trigger_events": "数据安全建设进入实质推进阶段；商用密码、等保或密评整改要求提升；现有密钥和证书管理体系分散，审计与运维效率低；业务系统需要快速接入加密与签名能力；混合云或多数据中心建设推动统一密码服务平台落地。",
+      "discovery_questions": [
+        "贵公司现在的密钥、证书和加密能力，是统一管理还是分散在不同系统里？一旦出问题，排查和审计是否足够高效？",
+        "在推进数据加密或合规整改时，当前最大的阻力是安全能力不够，还是集成太复杂、改造太慢、后续运维压力太大？",
+        "如果未来要同时支持数据库、文件、应用系统和云环境的数据保护，现有体系是否还能持续扩展，还是会继续堆更多孤立工具？"
+      ],
+      "competitor_analysis": "## 竞品分析\n\n### 客户为什么会重新看机密管理平台\n很多客户过去是“哪里需要就补一个加密点”，结果时间一长，密钥、证书、算法能力和安全策略分散在多个系统里。表面上每个点都能用，实际上整体管理、审计、扩展和合规压力越来越大。\n\n### 与单点加密产品相比\n- 单点产品往往能解决局部问题，但很难支撑企业级统一治理。\n- 当客户需要同时覆盖数据库、应用、文件、云环境和证书管理时，单点方案容易越堆越复杂。\n- 真正的挑战不只是“某个地方能加密”，而是“整个密码资源体系能不能统一管起来”。\n\n### 与纯硬件导向方案相比\n- 纯硬件方案强调安全强度，但如果平台化能力、接口能力和运维体验不足，业务落地速度会受影响。\n- 对销售来说，不能只讲“更安全”，还要讲“更容易接入、更容易统一管理、更容易持续扩展”。\n\n### 销售定位建议\n在和客户沟通时，不建议把 KSP 只讲成“一个密钥管理系统”。\n更好的说法是：\n\n\u003e **它是一个把机密管理、密码服务与数据保护能力真正平台化的底座。**\n\n这样更容易从管理层、安全负责人和应用架构团队三个层面同时建立价值共识。",
+      "roi_metrics": "ROI 主要体现在四个方面：第一，减少多套密钥、证书和加密系统分散建设带来的重复投入；第二，降低合规整改、审计准备和运维协同成本；第三，通过统一密码服务平台缩短业务系统安全改造周期；第四，降低因密钥管理不规范、审计不足或系统割裂带来的安全与管理风险。对很多客户来说，KSP 的价值不仅是提升安全性，更是把安全能力做成可持续运营的平台能力。",
+      "vendor_market": "domestic",
+      "is_draft": false,
+      "updated_at": "2026-03-25T07:25:28.956625Z",
+      "created_at": "2026-03-25T07:24:58.305649Z"
+    },
+    {
+      "id": 7,
+      "name": "基调听云 Network 拨测平台",
+      "category": "拨测",
+      "solution_category_id": 10,
+      "manufacturer_name": "基调听云",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "## 方案概述\n\n一句话来说，**基调听云 Network 是一个通过主动拨测方式，帮助企业持续观察网站、接口、业务流程、网络链路和 CDN 服务质量的监测平台。**\n\n很多企业的系统在内部看起来“运行正常”，但用户真正访问时，体验却可能已经变差。页面打开慢、接口偶发失败、不同地域访问不稳定、CDN 调度效果不一致、业务高峰期性能波动，这些问题如果只看服务器监控，往往发现得太晚。\n\n基调听云 Network 的价值在于：站在真实访问路径和真实用户体验的角度，提前发现外部访问质量问题，并且帮助客户判断问题到底出在网络、CDN、运营商链路、接口服务，还是后端系统。对于重视用户体验、业务转化和服务稳定性的客户来说，这类能力非常关键。\n\n## 适用场景\n\n- 网站、接口、关键业务流程的可用性与性能监测\n- 多地域、多运营商访问质量对比与网络链路分析\n- CDN 服务质量评估与调优支撑\n- 核心交易、注册、登录、下单等关键事务监控\n- 业务高峰期前的压力测试与风险识别\n- IPv6 网站改造、质量验证与性能对比\n\n## 核心价值\n\n### 1. 从用户访问视角发现问题\n很多问题不是主机挂了，而是用户访问慢了、失败了、体验下降了。拨测平台的价值就是更早看到这些问题。\n\n### 2. 帮助客户快速判断问题在哪\n当访问异常出现时，客户最怕的是不知道问题出在网络、CDN、接口还是后端。基调听云 Network 的优势是能把“故障现象”更快转成“定位线索”。\n\n### 3. 让服务质量更可量化\n无论是网络链路质量、CDN 服务效果还是关键业务流程的稳定性，平台都能帮助客户把原本模糊的体验问题变成可持续观察、可对比、可优化的数据。\n\n## 哪类客户更适合优先考虑\n\n- 面向全国或多地域用户提供在线服务的客户\n- 对网站可用性、接口稳定性和业务转化率敏感的客户\n- 正在优化 CDN、网络链路或云资源选型的客户\n- 高峰期波动明显、但内部监控又难以提前发现问题的客户\n- 既想看“监控数据”，也想看“真实用户访问体验”的客户",
+      "highlights": [
+        "从真实访问路径出发做主动拨测，更早发现网站、接口和业务流程的体验问题。",
+        "可同时覆盖网络链路、CDN、事务流程和 IPv6 场景，帮助客户更快定位问题来源。",
+        "把原本难以量化的访问体验，转化为可对比、可预警、可优化的数据支撑。"
+      ],
+      "target_personas": {
+        "CIO": "关注线上业务稳定性、用户体验和数字化服务质量是否真正可衡量、可管理。",
+        "业务负责人": "关注用户访问卡顿、失败或交易中断是否影响收入、品牌和客户留存。",
+        "应用负责人": "关注关键业务流程是否稳定，接口和页面性能是否会影响转化与用户满意度。",
+        "网络负责人": "关注不同地域、运营商、链路和 CDN 节点的服务质量是否透明可见。",
+        "运维负责人": "关注访问异常能否被提前发现，故障定位能否更快，告警是否更贴近真实影响。"
+      },
+      "trigger_events": "网站和接口投诉增多；多地访问体验不一致；CDN 费用高但效果不透明；业务高峰期出现性能波动；IPv6 改造需要验证质量；现有监控偏内部视角，无法解释用户真实访问问题。",
+      "discovery_questions": [
+        "贵公司现在判断网站或接口是否“正常”，主要依赖服务器监控，还是已经能看到不同地域、不同运营商用户的真实访问质量？",
+        "当客户反馈页面慢、接口超时或交易失败时，团队通常能多快判断问题出在网络、CDN、应用还是后端服务？",
+        "如果要优化 CDN 策略、网络链路或高峰期保障，贵公司目前有没有足够的体验数据做判断，而不是只靠感觉或投诉？"
+      ],
+      "competitor_analysis": "## 竞品分析\n\n### 客户为什么会重新看拨测平台\n很多企业已经有服务器监控、APM 或日志系统，但这些系统更多是从内部视角看问题。真正让客户重新评估拨测平台的原因，往往是：**用户已经感知到问题，但内部系统还没来得及发现，或者发现了却难以快速判断问题在哪。**\n\n### 与传统内部监控相比\n- 内部监控擅长看资源、进程和服务状态，但不一定能代表外部访问体验。\n- 当问题发生在公网链路、CDN 调度、地域访问差异或真实业务流程时，仅靠内部监控很难完整解释。\n- 拨测的价值不在替代内部监控，而在补足“用户侧”和“路径侧”的可见性。\n\n### 与单点网站监测工具相比\n- 单点工具通常只能看页面是否可访问，难以覆盖接口、事务流程、CDN 和网络链路的综合分析。\n- 如果客户希望不仅知道“出问题了”，还想知道“更可能出在哪”，平台型拨测能力会更有价值。\n\n### 销售定位建议\n不要把基调听云 Network 只讲成“一个监控工具”。\n更好的定位是：\n\n\u003e **它是帮助企业从真实访问体验角度管理服务质量的主动观测平台。**\n\n这样更容易和用户体验、业务连续性、故障处置效率以及网络优化价值连接起来。",
+      "roi_metrics": "ROI 主要体现在四个方面：第一，更早发现影响用户访问的问题，减少投诉、交易流失和业务损失；第二，缩短故障定位时间，减少跨团队排查成本；第三，为 CDN、网络链路和资源选型提供更客观的数据依据；第四，通过持续优化关键业务流程体验，提升用户满意度和线上转化效率。对很多客户来说，拨测平台的价值不只是“多一层监控”，而是让体验问题更早暴露、让优化决策更有依据。",
+      "vendor_market": "domestic",
+      "is_draft": false,
+      "updated_at": "2026-03-25T07:35:35.325801Z",
+      "created_at": "2026-03-25T07:34:27.237779Z"
+    },
+    {
+      "id": 8,
+      "name": "擎创数智运维管理平台",
+      "category": "AIOps",
+      "solution_category_id": 8,
+      "manufacturer_name": "擎创科技",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "## 方案概述\n\n一句话来说，**擎创数智运维管理平台不是替代客户现有监控系统重新采集一遍数据，而是把企业已经存在的指标、日志、APM、事件和各类运维数据源统一接进来，做集中分析、智能展示、故障定位和告警治理。**\n\n很多大型企业的问题不是没有监控，而是监控工具太多、数据太散、告警太吵、分析链路太长。基础设施监控、APM、日志平台、云监控、应用监控和业务告警各自独立存在，出了问题往往需要多个团队来回切换系统、交叉确认，导致定位慢、处置慢、汇报也困难。\n\n擎创数智运维管理平台的价值，在于不强迫客户推翻原有体系，而是在尊重现有建设成果的基础上，把多源异构数据统一纳管，构建面向运维场景的智能分析与可视化能力。这样客户既能保留原有采集和监控投入，又能获得跨平台关联分析、风险预警、综合排障、告警抑制和运营决策支持等更高层能力。\n\n## 适用场景\n\n- 企业已有多套监控、日志、APM、CMDB、告警工具并存，希望统一分析和展示\n- 大型生产环境告警量大、噪音多，希望推进告警治理与抑制\n- 出现故障时需要跨系统、跨团队快速定界与根因定位\n- 管理层希望从业务视角统一观察运行健康、风险和运营状态\n- 正在推进智能运维、运维数据治理、运维大模型或信创替代建设\n\n## 核心价值\n\n### 1. 不推翻现有体系，而是把已有数据资产用起来\n很多客户已经投入了大量监控和日志系统，真正缺的不是再买一个采集工具，而是把现有数据整合起来，形成统一的运维认知。\n\n### 2. 从“看见数据”升级到“看懂问题”\n平台价值不只是汇总数据，而是把指标、日志、链路、事件、对象关系和时序关联起来，帮助运维团队更快判断故障影响范围和更可能的原因。\n\n### 3. 把告警治理和管理视图做成体系能力\n面对海量告警和复杂生产环境，客户需要的不只是更多告警，而是更少无效告警、更高效的定界路径，以及更适合管理层理解的全局视图。\n\n## 哪类客户更适合优先考虑\n\n- 金融、运营商、政企、制造等多系统、多团队运维环境复杂的客户\n- 已经建设了多套监控体系，但仍然觉得故障定位慢、告警噪音大的客户\n- 想推进 AIOps，但不希望重建全部采集链路的客户\n- 希望统一纳管运维数据、提升管理可视性和运维协同效率的客户\n- 既重视自主可控，也重视智能分析与运营决策能力的客户",
+      "highlights": [
+        "兼容企业现有指标、日志、APM、事件等多源数据，不要求客户推翻原有监控体系重建。",
+        "通过统一纳管、关联分析和智能展示，帮助客户更快完成故障定界、定位和风险识别。",
+        "围绕告警治理、运营分析和管理视图建设，提升一线运维效率与管理层决策支撑能力。"
+      ],
+      "target_personas": {
+        "CIO": "关注现有运维体系是否能进一步智能化、平台化，提升整体可管理性和运营透明度。",
+        "管理层": "关注生产风险、业务健康度、运营质量和决策视图是否足够直观可信。",
+        "运维总监": "关注故障定位效率、跨团队协同效率、告警治理效果和整体运维成熟度。",
+        "平台负责人": "关注多套监控工具和运维数据能否统一纳管、统一展示、统一分析。",
+        "一线运维负责人": "关注告警是否可压缩、故障是否更容易定界、处理链路是否能缩短。"
+      },
+      "trigger_events": "多套监控工具并存但协同效率低；故障定位依赖人工经验且耗时长；告警风暴频繁影响一线运维；管理层希望获得统一运维视图；企业推进 AIOps、运维数据治理、大模型赋能或信创平台替代。",
+      "discovery_questions": [
+        "贵公司现在是不是已经有多套监控、日志或 APM 工具，但一旦出问题，团队仍然需要在多个系统之间反复切换和交叉排查？",
+        "当前最困扰你们的是“看不到数据”，还是“数据很多但很难统一分析、很难快速定位问题、告警太多太杂”？",
+        "如果现在要给管理层回答“哪个业务风险最大、哪类故障最影响生产、哪些告警最该优先处理”，现有系统能否快速给出统一视角？"
+      ],
+      "competitor_analysis": "## 竞品分析\n\n### 客户为什么会重新看 AIOps 平台\n很多客户已经不缺监控工具，真正缺的是把这些工具产出的数据、事件和关系整合起来的能力。也就是说，问题不再是“有没有数据”，而是**数据能不能统一看、统一分析、统一服务于故障处置和运营决策。**\n\n### 与重新建设采集型平台相比\n- 一些平台更强调“从头统一采集”，但大型企业往往已经有既有体系，完全重建的成本和阻力都很高。\n- 对这类客户来说，更现实的路径通常不是推翻重来，而是兼容现有多源数据，在上层建立分析和治理能力。\n- 因此，擎创更适合被讲成“多源数据智能运维中台”，而不是“另一个监控系统”。\n\n### 与单点可视化或报表平台相比\n- 单点可视化工具能做展示，但不一定能完成告警治理、关联分析和应急定界。\n- 真正的 AIOps 平台价值，应该是帮助客户从数据汇总进一步走向风险预警、根因定位和处置提效。\n\n### 销售定位建议\n销售沟通时，不建议把擎创只讲成“大屏”或“展示平台”。\n更好的定位是：\n\n\u003e **它是建立在企业既有监控体系之上的智能运维分析与治理平台。**\n\n这样更容易和客户现状接轨，也更容易避免陷入“是不是要替换现有工具”的阻力。",
+      "roi_metrics": "ROI 主要体现在四个方面：第一，减少跨系统、跨团队排查带来的时间成本，缩短故障定位和恢复时间；第二，通过告警抑制、治理和优先级优化，降低一线运维的噪音负担；第三，复用客户现有采集与监控投入，避免完全重建体系的高成本；第四，帮助管理层获得更统一的风险、健康度和运营视图，提高决策效率。对大型企业来说，它的价值不只是“看得更全”，而是“处理得更快、管理得更清楚、现有投入利用得更充分”。",
+      "vendor_market": "domestic",
+      "is_draft": true,
+      "updated_at": "2026-03-25T07:38:40.958036Z",
+      "created_at": "2026-03-25T07:38:40.958036Z"
+    },
+    {
+      "id": 9,
+      "name": "未命名方案",
+      "category": "",
+      "manufacturer_name": "",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "",
+      "highlights": [],
+      "target_personas": {},
+      "trigger_events": "",
+      "discovery_questions": [],
+      "competitor_analysis": "",
+      "roi_metrics": "",
+      "vendor_market": "all",
+      "is_draft": true,
+      "updated_at": "2026-03-25T07:39:50.827529Z",
+      "created_at": "2026-03-25T07:39:50.827529Z"
+    },
+    {
+      "id": 10,
+      "name": "未命名方案",
+      "category": "",
+      "manufacturer_name": "",
+      "sales_contact_name": "",
+      "sales_contact_phone": "",
+      "sales_contact_email": "",
+      "presales_contact_name": "",
+      "presales_contact_phone": "",
+      "presales_contact_email": "",
+      "description": "",
+      "highlights": [],
+      "target_personas": {},
+      "trigger_events": "",
+      "discovery_questions": [],
+      "competitor_analysis": "",
+      "roi_metrics": "",
+      "vendor_market": "all",
+      "is_draft": true,
+      "updated_at": "2026-03-25T08:12:47.97312Z",
+      "created_at": "2026-03-25T08:12:47.97312Z"
+    }
+  ],
+  "sales_scripts": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "scenario": "异议：迁移风险大",
+      "content": "我们建议分阶段并行：先用 KubeVirt 纳管关键 VM，再逐步容器化。每一步都有回滚窗口，业务不中断。",
+      "created_at": "2026-03-25T01:01:58.759721Z",
+      "updated_at": "2026-03-25T01:01:58.759721Z"
+    },
+    {
+      "id": 2,
+      "product_id": 1,
+      "scenario": "开场破冰",
+      "content": "如果未来三年授权成本按当前涨幅外推，这笔预算是否还能支撑贵司的云原生路线图？",
+      "created_at": "2026-03-25T01:01:58.762527Z",
+      "updated_at": "2026-03-25T01:01:58.762527Z"
+    },
+    {
+      "id": 3,
+      "product_id": 5,
+      "scenario": "开场破冰",
+      "content": "很多企业现在其实不是没有备份，而是担心真出问题时恢复不回来。Veeam 更适合用来解决这个问题——它的价值不只是多做一份副本，而是帮助企业在故障、安全事件和误操作场景下，更快把业务拉起来。",
+      "created_at": "2026-03-25T07:15:59.233Z",
+      "updated_at": "2026-03-25T07:15:59.233Z"
+    },
+    {
+      "id": 4,
+      "product_id": 5,
+      "scenario": "痛点挖掘",
+      "content": "我想先了解一下，您现在的数据保护体系更偏“备份任务完成”，还是已经做到了“按业务优先级验证恢复能力”？很多客户的难点不在备份本身，而在恢复速度、恢复成功率和多平台统一管理。",
+      "created_at": "2026-03-25T07:15:59.426405Z",
+      "updated_at": "2026-03-25T07:15:59.426405Z"
+    },
+    {
+      "id": 5,
+      "product_id": 5,
+      "scenario": "价值表达",
+      "content": "如果把它讲简单一点，Veeam 的价值主要有三点：第一，关键业务恢复更快；第二，多种工作负载可以统一保护；第三，面对勒索软件和审计要求时，管理层更放心。客户买它，不只是为了存一份数据，而是为了降低真正出事时的业务风险。",
+      "created_at": "2026-03-25T07:15:59.560378Z",
+      "updated_at": "2026-03-25T07:15:59.560378Z"
+    },
+    {
+      "id": 6,
+      "product_id": 5,
+      "scenario": "竞品对比",
+      "content": "如果客户只看采购价格，低价方案可能更容易切进去；但如果客户开始关注恢复效率、平台统一性和长期治理，Veeam 的优势会更明显。我们不建议只谈功能多少，而是建议把重点放在“关键时刻能不能恢复业务”这个结果上。",
+      "created_at": "2026-03-25T07:15:59.780314Z",
+      "updated_at": "2026-03-25T07:15:59.780314Z"
+    },
+    {
+      "id": 7,
+      "product_id": 5,
+      "scenario": "异议处理：我们已经有备份了",
+      "content": "完全理解，很多客户现在也都有备份系统。问题通常不是“有没有备份”，而是现有体系是否真的覆盖了关键业务恢复、勒索软件场景和多平台统一管理。如果方便，我们可以一起看看：现有方案在恢复演练、恢复速度和管理复杂度上，是否还有优化空间。",
+      "created_at": "2026-03-25T07:15:59.900353Z",
+      "updated_at": "2026-03-25T07:15:59.900353Z"
+    },
+    {
+      "id": 8,
+      "product_id": 5,
+      "scenario": "收口推进",
+      "content": "我建议下一步不要急着谈产品清单，先一起梳理三个问题：关键系统的恢复目标、当前备份覆盖范围，以及最近一次恢复演练结果。只要这三件事梳理清楚，是否需要升级数据保护平台，判断就会非常清晰。",
+      "created_at": "2026-03-25T07:16:00.012307Z",
+      "updated_at": "2026-03-25T07:16:00.012307Z"
+    },
+    {
+      "id": 9,
+      "product_id": 6,
+      "scenario": "开场破冰",
+      "content": "很多企业现在不是不知道要做数据安全，而是做到最后发现：密钥、证书、加密能力分散在不同系统里，真正出了问题很难统一管理。安当 KSP 更适合解决这个“底座不统一”的问题，它不是单点工具，而是把机密管理和密码服务统一纳管的平台。",
+      "created_at": "2026-03-25T07:28:48.936998Z",
+      "updated_at": "2026-03-25T07:28:48.936998Z"
+    },
+    {
+      "id": 10,
+      "product_id": 6,
+      "scenario": "痛点挖掘",
+      "content": "我想先了解一下，贵公司现在密钥、证书和加密能力是统一管理，还是由不同系统分别维护？很多客户在审计、整改或系统扩展时，真正的压力往往不是功能不够，而是体系太分散、后续运维太重。",
+      "created_at": "2026-03-25T07:28:49.131977Z",
+      "updated_at": "2026-03-25T07:28:49.131977Z"
+    },
+    {
+      "id": 11,
+      "product_id": 6,
+      "scenario": "价值表达",
+      "content": "如果把它讲简单一点，KSP 的价值主要有三点：第一，把密钥、证书和密码服务统一起来；第二，让数据加密和安全能力更容易接入业务系统；第三，在满足国密和合规要求的同时，降低后续管理和扩展难度。它解决的不是一个点，而是整个机密管理体系的可持续建设问题。",
+      "created_at": "2026-03-25T07:28:49.411742Z",
+      "updated_at": "2026-03-25T07:28:49.411742Z"
+    },
+    {
+      "id": 12,
+      "product_id": 6,
+      "scenario": "竞品对比",
+      "content": "如果客户只解决一个局部场景，单点加密产品也许够用；但如果客户希望同时覆盖应用、数据库、文件、证书和多环境统一治理，那么平台化能力会更重要。KSP 的优势不只是“能做加密”，而是能把这些能力统一起来，减少后面越做越散的风险。",
+      "created_at": "2026-03-25T07:28:49.53869Z",
+      "updated_at": "2026-03-25T07:28:49.53869Z"
+    },
+    {
+      "id": 13,
+      "product_id": 6,
+      "scenario": "异议处理：我们已经有加密或密钥管理系统了",
+      "content": "完全理解，很多客户原来也是这么建设的。问题通常不是有没有系统，而是现有体系是否真的做到了统一管理、便于审计、容易扩展、方便业务接入。如果现在多个系统分散维护、整改和运维压力越来越大，那么就说明还有进一步平台化整合的空间。",
+      "created_at": "2026-03-25T07:28:49.673452Z",
+      "updated_at": "2026-03-25T07:28:49.673452Z"
+    },
+    {
+      "id": 14,
+      "product_id": 6,
+      "scenario": "收口推进",
+      "content": "我建议下一步先不急着看产品功能清单，而是一起梳理三件事：现在有哪些密钥和证书体系、哪些业务系统需要接入、最近一次合规或审计整改卡在什么地方。只要把这三点梳理清楚，是否需要一个统一的机密管理平台，判断会非常清晰。",
+      "created_at": "2026-03-25T07:28:49.788207Z",
+      "updated_at": "2026-03-25T07:28:49.788207Z"
+    },
+    {
+      "id": 15,
+      "product_id": 8,
+      "scenario": "开场破冰",
+      "content": "很多企业现在不是没有监控，而是监控系统越建越多：指标一套、日志一套、APM 一套、云监控一套、告警平台又一套。真正出问题的时候，团队最痛苦的不是看不到，而是看得太散、切得太多、定位太慢。擎创这类平台的价值，就是把这些已有数据整合起来，形成统一的智能运维分析能力。",
+      "created_at": "2026-03-25T07:40:22.596898Z",
+      "updated_at": "2026-03-25T07:40:22.596898Z"
+    },
+    {
+      "id": 16,
+      "product_id": 8,
+      "scenario": "痛点挖掘",
+      "content": "我想先了解一下，贵公司现在运维侧最大的压力，是采集覆盖不够，还是已经有很多数据，但故障来了以后仍然要跨多个系统排查、告警太多、很难快速定界？很多大型客户真正卡住的往往不是“没有数据”，而是“数据用不起来”。",
+      "created_at": "2026-03-25T07:40:22.838053Z",
+      "updated_at": "2026-03-25T07:40:22.838053Z"
+    },
+    {
+      "id": 17,
+      "product_id": 8,
+      "scenario": "价值表达",
+      "content": "如果把它讲简单一点，擎创平台不是替换你现有监控，而是在现有基础上，把指标、日志、APM、事件这些数据统一纳管，再做关联分析、集中展示、告警治理和故障定位。这样客户既不用推翻原有投入，又能获得更高层的智能运维能力。",
+      "created_at": "2026-03-25T07:40:22.977201Z",
+      "updated_at": "2026-03-25T07:40:22.977201Z"
+    },
+    {
+      "id": 18,
+      "product_id": 8,
+      "scenario": "竞品对比",
+      "content": "有些方案更强调重新建设一套统一采集平台，但对已经有较多存量系统的大型企业来说，重建成本和推动阻力都很高。擎创更适合的路径，是兼容客户现有体系，在上层建立分析和治理能力。所以它更像“运维智能中台”，而不是“再上一套监控工具”。",
+      "created_at": "2026-03-25T07:40:23.356501Z",
+      "updated_at": "2026-03-25T07:40:23.356501Z"
+    },
+    {
+      "id": 19,
+      "product_id": 8,
+      "scenario": "异议处理：我们已经有监控平台了",
+      "content": "完全理解，而且很多成熟客户恰恰就是因为已经有很多平台，才更需要这样的能力。问题通常不是有没有监控，而是这些平台之间能不能真正形成统一视图，出了故障能不能快速关联分析，告警能不能有效降噪。如果这些问题还在，就说明仍然有很大的优化空间。",
+      "created_at": "2026-03-25T07:40:23.745064Z",
+      "updated_at": "2026-03-25T07:40:23.745064Z"
+    },
+    {
+      "id": 20,
+      "product_id": 8,
+      "scenario": "收口推进",
+      "content": "我建议下一步可以先一起梳理三件事：现有有哪些监控和数据源、当前最典型的告警噪音或故障排查痛点是什么、管理层最希望看到哪些统一视图。只要把这三件事梳理清楚，就很容易判断这类 AIOps 平台能先从哪个场景切入，价值也会更容易体现。",
+      "created_at": "2026-03-25T07:40:23.958357Z",
+      "updated_at": "2026-03-25T07:40:23.958357Z"
+    }
+  ],
+  "cases": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "client_name": "某省政务云（示例）",
+      "pain_points": "VMware 授权成本攀升，信创验收窗口紧。",
+      "solution": "OpenShift 为底座，KubeVirt 承载遗留 VM，新应用容器化发布。",
+      "value_delivered": "6 个月内完成核心系统迁移评估与一期上线，形成可复制的标准模板。",
+      "created_at": "2026-03-25T01:01:58.764959Z",
+      "updated_at": "2026-03-25T01:01:58.764959Z"
+    },
+    {
+      "id": 2,
+      "product_id": 1,
+      "client_name": "",
+      "pain_points": "",
+      "solution": "",
+      "value_delivered": "",
+      "created_at": "2026-03-25T03:01:27.433066Z",
+      "updated_at": "2026-03-25T03:01:27.433066Z"
+    },
+    {
+      "id": 4,
+      "product_id": 4,
+      "client_name": "李锦记",
+      "pain_points": "aaa",
+      "solution": "aaa",
+      "value_delivered": "aaa",
+      "created_at": "2026-03-25T04:33:58.496803Z",
+      "updated_at": "2026-03-25T04:33:58.496803Z"
+    },
+    {
+      "id": 5,
+      "product_id": 5,
+      "client_name": "某大型制造企业",
+      "pain_points": "该客户同时运行虚拟化平台、文件服务和多套关键业务系统，原有备份体系由不同工具分别维护。平时看似都在运行，但恢复演练少、管理复杂，一旦核心系统故障，IT 团队很难快速判断恢复顺序和恢复时间。",
+      "solution": "通过引入 Veeam 数据保护平台，对关键虚拟机、文件数据和核心业务系统建立统一的数据保护与恢复策略，同时加强恢复演练和副本治理，形成更清晰的业务优先级恢复机制。",
+      "value_delivered": "客户获得了更统一的数据保护视图，减少了多套工具并存带来的管理复杂度；在恢复演练和故障预案上也更有把握，管理层对关键业务连续性的信心明显提升。",
+      "created_at": "2026-03-25T07:16:00.26108Z",
+      "updated_at": "2026-03-25T07:16:00.26108Z"
+    },
+    {
+      "id": 6,
+      "product_id": 5,
+      "client_name": "某区域医疗集团",
+      "pain_points": "客户对业务连续性要求高，但现有方案更偏传统备份思路，对勒索软件、误删和多系统快速恢复准备不足。随着监管要求提升，客户希望数据保护不只是“能备份”，而是“可恢复、可审计、可演练”。",
+      "solution": "基于 Veeam 建设统一的数据保护能力，对核心业务系统和重要数据建立更规范的备份、留存与恢复机制，并结合恢复演练和管理视图，提升整体数据韧性。",
+      "value_delivered": "客户在合规、恢复演练和业务连续性管理方面更加成熟，IT 团队对关键数据的保护与恢复路径更清晰，也更容易向管理层做汇报和说明。",
+      "created_at": "2026-03-25T07:16:00.629288Z",
+      "updated_at": "2026-03-25T07:16:00.629288Z"
+    }
+  ],
+  "auth_settings": {
+    "id": 1,
+    "local_login_enabled": true,
+    "ldap_enabled": false,
+    "ldap_config": {
+      "host": "ldap.example.com",
+      "port": 389,
+      "bind_dn": "cn=readonly,dc=example,dc=com",
+      "use_tls": false,
+      "user_filter": "(uid=%s)",
+      "bind_password": "",
+      "user_search_base": "ou=users,dc=example,dc=com"
+    },
+    "oidc_enabled": false,
+    "oidc_config": {
+      "issuer": "https://keycloak.example/realms/corp",
+      "client_id": "",
+      "redirect_url": "http://localhost:8080/api/v1/auth/oidc/callback",
+      "client_secret": ""
+    },
+    "updated_at": "2026-03-25T01:01:58.756042Z"
+  }
+}
