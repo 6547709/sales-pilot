@@ -1,54 +1,69 @@
-# Sales-Pilot 一体化编排（PostgreSQL + API + 前端 + Nginx）
-# 镜像基础：PostgreSQL/Node/Go 构建链为 Bookworm；运行期 API 使用 UBI9 micro
+# Sales-Pilot 开发/生产环境 Docker Compose
+# 基于 gin-vue-admin 架构：Go + Gin 后端 + Vue + Element Plus 前端 + PostgreSQL + Redis
 
 services:
-  db:
-    image: postgres:17-bookworm
+  postgres:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: sales
-      POSTGRES_PASSWORD: sales
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sales_pilot
+    ports:
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sales -d sales_pilot"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
 
-  backend:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
     build:
-      context: ./backend
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
     environment:
-      DATABASE_URL: postgres://sales:sales@db:5432/sales_pilot?sslmode=disable
-      JWT_SECRET: ${JWT_SECRET:-please-change-me}
-      # 对外访问基址（OIDC redirect 等，经 Nginx 时勿写容器内 8080）
-      APP_BASE_URL: ${APP_BASE_URL:-http://localhost}
-      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
-      GIN_MODE: release
+      # Viper 配置文件路径
+      CONFIG_FILE: config.yaml
+    volumes:
+      # 挂载本地代码便于开发时热重载
+      - ./server:/app
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
-  frontend:
+  web:
     build:
-      context: ./frontend
-      args:
-        NEXT_PUBLIC_API_URL: ""
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
     environment:
       NODE_ENV: production
-    depends_on:
-      - backend
-
-  nginx:
-    image: nginx:1.26-bookworm
-    ports:
-      - "${HTTP_PORT:-80}:80"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web:/app
+      - /app/node_modules
     depends_on:
-      - frontend
-      - backend
+      - server
+    restart: unless-stopped
 
 volumes:
-  pgdata:
+  postgres_data:
+  redis_data:
