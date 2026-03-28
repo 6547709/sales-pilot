@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -22,7 +23,9 @@ import {
 import { LayoutGrid, Search } from "lucide-react";
 
 function ProductsInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const isFirstLoad = useRef(true);
   const initialCat = searchParams.get("solution_category_id") ?? "";
   const initialQ = searchParams.get("q") ?? searchParams.get("kw") ?? "";
   const initialMarketRaw = searchParams.get("market") ?? "";
@@ -81,8 +84,20 @@ function ProductsInner() {
           : `/api/v1/products?${params.toString()}`;
     }
     const res = await apiFetch(path);
-    if (res.ok) setList(await res.json());
-    else setList([]);
+    if (res.ok) {
+      const data = await res.json();
+      // 如果只有1个结果，自动跳转到详情页
+      if (data.length === 1 && !isFirstLoad.current) {
+        isFirstLoad.current = true;
+        router.replace(`/products/${data[0].id}`);
+        setLoading(false);
+        return;
+      }
+      setList(data);
+    } else {
+      setList([]);
+    }
+    isFirstLoad.current = false;
     setLoading(false);
   }, [q, solutionFilter, marketFilter, mfrFilter]);
 
