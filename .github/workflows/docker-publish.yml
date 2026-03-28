@@ -5,6 +5,11 @@ name: Docker publish (GHCR)
 on:
   push:
     branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "nginx/**"
+      - ".github/workflows/docker-publish.yml"
   workflow_dispatch:
 
 env:
@@ -18,7 +23,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      nginx: ${{ steps.filter.outputs.nginx }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - "backend/**"
+            frontend:
+              - "frontend/**"
+            nginx:
+              - "nginx/**"
+
   build-backend:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -69,6 +95,8 @@ jobs:
           echo "- 镜像: \`${{ env.REGISTRY }}/${{ env.OWNER_LC }}/sales-pilot-backend\`" >> "$GITHUB_STEP_SUMMARY"
 
   build-frontend:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -120,6 +148,8 @@ jobs:
           echo "- 镜像: \`${{ env.REGISTRY }}/${{ env.OWNER_LC }}/sales-pilot-frontend\`" >> "$GITHUB_STEP_SUMMARY"
 
   build-nginx:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.nginx == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
