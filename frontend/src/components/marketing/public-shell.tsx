@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { fetchMe, type User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
@@ -17,6 +17,27 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [scrollDir, setScrollDir] = useState("up");
+  const clickCount = useRef(0);
+  const lastClickTime = useRef(0);
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (user?.role === "admin" || user?.role === "ADMIN") {
+      const now = Date.now();
+      // Require clicks to be within 1000ms of each other
+      if (now - lastClickTime.current < 1000) {
+        clickCount.current += 1;
+        e.preventDefault(); // prevent next/link redirect for subsequent fast clicks
+      } else {
+        clickCount.current = 1;
+      }
+      lastClickTime.current = now;
+
+      if (clickCount.current >= 5) {
+        clickCount.current = 0;
+        window.location.href = "/admin";
+      }
+    }
+  };
 
   useEffect(() => {
     let lastScroll = window.scrollY;
@@ -50,15 +71,17 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           scrollDir === "down" ? "-translate-y-full" : "translate-y-0"
         )}
       >
-        <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-4 px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">
-              SP
-            </span>
-            <span className="hidden sm:inline">Sales-Pilot</span>
-          </Link>
+        <div className="mx-auto flex h-14 max-w-[1400px] items-center px-4">
+          <div className="flex flex-1 justify-start">
+            <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2 font-semibold text-primary">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">
+                SP
+              </span>
+              <span className="hidden sm:inline">Sales-Pilot</span>
+            </Link>
+          </div>
 
-          <div className="flex items-center gap-1 sm:gap-4">
+          <div className="flex shrink-0 justify-center">
             <nav className="flex items-center gap-1">
               {publicLinks.map((l) => (
                 <Link
@@ -75,35 +98,35 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
             </nav>
+          </div>
 
-            <div className="flex items-center gap-2">
-              {user === undefined ? null : user ? (
-                <>
-                  <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground lg:inline">
-                    {user.username}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm"
-                    onClick={() => {
-                      clearToken();
-                      setUser(null);
-                      window.location.href = "/login";
-                    }}
-                  >
-                    退出
-                  </Button>
-                </>
-              ) : (
-                <Link
-                  href="/login"
-                  className={cn(buttonVariants({ size: "sm" }), "h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm")}
+          <div className="flex flex-1 items-center justify-end gap-2">
+            {user === undefined ? null : user ? (
+              <>
+                <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground lg:inline">
+                  {user.username}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm"
+                  onClick={() => {
+                    clearToken();
+                    setUser(null);
+                    window.location.href = "/login";
+                  }}
                 >
-                  登录
-                </Link>
-              )}
-            </div>
+                  退出
+                </Button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(buttonVariants({ size: "sm" }), "h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm")}
+              >
+                登录
+              </Link>
+            )}
           </div>
         </div>
       </header>
