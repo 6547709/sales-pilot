@@ -4,17 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { fetchMe, type User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { Menu } from "lucide-react";
 
 const publicLinks = [
   { href: "/", label: "首页" },
@@ -24,6 +16,22 @@ const publicLinks = [
 export function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [scrollDir, setScrollDir] = useState("up");
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setScrollDir("down");
+      } else if (currentScrollY < lastScrollY) {
+        setScrollDir("up");
+      }
+      setLastScrollY(currentScrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   useEffect(() => {
     const t = getToken();
@@ -36,7 +44,12 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md">
+      <header
+        className={cn(
+          "sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-md transition-transform duration-300",
+          scrollDir === "down" ? "-translate-y-full" : "translate-y-0"
+        )}
+      >
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-4 px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">
@@ -45,97 +58,52 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             <span className="hidden sm:inline">Sales-Pilot</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {publicLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  pathname === l.href
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            {user === undefined ? null : user ? (
-              <>
-                <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground lg:inline">
-                  {user.username}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    clearToken();
-                    setUser(null);
-                    window.location.href = "/login";
-                  }}
-                >
-                  退出
-                </Button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className={cn(buttonVariants({ size: "sm" }))}
-              >
-                登录
-              </Link>
-            )}
-
-            <Sheet>
-              <SheetTrigger
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "md:hidden",
-                )}
-              >
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">菜单</span>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[280px]">
-                <SheetHeader>
-                  <SheetTitle>导航</SheetTitle>
-                </SheetHeader>
-                <nav className="mt-6 flex flex-col gap-1">
-                  {publicLinks.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="rounded-lg px-3 py-3 text-base font-medium hover:bg-muted"
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
-                  {user ? (
-                    <button
-                      type="button"
-                      className="rounded-lg px-3 py-3 text-left text-base font-medium hover:bg-muted"
-                      onClick={() => {
-                        clearToken();
-                        setUser(null);
-                        window.location.href = "/login";
-                      }}
-                    >
-                      退出登录
-                    </button>
-                  ) : (
-                    <Link
-                      href="/login"
-                      className="rounded-lg px-3 py-3 text-base font-medium hover:bg-muted"
-                    >
-                      登录
-                    </Link>
+          <div className="flex items-center gap-1 sm:gap-4">
+            <nav className="flex items-center gap-1">
+              {publicLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className={cn(
+                    "rounded-lg px-2 py-1 text-xs font-medium transition-colors sm:px-3 sm:py-2 sm:text-sm",
+                    pathname === l.href
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2">
+              {user === undefined ? null : user ? (
+                <>
+                  <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground lg:inline">
+                    {user.username}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm"
+                    onClick={() => {
+                      clearToken();
+                      setUser(null);
+                      window.location.href = "/login";
+                    }}
+                  >
+                    退出
+                  </Button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className={cn(buttonVariants({ size: "sm" }), "h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm")}
+                >
+                  登录
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </header>
