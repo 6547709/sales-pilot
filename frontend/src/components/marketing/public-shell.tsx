@@ -17,21 +17,21 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [scrollDir, setScrollDir] = useState("up");
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
+    let lastScroll = window.scrollY;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      if (currentScrollY > lastScroll && currentScrollY > 50) {
         setScrollDir("down");
-      } else if (currentScrollY < lastScrollY) {
+      } else if (currentScrollY < lastScroll) {
         setScrollDir("up");
       }
-      setLastScrollY(currentScrollY);
+      lastScroll = currentScrollY;
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   useEffect(() => {
     const t = getToken();
