@@ -16,7 +16,7 @@ type Claims struct {
 }
 
 // TokenTTL 访问令牌有效期
-const TokenTTL = 24 * time.Hour
+const TokenTTL = 14 * 24 * time.Hour
 
 // IssueToken 签发 JWT
 func IssueToken(secret string, userID uint, username, role string) (string, error) {
