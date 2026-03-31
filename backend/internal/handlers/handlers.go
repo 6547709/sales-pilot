@@ -557,6 +557,7 @@ func (s *Server) updateProduct(c *gin.Context) {
 		"solution_category_id":      p.SolutionCategoryID,
 		"vendor_market":             p.VendorMarket,
 		"manufacturer_name":         p.ManufacturerName,
+		"manufacturer_logo":         p.ManufacturerLogo,
 		"sales_contact_name":        p.SalesContactName,
 		"sales_contact_phone":       p.SalesContactPhone,
 		"sales_contact_email":       p.SalesContactEmail,

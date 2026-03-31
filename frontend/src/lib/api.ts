@@ -40,6 +40,7 @@ export type Product = {
   solution_category_id?: number | null;
   solution_category?: SolutionCategoryRef | null;
   manufacturer_name?: string;
+  manufacturer_logo?: string;
   sales_contact_name?: string;
   sales_contact_phone?: string;
   sales_contact_email?: string;

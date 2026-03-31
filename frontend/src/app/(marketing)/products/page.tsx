@@ -10,12 +10,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { apiFetch, fetchSolutionCategories, type Product } from "@/lib/api";
+import { apiFetch, fetchSolutionCategories, parseJsonArray, type Product } from "@/lib/api";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -203,10 +204,15 @@ function ProductsInner() {
               transition={{ delay: Math.min(i * 0.03, 0.3) }}
             >
               <Link href={`/products/${p.id}`} className="block h-full">
-                <Card className="h-full border-border/80 transition hover:border-primary/40 hover:shadow-lg">
-                  <CardHeader>
+                <Card className="h-full flex flex-col border-border/80 transition hover:border-primary/40 hover:shadow-lg overflow-hidden">
+                  <CardHeader className={(solutionFilter || mfrFilter || q || marketFilter) ? "pb-4" : ""}>
                     <div className="flex flex-wrap items-start justify-between gap-2">
-                      <CardTitle className="text-lg leading-snug">{p.name}</CardTitle>
+                      <div className="flex items-center gap-3">
+                        {p.manufacturer_logo ? (
+                          <img src={p.manufacturer_logo} alt={p.manufacturer_name ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
+                        ) : null}
+                        <CardTitle className="text-lg leading-snug">{p.name}</CardTitle>
+                      </div>
                       {vendorMarketBadgeText(p.vendor_market) ? (
                         <Badge
                           variant="outline"
@@ -222,6 +228,39 @@ function ProductsInner() {
                         : p.category || "未分类"}
                     </CardDescription>
                   </CardHeader>
+                  {(solutionFilter || mfrFilter || q || marketFilter) ? (
+                    (() => {
+                      const hl = parseJsonArray(p.highlights);
+                      const qs = parseJsonArray(p.discovery_questions);
+                      if (hl.length === 0 && qs.length === 0) return null;
+                      return (
+                        <CardContent className="mt-auto px-6 py-4 border-t bg-muted/10 text-xs flex-1">
+                          <div className="space-y-4">
+                            {hl.length > 0 && (
+                              <div>
+                                <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
+                                  <span className="text-[10px]">✨</span> 亮点优势
+                                </div>
+                                <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
+                                  {hl.map((h, i) => <li key={i} className="line-clamp-2">{h}</li>)}
+                                </ul>
+                              </div>
+                            )}
+                            {qs.length > 0 && (
+                              <div>
+                                <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
+                                  <span className="text-[10px]">💡</span> 黄金三问
+                                </div>
+                                <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
+                                  {qs.map((q, i) => <li key={i} className="line-clamp-2">{q}</li>)}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      );
+                    })()
+                  ) : null}
                 </Card>
               </Link>
             </motion.li>

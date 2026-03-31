@@ -338,6 +338,19 @@ export default function AdminProductEditPage() {
             }
           />
         </div>
+        <div className="space-y-2">
+          <Label>厂商 Logo URL（可选）</Label>
+          <Input
+            placeholder="https://..."
+            value={product.manufacturer_logo ?? ""}
+            onChange={(e) =>
+              setProduct({
+                ...product,
+                manufacturer_logo: e.target.value,
+              })
+            }
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/20 px-3 py-2">

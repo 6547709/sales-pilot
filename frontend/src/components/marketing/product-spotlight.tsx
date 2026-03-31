@@ -6,12 +6,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { apiFetch, fetchTopology, type Product } from "@/lib/api";
+import { apiFetch, fetchTopology, parseJsonArray, type Product } from "@/lib/api";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -181,12 +182,17 @@ export function ProductSpotlight({
                 transition={{ delay: i * 0.04 }}
               >
                 <Link href={`/products/${p.id}`} className="block h-full">
-                  <Card className="h-full border-border/80 transition hover:border-primary/35 hover:shadow-md">
-                    <CardHeader>
+                  <Card className="h-full flex flex-col border-border/80 transition hover:border-primary/35 hover:shadow-md overflow-hidden">
+                    <CardHeader className={(solutionId || keyword || vendorMarket) ? "pb-4" : ""}>
                       <div className="flex flex-wrap items-start justify-between gap-2">
-                        <CardTitle className="text-lg leading-snug">
-                          {p.name}
-                        </CardTitle>
+                        <div className="flex items-center gap-3">
+                          {p.manufacturer_logo ? (
+                            <img src={p.manufacturer_logo} alt={p.manufacturer_name ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
+                          ) : null}
+                          <CardTitle className="text-lg leading-snug">
+                            {p.name}
+                          </CardTitle>
+                        </div>
                         {vendorMarketBadgeText(p.vendor_market) ? (
                           <Badge
                             variant="outline"
@@ -197,9 +203,44 @@ export function ProductSpotlight({
                         ) : null}
                       </div>
                       <CardDescription className="line-clamp-2">
-                        {p.category || "方案"}
+                        {p.manufacturer_name
+                          ? `${p.manufacturer_name} · ${p.category || "方案"}`
+                          : p.category || "未分类"}
                       </CardDescription>
                     </CardHeader>
+                    {(solutionId || keyword || vendorMarket) ? (
+                      (() => {
+                        const hl = parseJsonArray(p.highlights);
+                        const qs = parseJsonArray(p.discovery_questions);
+                        if (hl.length === 0 && qs.length === 0) return null;
+                        return (
+                          <CardContent className="mt-auto px-6 py-4 border-t bg-muted/10 text-xs flex-1">
+                            <div className="space-y-4">
+                              {hl.length > 0 && (
+                                <div>
+                                  <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
+                                    <span className="text-[10px]">✨</span> 亮点优势
+                                  </div>
+                                  <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
+                                    {hl.map((h, i) => <li key={i} className="line-clamp-2">{h}</li>)}
+                                  </ul>
+                                </div>
+                              )}
+                              {qs.length > 0 && (
+                                <div>
+                                  <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
+                                    <span className="text-[10px]">💡</span> 黄金三问
+                                  </div>
+                                  <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
+                                    {qs.map((q, i) => <li key={i} className="line-clamp-2">{q}</li>)}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        );
+                      })()
+                    ) : null}
                   </Card>
                 </Link>
               </motion.li>

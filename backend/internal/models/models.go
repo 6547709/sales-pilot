@@ -28,6 +28,7 @@ type Product struct {
 	SolutionCategoryID *uint          `gorm:"index" json:"solution_category_id,omitempty"`
 	SolutionCategory   *SolutionCategory `gorm:"foreignKey:SolutionCategoryID" json:"solution_category,omitempty"`
 	ManufacturerName   string         `gorm:"size:255" json:"manufacturer_name"`
+	ManufacturerLogo   string         `gorm:"type:text" json:"manufacturer_logo"`
 	SalesContactName   string         `gorm:"size:128" json:"sales_contact_name"`
 	SalesContactPhone  string         `gorm:"size:64" json:"sales_contact_phone"`
 	SalesContactEmail  string         `gorm:"size:255" json:"sales_contact_email"`
