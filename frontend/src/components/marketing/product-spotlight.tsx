@@ -215,25 +215,35 @@ export function ProductSpotlight({
                         if (hl.length === 0 && qs.length === 0) return null;
                         return (
                           <CardContent className="mt-auto px-6 py-4 border-t bg-muted/10 text-xs flex-1">
-                            <div className="space-y-4">
+                            <div className="space-y-5">
                               {hl.length > 0 && (
                                 <div>
-                                  <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
-                                    <span className="text-[10px]">✨</span> 亮点优势
+                                  <div className="font-semibold text-primary/80 mb-2 flex items-center gap-1.5">
+                                    <span className="text-[11px]">✨</span> 亮点优势
                                   </div>
-                                  <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
-                                    {hl.map((h, i) => <li key={i} className="line-clamp-2">{h}</li>)}
-                                  </ul>
+                                  <div className="space-y-2.5 text-muted-foreground">
+                                    {hl.map((h, i) => (
+                                      <div key={i} className="flex items-start gap-2">
+                                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary mt-px">{i + 1}</span>
+                                        <span className="line-clamp-2 leading-relaxed">{h}</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                               {qs.length > 0 && (
                                 <div>
-                                  <div className="font-semibold text-primary/80 mb-1.5 flex items-center gap-1.5">
-                                    <span className="text-[10px]">💡</span> 黄金三问
+                                  <div className="font-semibold text-primary/80 mb-2 flex items-center gap-1.5">
+                                    <span className="text-[11px]">💡</span> 黄金三问
                                   </div>
-                                  <ul className="space-y-1 text-muted-foreground list-disc pl-4 marker:text-primary/40">
-                                    {qs.map((q, i) => <li key={i} className="line-clamp-2">{q}</li>)}
-                                  </ul>
+                                  <div className="space-y-2.5 text-muted-foreground">
+                                    {qs.map((q, i) => (
+                                      <div key={i} className="flex items-start gap-2">
+                                        <span className="flex h-4 w-4.5 shrink-0 items-center justify-center rounded-[4px] bg-primary/15 px-1 text-[9px] font-bold text-primary mt-px">Q{i + 1}</span>
+                                        <span className="line-clamp-2 leading-relaxed">{q}</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               )}
                             </div>
