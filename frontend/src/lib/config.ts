@@ -12,3 +12,13 @@ function resolveApiBase(): string {
 }
 
 export const API_BASE = resolveApiBase();
+
+/**
+ * 页脚文字，可选。如 "企业销售赋能"。
+ */
+export const FOOTER_TEXT = process.env.NEXT_PUBLIC_FOOTER_TEXT;
+
+/**
+ * 备案号，可选。如 "京ICP备xxxx号"。
+ */
+export const FILING_NUMBER = process.env.NEXT_PUBLIC_FILING_NUMBER;
