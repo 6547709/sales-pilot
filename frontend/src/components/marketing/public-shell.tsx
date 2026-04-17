@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { fetchMe, type User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
 
 const publicLinks = [
   { href: "/", label: "首页" },
@@ -133,9 +134,12 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1">{children}</div>
 
-      <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        <p>Sales-Pilot · 企业销售赋能</p>
-      </footer>
+      {(FOOTER_TEXT || FILING_NUMBER) && (
+        <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
+          {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
+          {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+        </footer>
+      )}
     </div>
   );
 }
