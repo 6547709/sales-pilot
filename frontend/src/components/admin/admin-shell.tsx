@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
 import type { User } from "@/lib/api";
 import { clearToken } from "@/lib/auth";
 import {
@@ -107,6 +108,12 @@ export function AdminShell({
         </div>
       </div>
 
+      {(FOOTER_TEXT || FILING_NUMBER) && (
+        <div className="fixed bottom-16 left-0 right-0 z-40 border-t bg-muted/50 py-2 text-center text-xs text-muted-foreground md:hidden">
+          {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
+          {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+        </div>
+      )}
       {/* 移动端底部导航 */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t bg-card/95 backdrop-blur md:hidden">
         {adminNav.map((item) => {
