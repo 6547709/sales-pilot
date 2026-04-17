@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { API_BASE } from "@/lib/config";
+import { API_BASE, FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
 import {
   fetchLoginOptions,
   fetchMe,
@@ -214,6 +214,12 @@ export default function LoginPage() {
           <p className="text-center text-xs text-muted-foreground">
             登录后可访问首页与方案库等企业内容。
           </p>
+          {(FOOTER_TEXT || FILING_NUMBER) && (
+            <div className="mt-4 border-t pt-4 text-center text-xs text-muted-foreground">
+              {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
+              {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
