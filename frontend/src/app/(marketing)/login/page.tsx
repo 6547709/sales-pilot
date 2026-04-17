@@ -216,8 +216,9 @@ export default function LoginPage() {
           </p>
           {(FOOTER_TEXT || FILING_NUMBER) && (
             <div className="mt-4 border-t pt-4 text-center text-xs text-muted-foreground">
-              {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
-              {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+              {FOOTER_TEXT}
+              {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
+              {FILING_NUMBER}
             </div>
           )}
         </CardContent>

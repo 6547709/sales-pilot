@@ -110,8 +110,9 @@ export function AdminShell({
 
       {(FOOTER_TEXT || FILING_NUMBER) && (
         <div className="fixed bottom-16 left-0 right-0 z-40 border-t bg-muted/50 py-2 text-center text-xs text-muted-foreground md:hidden">
-          {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
-          {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+          {FOOTER_TEXT}
+          {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
+          {FILING_NUMBER}
         </div>
       )}
       {/* 移动端底部导航 */}

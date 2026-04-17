@@ -136,8 +136,9 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
       {(FOOTER_TEXT || FILING_NUMBER) && (
         <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-          {FOOTER_TEXT && <p>{FOOTER_TEXT}</p>}
-          {FILING_NUMBER && <p>{FILING_NUMBER}</p>}
+          {FOOTER_TEXT}
+          {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
+          {FILING_NUMBER}
         </footer>
       )}
     </div>
