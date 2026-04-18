@@ -9,8 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiFetch } from "@/lib/api";
+import { useFooterConfig } from "@/lib/footer-config";
 
 type AuthSettings = {
   id: number;
@@ -27,6 +29,8 @@ export default function AdminSettingsPage() {
   const [ldapJson, setLdapJson] = useState("");
   const [oidcJson, setOidcJson] = useState("");
   const [msg, setMsg] = useState("");
+  const [footerText, setFooterText] = useState("");
+  const [filingNumber, setFilingNumber] = useState("");
 
   useEffect(() => {
     apiFetch("/api/v1/admin/auth-settings").then(async (r) => {
@@ -47,6 +51,12 @@ export default function AdminSettingsPage() {
           : JSON.stringify(data.oidc_config || {}, null, 2),
       );
     });
+    apiFetch("/api/v1/config").then(async (r) => {
+      if (!r.ok) return;
+      const data = await r.json();
+      setFooterText(data.footer_text || "");
+      setFilingNumber(data.filing_number || "");
+    });
   }, []);
 
   async function save() {
@@ -61,6 +71,14 @@ export default function AdminSettingsPage() {
       setMsg("JSON 格式错误");
       return;
     }
+    // 保存系统配置
+    await apiFetch("/api/v1/admin/system-settings", {
+      method: "PATCH",
+      body: JSON.stringify({
+        footer_text: footerText,
+        filing_number: filingNumber,
+      }),
+    });
     const res = await apiFetch("/api/v1/admin/auth-settings", {
       method: "PATCH",
       body: JSON.stringify({
@@ -160,6 +178,34 @@ export default function AdminSettingsPage() {
             value={oidcJson}
             onChange={(e) => setOidcJson(e.target.value)}
           />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>系统配置</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="ft">页脚文字</Label>
+            <Input
+              id="ft"
+              value={footerText}
+              onChange={(e) => setFooterText(e.target.value)}
+              placeholder="如：企业销售赋能"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="fn">备案号</Label>
+            <Input
+              id="fn"
+              value={filingNumber}
+              onChange={(e) => setFilingNumber(e.target.value)}
+              placeholder="如：京ICP备xxxx号"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            将在首页、登录页、管理后台底部显示。
+          </p>
         </CardContent>
       </Card>
       {msg ? <p className="text-sm text-primary">{msg}</p> : null}
