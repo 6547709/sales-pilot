@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
+import { useFooterConfig } from "@/lib/footer-config";
 import type { User } from "@/lib/api";
 import { clearToken } from "@/lib/auth";
 import {
@@ -36,6 +36,7 @@ export function AdminShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { footerText, filingNumber } = useFooterConfig();
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -108,11 +109,11 @@ export function AdminShell({
         </div>
       </div>
 
-      {(FOOTER_TEXT || FILING_NUMBER) && (
+      {(footerText || filingNumber) && (
         <div className="fixed bottom-16 left-0 right-0 z-40 border-t bg-muted/50 py-2 text-center text-xs text-muted-foreground md:hidden">
-          {FOOTER_TEXT}
-          {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
-          {FILING_NUMBER}
+          {footerText}
+          {footerText && filingNumber && <span className="mx-2">|</span>}
+          {filingNumber}
         </div>
       )}
       {/* 移动端底部导航 */}
