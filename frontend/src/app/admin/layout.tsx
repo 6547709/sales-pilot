@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { FooterConfigProvider } from "@/lib/footer-config";
 import { fetchMe, type User } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -38,5 +39,9 @@ export default function AdminLayout({
     );
   }
 
-  return <AdminShell user={user}>{children}</AdminShell>;
+  return (
+    <FooterConfigProvider>
+      <AdminShell user={user}>{children}</AdminShell>
+    </FooterConfigProvider>
+  );
 }
