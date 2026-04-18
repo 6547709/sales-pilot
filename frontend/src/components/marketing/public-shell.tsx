@@ -7,7 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { fetchMe, type User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
+import { useFooterConfig } from "@/lib/footer-config";
 
 const publicLinks = [
   { href: "/", label: "首页" },
@@ -16,6 +16,7 @@ const publicLinks = [
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { footerText, filingNumber } = useFooterConfig();
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [scrollDir, setScrollDir] = useState("up");
   const clickCount = useRef(0);
@@ -134,11 +135,11 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1">{children}</div>
 
-      {(FOOTER_TEXT || FILING_NUMBER) && (
+      {(footerText || filingNumber) && (
         <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-          {FOOTER_TEXT}
-          {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
-          {FILING_NUMBER}
+          {footerText}
+          {footerText && filingNumber && <span className="mx-2">|</span>}
+          {filingNumber}
         </footer>
       )}
     </div>
