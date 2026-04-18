@@ -13,7 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { API_BASE, FOOTER_TEXT, FILING_NUMBER } from "@/lib/config";
+import { API_BASE } from "@/lib/config";
+import { useFooterConfig } from "@/lib/footer-config";
 import {
   fetchLoginOptions,
   fetchMe,
@@ -25,6 +26,7 @@ import { getToken, setToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { footerText, filingNumber } = useFooterConfig();
   const [u, setU] = useState("");
   const [p, setP] = useState("");
   const [err, setErr] = useState("");
@@ -214,11 +216,11 @@ export default function LoginPage() {
           <p className="text-center text-xs text-muted-foreground">
             登录后可访问首页与方案库等企业内容。
           </p>
-          {(FOOTER_TEXT || FILING_NUMBER) && (
+          {(footerText || filingNumber) && (
             <div className="mt-4 border-t pt-4 text-center text-xs text-muted-foreground">
-              {FOOTER_TEXT}
-              {FOOTER_TEXT && FILING_NUMBER && <span className="mx-2">|</span>}
-              {FILING_NUMBER}
+              {footerText}
+              {footerText && filingNumber && <span className="mx-2">|</span>}
+              {filingNumber}
             </div>
           )}
         </CardContent>
