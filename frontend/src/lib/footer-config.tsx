@@ -28,7 +28,12 @@ export function FooterConfigProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     apiFetch("/api/v1/config")
       .then((r) => r.json())
-      .then((data: FooterConfig) => setConfig(data))
+      .then((data: { footer_text: string; filing_number: string }) =>
+        setConfig({
+          footerText: data.footer_text || "",
+          filingNumber: data.filing_number || "",
+        }),
+      )
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
