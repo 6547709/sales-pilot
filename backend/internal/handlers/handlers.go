@@ -386,6 +386,57 @@ func (s *Server) patchAuthSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, st)
 }
 
+// getConfig 公开接口：返回 footer 配置（无需登录）
+func (s *Server) getConfig(c *gin.Context) {
+	var st models.SystemSettings
+	if err := s.DB.FirstOrCreate(&st, models.SystemSettings{ID: 1}).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"footer_text": "", "filing_number": ""})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"footer_text":  st.FooterText,
+		"filing_number": st.FilingNumber,
+	})
+}
+
+// getSystemSettings 管理接口：获取完整配置
+func (s *Server) getSystemSettings(c *gin.Context) {
+	var st models.SystemSettings
+	if err := s.DB.FirstOrCreate(&st, models.SystemSettings{ID: 1}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, st)
+}
+
+// patchSystemSettings 管理接口：更新配置
+func (s *Server) patchSystemSettings(c *gin.Context) {
+	var body struct {
+		FooterText   *string `json:"footer_text"`
+		FilingNumber *string `json:"filing_number"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "参数错误"})
+		return
+	}
+	var st models.SystemSettings
+	if err := s.DB.FirstOrCreate(&st, models.SystemSettings{ID: 1}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if body.FooterText != nil {
+		st.FooterText = *body.FooterText
+	}
+	if body.FilingNumber != nil {
+		st.FilingNumber = *body.FilingNumber
+	}
+	if err := s.DB.Save(&st).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, st)
+}
+
 func (s *Server) listProducts(c *gin.Context) {
 	qb := s.DB.Model(&models.Product{}).Where("is_draft = ?", false)
 	qb = applyVendorMarketFilter(qb, c.Query("vendor_market"))
