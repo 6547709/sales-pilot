@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PublicShell } from "@/components/marketing/public-shell";
+import { FooterConfigProvider } from "@/lib/footer-config";
 import { fetchMe } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
@@ -66,5 +67,9 @@ export function MarketingAuthLayout({
     );
   }
 
-  return <PublicShell>{children}</PublicShell>;
+  return (
+    <FooterConfigProvider>
+      <PublicShell>{children}</PublicShell>
+    </FooterConfigProvider>
+  );
 }
