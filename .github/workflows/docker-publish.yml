@@ -136,6 +136,8 @@ jobs:
           push: true
           build-args: |
             NEXT_PUBLIC_API_URL=
+            NEXT_PUBLIC_FOOTER_TEXT=
+            NEXT_PUBLIC_FILING_NUMBER=
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
