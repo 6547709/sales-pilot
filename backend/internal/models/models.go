@@ -81,3 +81,11 @@ type AuthSettings struct {
 	OidcConfig         datatypes.JSON `gorm:"type:jsonb" json:"oidc_config"`
 	UpdatedAt          time.Time      `json:"updated_at"`
 }
+
+// SystemSettings 系统运行时配置（单例 id=1）
+type SystemSettings struct {
+	ID           uint      `gorm:"primaryKey" json:"id"`
+	FooterText   string    `gorm:"size:255" json:"footer_text"`
+	FilingNumber string    `gorm:"size:64" json:"filing_number"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
