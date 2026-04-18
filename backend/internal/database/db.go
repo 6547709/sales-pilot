@@ -25,6 +25,7 @@ func Connect(dsn string) (*gorm.DB, error) {
 		&models.SalesScript{},
 		&models.Case{},
 		&models.AuthSettings{},
+		&models.SystemSettings{},
 	); err != nil {
 		return nil, err
 	}
