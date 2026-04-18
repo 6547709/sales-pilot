@@ -31,6 +31,7 @@ func (s *Server) RegisterRoutes(r *gin.Engine) {
 	api := r.Group("/api/v1")
 
 	api.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"status": "ok"}) })
+	api.GET("/config", s.getConfig)
 
 	api.POST("/auth/login", s.postLocalLogin)
 	api.POST("/auth/login/ldap", s.postLDAPLogin)
@@ -62,6 +63,9 @@ func (s *Server) RegisterRoutes(r *gin.Engine) {
 
 		admin.GET("/auth-settings", s.getAuthSettings)
 		admin.PATCH("/auth-settings", s.patchAuthSettings)
+
+		admin.GET("/system-settings", s.getSystemSettings)
+		admin.PATCH("/system-settings", s.patchSystemSettings)
 
 		admin.GET("/users/local", s.adminListLocalUsers)
 		admin.POST("/users/local", s.adminCreateLocalUser)
