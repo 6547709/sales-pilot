@@ -5,7 +5,11 @@ import type {
   LocalUserDTO,
   LoginOptionsDTO,
   ProductDTO,
+  ScenarioDTO,
+  ScenarioDetailDTO,
+  ScenarioGroupDTO,
   SalesScriptDTO,
+  ServiceDTO,
   SolutionCategoryDTO,
   TopologyCategoryNodeDTO,
   TopologyDTO,
@@ -327,5 +331,127 @@ export function toPageResult<T, M>(
     total: p.total ?? items.length,
     page: p.page ?? page,
     pageSize: p.page_size ?? pageSize,
+  };
+}
+
+export type Service = {
+  id: number;
+  slug: string;
+  name: string;
+  kind: string;
+  summary: string;
+  highlights: string[];
+  deliverables: string[];
+  valueProp?: string;
+  features: string[];
+  iconKey?: string;
+  sortOrder: number;
+  isActive: boolean;
+  updatedAt: string;
+};
+
+export type Scenario = {
+  id: number;
+  groupId: number;
+  slug: string;
+  name: string;
+  summary: string;
+  painPoint?: string;
+  valueProp?: string;
+  iconKey?: string;
+  sortOrder: number;
+  isActive: boolean;
+};
+
+export type ScenarioSummary = {
+  scenario: Scenario;
+  productCount: number;
+  serviceCount: number;
+};
+
+export type ScenarioGroup = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  sortOrder: number;
+  scenarios: ScenarioSummary[];
+};
+
+export type ScenarioDetail = {
+  scenario: Scenario;
+  group?: { id: number; slug: string; name: string; description: string; sortOrder: number } | null;
+  services: Service[];
+  products: Product[];
+  cases: Case[];
+};
+
+export function toService(dto: ServiceDTO): Service {
+  return {
+    id: dto.id,
+    slug: dto.slug,
+    name: dto.name,
+    kind: dto.kind,
+    summary: dto.summary,
+    highlights: parseJsonArray(dto.highlights),
+    deliverables: parseJsonArray(dto.deliverables),
+    valueProp: dto.value_prop,
+    features: parseJsonArray(dto.features),
+    iconKey: dto.icon_key,
+    sortOrder: dto.sort_order,
+    isActive: dto.is_active,
+    updatedAt: dto.updated_at,
+  };
+}
+
+export function toServices(dtos: ServiceDTO[]): Service[] {
+  return dtos.map(toService);
+}
+
+export function toScenario(dto: ScenarioDTO): Scenario {
+  return {
+    id: dto.id,
+    groupId: dto.group_id,
+    slug: dto.slug,
+    name: dto.name,
+    summary: dto.summary,
+    painPoint: dto.pain_point,
+    valueProp: dto.value_prop,
+    iconKey: dto.icon_key,
+    sortOrder: dto.sort_order,
+    isActive: dto.is_active,
+  };
+}
+
+export function toScenarioGroups(dtos: ScenarioGroupDTO[]): ScenarioGroup[] {
+  return dtos.map((g) => ({
+    id: g.id,
+    slug: g.slug,
+    name: g.name,
+    description: g.description,
+    sortOrder: g.sort_order,
+    scenarios: (g.scenarios ?? []).map((s) => ({
+      scenario: toScenario(s),
+      productCount: s.product_count ?? 0,
+      serviceCount: s.service_count ?? 0,
+    })),
+  }));
+}
+
+export function toScenarioDetail(dto: ScenarioDetailDTO): ScenarioDetail {
+  return {
+    scenario: toScenario(dto.scenario),
+    group: dto.group
+      ? {
+          id: dto.group.id,
+          slug: dto.group.slug,
+          name: dto.group.name,
+          description: dto.group.description,
+          sortOrder: dto.group.sort_order,
+        }
+      : null,
+    services: toServices(dto.services ?? []),
+    products: toProducts(dto.products ?? []),
+    cases: toCases(dto.cases ?? []),
   };
 }

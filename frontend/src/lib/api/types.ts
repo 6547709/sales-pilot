@@ -91,6 +91,7 @@ export type TopologyCategoryNodeDTO = {
   keywords: string[];
   hint: string;
   vendors: { domestic: TopologyVendorDTO[]; foreign: TopologyVendorDTO[] };
+  services?: ServiceDTO[];
 };
 
 export type TopologyLayerBlockDTO = {
@@ -157,4 +158,55 @@ export type PageDTO<T> = {
   total: number;
   page: number;
   page_size: number;
+};
+
+export type ServiceDTO = {
+  id: number;
+  slug: string;
+  name: string;
+  kind: string;
+  summary: string;
+  highlights: string | string[];
+  deliverables: string | string[];
+  value_prop?: string;
+  features?: string | string[];
+  icon_key?: string;
+  sort_order: number;
+  is_active: boolean;
+  updated_at: string;
+};
+
+export type ScenarioDTO = {
+  id: number;
+  group_id: number;
+  slug: string;
+  name: string;
+  summary: string;
+  pain_point?: string;
+  value_prop?: string;
+  icon_key?: string;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export type ScenarioSummaryDTO = ScenarioDTO & {
+  product_count: number;
+  service_count: number;
+};
+
+export type ScenarioGroupDTO = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  sort_order: number;
+  scenarios: ScenarioSummaryDTO[];
+};
+
+export type ScenarioDetailDTO = {
+  scenario: ScenarioDTO;
+  group?: { id: number; slug: string; name: string; description: string; sort_order: number } | null;
+  services: ServiceDTO[];
+  products: ProductDTO[];
+  cases: CaseDTO[];
 };

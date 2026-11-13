@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toLocalUser, toPageResult, toProduct, toProductDTO } from "./adapters";
+import { toLocalUser, toPageResult, toProduct, toProductDTO, toScenarioGroups } from "./adapters";
 
 describe("toProduct", () => {
   it("maps snake_case DTO to camelCase model and parses json fields", () => {
@@ -90,5 +90,36 @@ describe("toPageResult", () => {
     expect(r.total).toBe(42);
     expect(r.page).toBe(3);
     expect(r.pageSize).toBe(2);
+  });
+});
+
+
+describe("toScenarioGroups", () => {
+  it("maps scenario summaries with counts", () => {
+    const g = toScenarioGroups([
+      {
+        id: 1,
+        slug: "dp",
+        name: "数据保护",
+        description: "",
+        sort_order: 10,
+        scenarios: [
+          {
+            id: 11,
+            group_id: 1,
+            slug: "db",
+            name: "核心数据库备份",
+            summary: "备份窗口不足",
+            sort_order: 10,
+            is_active: true,
+            product_count: 2,
+            service_count: 3,
+          },
+        ],
+      },
+    ]);
+    expect(g[0]?.scenarios[0]?.productCount).toBe(2);
+    expect(g[0]?.scenarios[0]?.serviceCount).toBe(3);
+    expect(g[0]?.scenarios[0]?.scenario.name).toBe("核心数据库备份");
   });
 });

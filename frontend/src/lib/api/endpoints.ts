@@ -1,4 +1,5 @@
 import { apiFetch, apiJson } from "./client";
+import { withView, type ViewMode } from "@/lib/view-mode-shared";
 import {
   toApiKeyCreated,
   toApiKeys,
@@ -11,6 +12,10 @@ import {
   toProductDTO,
   toProducts,
   toSalesScripts,
+  toScenarioDetail,
+  toScenarioGroups,
+  toService,
+  toServices,
   toUser,
   type ApiKeyCreateResult,
   type ApiKeyRow,
@@ -19,6 +24,9 @@ import {
   type LoginOptions,
   type PageResult,
   type Product,
+  type ScenarioDetail,
+  type ScenarioGroup,
+  type Service,
   type SalesScript,
   type SolutionCategory,
   type TopologyResponse,
@@ -32,7 +40,10 @@ import type {
   LocalUserDTO,
   LoginOptionsDTO,
   ProductDTO,
+  ScenarioDetailDTO,
+  ScenarioGroupDTO,
   SalesScriptDTO,
+  ServiceDTO,
   SolutionCategoryDTO,
   SystemSettingsDTO,
   TopologyDTO,
@@ -43,25 +54,30 @@ import type {
 export const BACKUP_RESTORE_CONFIRM = "RESTORE_FULL_V1";
 
 // 内存缓存，避免重复请求
-let topologyCache: TopologyResponse | null = null;
-let productsCache: Product[] | null = null;
+const topologyCache: Partial<Record<ViewMode, TopologyResponse>> = {};
+const productsCache: Partial<Record<ViewMode, Product[]>> = {};
 
-export async function fetchTopology(): Promise<TopologyResponse> {
-  if (topologyCache) return topologyCache;
-  const data = await apiJson<TopologyDTO>("/api/v1/topology");
-  topologyCache = data;
-  return topologyCache;
+export async function fetchTopology(view: ViewMode = "sales"): Promise<TopologyResponse> {
+  const cached = topologyCache[view];
+  if (cached) return cached;
+  const data = await apiJson<TopologyDTO>(withView("/api/v1/topology", view));
+  topologyCache[view] = data;
+  return data;
 }
 
-export async function fetchProducts(): Promise<Product[]> {
-  if (productsCache) return productsCache;
-  const data = await apiJson<ProductDTO[]>("/api/v1/products");
-  productsCache = toProducts(data);
-  return productsCache;
+export async function fetchProducts(view: ViewMode = "sales"): Promise<Product[]> {
+  const cached = productsCache[view];
+  if (cached) return cached;
+  const data = await apiJson<ProductDTO[]>(withView("/api/v1/products", view));
+  const list = toProducts(data);
+  productsCache[view] = list;
+  return list;
 }
 
 export function clearProductsCache() {
-  productsCache = null;
+  for (const key of Object.keys(productsCache)) {
+    delete productsCache[key as ViewMode];
+  }
 }
 
 export async function fetchSolutionCategories(
@@ -112,33 +128,38 @@ export async function fetchMe(): Promise<User | null> {
 
 export const productsApi = {
   list: fetchProducts,
-  async search(params: {
-    q?: string;
-    solutionCategoryId?: string | number;
-    vendorMarket?: string;
-    manufacturer?: string;
-  }): Promise<Product[]> {
+  async search(
+    params: {
+      q?: string;
+      solutionCategoryId?: string | number;
+      vendorMarket?: string;
+      manufacturer?: string;
+    },
+    view: ViewMode = "sales",
+  ): Promise<Product[]> {
     const qs = new URLSearchParams();
     if (params.q) qs.set("q", params.q);
     if (params.solutionCategoryId)
       qs.set("solution_category_id", String(params.solutionCategoryId));
     if (params.vendorMarket) qs.set("vendor_market", params.vendorMarket);
     if (params.manufacturer) qs.set("manufacturer", params.manufacturer);
-    const path = params.q
+    const base = params.q
       ? `/api/v1/products/search?${qs.toString()}`
       : `/api/v1/products${qs.toString() ? `?${qs.toString()}` : ""}`;
-    return toProducts(await apiJson<ProductDTO[]>(path));
+    return toProducts(await apiJson<ProductDTO[]>(withView(base, view)));
   },
-  async get(id: number | string): Promise<Product> {
-    return toProduct(await apiJson<ProductDTO>(`/api/v1/products/${id}`));
+  async get(id: number | string, view: ViewMode = "sales"): Promise<Product> {
+    return toProduct(await apiJson<ProductDTO>(withView(`/api/v1/products/${id}`, view)));
   },
-  async scripts(id: number | string): Promise<SalesScript[]> {
+  async scripts(id: number | string, view: ViewMode = "sales"): Promise<SalesScript[]> {
     return toSalesScripts(
-      await apiJson<SalesScriptDTO[]>(`/api/v1/products/${id}/scripts`),
+      await apiJson<SalesScriptDTO[]>(withView(`/api/v1/products/${id}/scripts`, view)),
     );
   },
-  async cases(id: number | string): Promise<Case[]> {
-    return toCases(await apiJson<CaseDTO[]>(`/api/v1/products/${id}/cases`));
+  async cases(id: number | string, view: ViewMode = "sales"): Promise<Case[]> {
+    return toCases(
+      await apiJson<CaseDTO[]>(withView(`/api/v1/products/${id}/cases`, view)),
+    );
   },
 };
 
@@ -429,5 +450,112 @@ export const backupApi = {
     apiJson<{ ok: boolean; message: string }>("/api/v1/admin/backup/import", {
       method: "POST",
       body: JSON.stringify({ confirm, backup }),
+    }),
+};
+
+
+export const servicesApi = {
+  async list(params: { kind?: string; view?: ViewMode } = {}): Promise<Service[]> {
+    const qs = new URLSearchParams();
+    if (params.kind) qs.set("kind", params.kind);
+    const base = `/api/v1/services${qs.toString() ? `?${qs.toString()}` : ""}`;
+    return toServices(await apiJson<ServiceDTO[]>(withView(base, params.view ?? "sales")));
+  },
+  async get(slug: string, view: ViewMode = "sales"): Promise<Service> {
+    return toService(await apiJson<ServiceDTO>(withView(`/api/v1/services/${slug}`, view)));
+  },
+};
+
+export const scenariosApi = {
+  async groups(view: ViewMode = "sales"): Promise<ScenarioGroup[]> {
+    const data = await apiJson<{ groups: ScenarioGroupDTO[] }>(
+      withView("/api/v1/scenarios", view),
+    );
+    return toScenarioGroups(data.groups ?? []);
+  },
+  async get(slug: string, view: ViewMode = "sales"): Promise<ScenarioDetail> {
+    return toScenarioDetail(
+      await apiJson<ScenarioDetailDTO>(withView(`/api/v1/scenarios/${slug}`, view)),
+    );
+  },
+};
+
+export type ServiceInput = {
+  slug: string;
+  name: string;
+  kind: string;
+  summary: string;
+  highlights: string[];
+  deliverables: string[];
+  value_prop?: string;
+  features: string[];
+  icon_key?: string;
+  sort_order: number;
+  is_active: boolean;
+  category_ids?: number[];
+};
+
+export const adminServicesApi = {
+  list: () => apiJson<ServiceDTO[]>("/api/v1/admin/services").then(toServices),
+  create: (input: ServiceInput) =>
+    apiJson<ServiceDTO>("/api/v1/admin/services", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then(toService),
+  update: (id: number | string, input: ServiceInput) =>
+    apiJson<ServiceDTO>(`/api/v1/admin/services/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(input),
+    }).then(toService),
+  remove: (id: number | string) =>
+    writeJSON(`/api/v1/admin/services/${id}`, "DELETE"),
+  setCategories: (id: number | string, categoryIds: number[]) =>
+    writeJSON(`/api/v1/admin/services/${id}/categories`, "PUT", {
+      category_ids: categoryIds,
+    }),
+};
+
+export type AdminScenarioGroupRow = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  sort_order: number;
+  scenario_count: number;
+};
+
+export const adminScenariosApi = {
+  groups: () => apiJson<AdminScenarioGroupRow[]>("/api/v1/admin/scenario-groups"),
+  createGroup: (input: { name: string; slug: string; description?: string }) =>
+    apiJson<AdminScenarioGroupRow>("/api/v1/admin/scenario-groups", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  updateGroup: (id: number | string, input: { name: string; slug: string; description?: string }) =>
+    apiJson<AdminScenarioGroupRow>(`/api/v1/admin/scenario-groups/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(input),
+    }),
+  removeGroup: (id: number | string) =>
+    writeJSON(`/api/v1/admin/scenario-groups/${id}`, "DELETE"),
+  list: () =>
+    apiJson<{ groups: ScenarioGroupDTO[] }>("/api/v1/admin/scenarios").then((d) =>
+      toScenarioGroups(d.groups ?? []),
+    ),
+  create: (input: Record<string, unknown>) =>
+    apiJson<unknown>("/api/v1/admin/scenarios", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  update: (id: number | string, input: Record<string, unknown>) =>
+    apiJson<unknown>(`/api/v1/admin/scenarios/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(input),
+    }),
+  remove: (id: number | string) => writeJSON(`/api/v1/admin/scenarios/${id}`, "DELETE"),
+  setLinks: (id: number | string, productIds: number[], serviceIds: number[]) =>
+    writeJSON(`/api/v1/admin/scenarios/${id}/links`, "PUT", {
+      product_ids: productIds,
+      service_ids: serviceIds,
     }),
 };

@@ -69,12 +69,7 @@ func (h *Handlers) getScenario(c *gin.Context) {
 }
 
 func (h *Handlers) adminListScenarios(c *gin.Context) {
-	groups, err := h.Scenarios.Groups(c.Request.Context())
-	if err != nil {
-		Fail(c, err)
-		return
-	}
-	OK(c, gin.H{"groups": groups})
+	h.listScenarios(c)
 }
 
 func (h *Handlers) adminCreateScenarioGroup(c *gin.Context) {
