@@ -32,7 +32,7 @@ func applyVendorMarketFilter(db *gorm.DB, raw string) *gorm.DB {
 }
 
 func (r *ProductRepository) ListPublic(ctx context.Context, solutionID *uint, keyword, market, manufacturer string) ([]models.Product, error) {
-	q := r.db.WithContext(ctx).Model(&models.Product{}).Where("is_draft = ?", false)
+	q := r.db.WithContext(ctx).Model(&models.Product{}).Preload("SolutionCategory").Where("is_draft = ?", false)
 	q = applyVendorMarketFilter(q, market)
 	if solutionID != nil && *solutionID != 0 {
 		q = q.Where("solution_category_id = ?", *solutionID)

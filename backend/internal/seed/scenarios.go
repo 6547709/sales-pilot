@@ -47,15 +47,24 @@ func defaultScenarios() []scenarioSeed {
 
 // EnsureScenarios 幂等写入默认场景组与场景。
 func EnsureScenarios(db *gorm.DB) {
+	const maxScenarioGroups = 6 // 与 service.MaxScenarioGroups 保持一致
+	var existingCount int64
+	db.Model(&models.ScenarioGroup{}).Count(&existingCount)
+
 	groupIDs := make(map[string]uint, len(defaultGroups()))
 	for _, g := range defaultGroups() {
 		var existing models.ScenarioGroup
 		err := db.Where("slug = ?", g.Slug).First(&existing).Error
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if existingCount >= maxScenarioGroups {
+				log.Printf("seed scenario group %s 跳过：场景组已达上限 %d", g.Slug, maxScenarioGroups)
+				continue
+			}
 			if err := db.Create(&g).Error; err != nil {
 				log.Printf("seed scenario group %s: %v", g.Slug, err)
 				continue
 			}
+			existingCount++
 			groupIDs[g.Slug] = g.ID
 			continue
 		}

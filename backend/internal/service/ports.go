@@ -95,6 +95,7 @@ type ServiceRepo interface {
 	FindBySlug(ctx context.Context, slug string) (*models.Service, error)
 	Create(ctx context.Context, s *models.Service) error
 	Save(ctx context.Context, s *models.Service) error
+	UpdateFields(ctx context.Context, id uint, fields map[string]any) error
 	Delete(ctx context.Context, id uint) error
 	SetCategories(ctx context.Context, serviceID uint, categoryIDs []uint) error
 	CategoryIDs(ctx context.Context, serviceID uint) ([]uint, error)
@@ -111,11 +112,13 @@ type ScenarioRepo interface {
 	FindGroup(ctx context.Context, id uint) (*models.ScenarioGroup, error)
 	CreateGroup(ctx context.Context, g *models.ScenarioGroup) error
 	SaveGroup(ctx context.Context, g *models.ScenarioGroup) error
+	UpdateGroupFields(ctx context.Context, id uint, fields map[string]any) error
 	DeleteGroup(ctx context.Context, id uint) error
 	CountGroups(ctx context.Context) (int64, error)
 	CountScenariosInGroup(ctx context.Context, groupID uint) (int64, error)
 	Create(ctx context.Context, s *models.Scenario) error
 	Save(ctx context.Context, s *models.Scenario) error
+	UpdateFields(ctx context.Context, id uint, fields map[string]any) error
 	Delete(ctx context.Context, id uint) error
 	ProductIDs(ctx context.Context, scenarioID uint) ([]uint, error)
 	ServiceIDs(ctx context.Context, scenarioID uint) ([]uint, error)

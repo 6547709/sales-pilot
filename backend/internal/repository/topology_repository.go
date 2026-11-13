@@ -90,6 +90,9 @@ func (r *TopologyRepository) DeleteCategory(ctx context.Context, id uint) error 
 		if err := tx.Where("category_id = ?", id).Delete(&models.SolutionVendor{}).Error; err != nil {
 			return err
 		}
+		if err := tx.Where("category_id = ?", id).Delete(&models.ServiceCategory{}).Error; err != nil {
+			return err
+		}
 		return tx.Delete(&models.SolutionCategory{}, id).Error
 	})
 }

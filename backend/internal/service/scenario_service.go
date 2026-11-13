@@ -168,7 +168,9 @@ func (s *ScenarioService) UpdateGroup(ctx context.Context, id uint, g *models.Sc
 		return nil, apperr.Internal(err)
 	}
 	g.ID = id
-	if err := s.repo.SaveGroup(ctx, g); err != nil {
+	if err := s.repo.UpdateGroupFields(ctx, id, map[string]any{
+		"name": g.Name, "slug": g.Slug, "description": g.Description,
+	}); err != nil {
 		return nil, apperr.Internal(err)
 	}
 	return g, nil
@@ -212,7 +214,11 @@ func (s *ScenarioService) Update(ctx context.Context, id uint, sc *models.Scenar
 		return nil, apperr.Invalid("invalid_scenario_group", "场景组不存在")
 	}
 	sc.ID = id
-	if err := s.repo.Save(ctx, sc); err != nil {
+	if err := s.repo.UpdateFields(ctx, id, map[string]any{
+		"group_id": sc.GroupID, "slug": sc.Slug, "name": sc.Name, "summary": sc.Summary,
+		"pain_point": sc.PainPoint, "value_prop": sc.ValueProp, "icon_key": sc.IconKey,
+		"sort_order": sc.SortOrder, "is_active": sc.IsActive,
+	}); err != nil {
 		return nil, apperr.Internal(err)
 	}
 	return sc, nil

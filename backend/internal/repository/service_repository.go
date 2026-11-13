@@ -68,6 +68,10 @@ func (r *ServiceRepository) Save(ctx context.Context, s *models.Service) error {
 	return r.db.WithContext(ctx).Save(s).Error
 }
 
+func (r *ServiceRepository) UpdateFields(ctx context.Context, id uint, fields map[string]any) error {
+	return r.db.WithContext(ctx).Model(&models.Service{}).Where("id = ?", id).Updates(fields).Error
+}
+
 func (r *ServiceRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("service_id = ?", id).Delete(&models.ServiceCategory{}).Error; err != nil {
