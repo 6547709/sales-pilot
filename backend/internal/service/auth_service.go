@@ -123,3 +123,29 @@ func (s *AuthService) AuthSettings(ctx context.Context) (*models.AuthSettings, e
 	}
 	return st, nil
 }
+
+// LoginOIDC 以 OIDC 身份查找或创建用户并签发令牌
+func (s *AuthService) LoginOIDC(ctx context.Context, username, email string) (string, error) {
+	u, err := s.users.FindByUsernameAndProvider(ctx, username, "oidc")
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", apperr.Internal(err)
+		}
+		u = &models.User{
+			Username: username, Email: email,
+			AuthProvider: "oidc", Role: "user", IsActive: true,
+		}
+		if err := s.users.Create(ctx, u); err != nil {
+			return "", apperr.Internal(err)
+		}
+	}
+	if !u.IsActive {
+		return "", apperr.Forbidden("user_disabled", "账号已禁用")
+	}
+	_ = s.users.UpdateLastLogin(ctx, u.ID)
+	token, err := auth.IssueToken(s.cfg.JWTSecret, u.ID, u.Username, u.Role)
+	if err != nil {
+		return "", apperr.Internal(err)
+	}
+	return token, nil
+}

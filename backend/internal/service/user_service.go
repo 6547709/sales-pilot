@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/6547709/sales-pilot/backend/internal/paging"
+
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/auth"
 	"github.com/6547709/sales-pilot/backend/internal/models"
@@ -143,4 +145,12 @@ func (s *UserService) DeleteLocal(ctx context.Context, id uint) error {
 		return apperr.Internal(err)
 	}
 	return nil
+}
+
+func (s *UserService) ListLocalPage(ctx context.Context, p paging.Request) ([]models.User, int64, error) {
+	list, total, err := s.repo.ListLocalPage(ctx, p)
+	if err != nil {
+		return nil, 0, apperr.Internal(err)
+	}
+	return list, total, nil
 }

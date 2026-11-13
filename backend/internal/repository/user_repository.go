@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/6547709/sales-pilot/backend/internal/paging"
+
 	"github.com/6547709/sales-pilot/backend/internal/models"
 	"gorm.io/gorm"
 )
@@ -66,4 +68,16 @@ func (r *UserRepository) CountActiveLocalAdmins(ctx context.Context) (int64, err
 		Where("auth_provider = ? AND role = ? AND is_active = ?", "local", "admin", true).
 		Count(&n).Error
 	return n, err
+}
+
+func (r *UserRepository) ListLocalPage(ctx context.Context, p paging.Request) ([]models.User, int64, error) {
+	q := r.db.WithContext(ctx).Model(&models.User{}).Where("auth_provider = ?", "local")
+	var total int64
+	if err := q.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	var list []models.User
+	err := r.db.WithContext(ctx).Model(&models.User{}).Where("auth_provider = ?", "local").
+		Order("id asc").Limit(p.Limit()).Offset(p.Offset()).Find(&list).Error
+	return list, total, err
 }

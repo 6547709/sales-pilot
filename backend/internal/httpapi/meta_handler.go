@@ -1,4 +1,4 @@
-package handlers
+package httpapi
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 // adminProductMaintainMeta 供 AI / MCP / OpenClaw 等拉取「产品维护」相关字段与端点说明（机器可读）
-func (s *Server) adminProductMaintainMeta(c *gin.Context) {
+func (h *Handlers) adminProductMaintainMeta(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"service":     "sales-pilot",
 		"api_version": "v1",
