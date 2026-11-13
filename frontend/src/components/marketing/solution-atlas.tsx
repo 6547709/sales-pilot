@@ -307,8 +307,7 @@ export function SolutionAtlas({
             transition={{ delay: 0.05 }}
             className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-2.5 shadow-sm dark:from-slate-950/40 dark:to-background"
           >
-            <h2 className="mb-2 flex items-center gap-2 text-sm font-bold text-primary">
-              <span className="h-2 w-2 rounded-full bg-primary" />
+            <h2 className="mb-2 text-center text-sm font-bold text-primary">
               安全体系
             </h2>
             <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-1">
@@ -380,8 +379,7 @@ export function SolutionAtlas({
             transition={{ delay: 0.05 }}
             className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-2.5 shadow-sm dark:from-slate-950/40 dark:to-background"
           >
-            <h2 className="mb-2 flex items-center gap-2 text-sm font-bold text-primary">
-              <span className="h-2 w-2 rounded-full bg-primary" />
+            <h2 className="mb-2 text-center text-sm font-bold text-primary">
               运维体系
             </h2>
             <ul className="grid grid-cols-2 gap-1.5 sm:grid-cols-1">
