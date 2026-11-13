@@ -286,7 +286,7 @@ export function UsersDataGrid() {
         recordCount={total}
         isLoading={loading}
         emptyMessage="暂无本地用户"
-        tableLayout={{ dense: true, headerBackground: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
       >
         <DataGridContainer>
           <DataGridTable />

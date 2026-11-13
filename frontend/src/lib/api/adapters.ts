@@ -377,6 +377,7 @@ export type ScenarioSummary = {
   scenario: Scenario;
   productCount: number;
   serviceCount: number;
+  keywords: string[];
 };
 
 export type ScenarioGroup = {
@@ -444,6 +445,7 @@ export function toScenarioGroups(dtos: ScenarioGroupDTO[]): ScenarioGroup[] {
       scenario: toScenario(s),
       productCount: s.product_count ?? 0,
       serviceCount: s.service_count ?? 0,
+      keywords: s.keywords ?? [],
     })),
   }));
 }

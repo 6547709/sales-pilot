@@ -15,6 +15,7 @@ type ScenarioSummary struct {
 	Scenario     models.Scenario `json:"scenario"`
 	ProductCount int64           `json:"product_count"`
 	ServiceCount int64           `json:"service_count"`
+	Keywords     []string        `json:"keywords"`
 }
 
 type ScenarioGroupView struct {
@@ -57,10 +58,21 @@ func (s *ScenarioService) Groups(ctx context.Context) ([]ScenarioGroupView, erro
 	if err != nil {
 		return nil, apperr.Internal(err)
 	}
+	productNames, err := s.repo.ProductNamesByScenario(ctx)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	serviceNames, err := s.repo.ServiceNamesByScenario(ctx)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
 	byGroup := make(map[uint][]ScenarioSummary, len(groups))
 	for _, item := range scenarios {
+		keywords := append([]string{}, productNames[item.ID]...)
+		keywords = append(keywords, serviceNames[item.ID]...)
 		byGroup[item.GroupID] = append(byGroup[item.GroupID], ScenarioSummary{
 			Scenario: item, ProductCount: pc[item.ID], ServiceCount: sc[item.ID],
+			Keywords: keywords,
 		})
 	}
 	out := make([]ScenarioGroupView, 0, len(groups))
@@ -227,6 +239,7 @@ func (s *ScenarioService) UpdateGroup(ctx context.Context, id uint, g *models.Sc
 	g.ID = id
 	if err := s.repo.UpdateGroupFields(ctx, id, map[string]any{
 		"name": g.Name, "slug": g.Slug, "description": g.Description,
+		"sort_order": g.SortOrder,
 	}); err != nil {
 		return nil, apperr.Internal(err)
 	}

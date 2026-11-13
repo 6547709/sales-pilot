@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  CategoriesGrid,
+  LayersGrid,
+  VendorsGrid,
+} from "@/features/topology/topology-data-grids";
+import {
   apiFetch,
   fetchTopology,
   fetchSolutionCategories,
@@ -410,43 +415,7 @@ export function TopologyEditor() {
               </Button>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b bg-muted/40">
-                  <tr>
-                    <th className="p-3">ID</th>
-                    <th className="p-3">level</th>
-                    <th className="p-3">标题</th>
-                    <th className="p-3">副标题</th>
-                    <th className="p-3">排序</th>
-                    <th className="p-3">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {layers.map((L) => (
-                    <tr key={L.id} className="border-b last:border-0">
-                      <td className="p-3">{L.id}</td>
-                      <td className="p-3">{L.level}</td>
-                      <td className="p-3 font-medium">{L.title}</td>
-                      <td className="p-3 text-muted-foreground">
-                        {L.subtitle}
-                      </td>
-                      <td className="p-3">{L.sort_order}</td>
-                      <td className="p-3">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          type="button"
-                          onClick={() => deleteLayer(L.id)}
-                        >
-                          删除
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <LayersGrid layers={layers} onDelete={(id) => deleteLayer(id)} />
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-6 pt-4">
@@ -565,54 +534,11 @@ export function TopologyEditor() {
               </Button>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b bg-muted/40">
-                  <tr>
-                    <th className="p-3">ID</th>
-                    <th className="p-3">名称</th>
-                    <th className="p-3">slug</th>
-                    <th className="p-3">栏目</th>
-                    <th className="p-3">分层</th>
-                    <th className="p-3">状态</th>
-                    <th className="p-3">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories.map((c) => (
-                    <tr key={c.id} className="border-b last:border-0">
-                      <td className="p-3">{c.id}</td>
-                      <td className="p-3 font-medium">{c.label}</td>
-                      <td className="p-3 text-muted-foreground">{c.slug}</td>
-                      <td className="p-3">{c.column_type}</td>
-                      <td className="p-3">{c.layer_id ?? "—"}</td>
-                      <td className="p-3">
-                        {c.is_active ? "启用" : "停用"}
-                      </td>
-                      <td className="p-3">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          type="button"
-                          className="mr-2"
-                          onClick={() => setEditCat(c)}
-                        >
-                          编辑
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          type="button"
-                          onClick={() => deleteCategory(c.id)}
-                        >
-                          删
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CategoriesGrid
+              categories={categories}
+              onEdit={(row) => setEditCat(row as never)}
+              onDelete={(id) => deleteCategory(id)}
+            />
 
             {editCat ? (
               <div className="rounded-lg border border-primary/30 bg-primary/[0.03] p-4">
@@ -835,51 +761,7 @@ export function TopologyEditor() {
               </Button>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b bg-muted/40">
-                  <tr>
-                    <th className="p-3">ID</th>
-                    <th className="p-3">方案</th>
-                    <th className="p-3">市场</th>
-                    <th className="p-3">名称</th>
-                    <th className="p-3">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vendorRows.map((v) => (
-                    <tr key={v.id} className="border-b last:border-0">
-                      <td className="p-3">{v.id}</td>
-                      <td className="p-3">
-                        {v.category_label}{" "}
-                        <span className="text-muted-foreground">
-                          (#{v.category_id})
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        {v.market === "foreign" ? "国外" : "国内"}
-                      </td>
-                      <td className="p-3 font-medium">{v.name}</td>
-                      <td className="p-3">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          type="button"
-                          onClick={() => deleteVendor(v.id)}
-                        >
-                          删除
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {vendorRows.length === 0 ? (
-                <p className="p-6 text-center text-sm text-muted-foreground">
-                  暂无数据或拓扑加载失败
-                </p>
-              ) : null}
-            </div>
+            <VendorsGrid rows={vendorRows} onDelete={(id) => deleteVendor(id)} />
           </TabsContent>
         </Tabs>
       )}

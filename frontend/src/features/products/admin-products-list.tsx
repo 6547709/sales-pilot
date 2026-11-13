@@ -292,7 +292,7 @@ export function AdminProductsList() {
         recordCount={total}
         isLoading={loading}
         emptyMessage="暂无产品"
-        tableLayout={{ dense: true, headerBackground: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
       >
         <DataGridContainer>
           <DataGridTable />

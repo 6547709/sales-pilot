@@ -196,7 +196,7 @@ export function ApiKeysDataGrid() {
         recordCount={list.length}
         isLoading={loading}
         emptyMessage="暂无 API 密钥"
-        tableLayout={{ dense: true, headerBackground: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
       >
         <DataGridContainer>
           <DataGridTable />

@@ -132,6 +132,8 @@ type ScenarioRepo interface {
 	ListPublicCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
 	ListCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
 	ListByIDs(ctx context.Context, ids []uint) ([]models.Scenario, error)
+	ProductNamesByScenario(ctx context.Context) (map[uint][]string, error)
+	ServiceNamesByScenario(ctx context.Context) (map[uint][]string, error)
 	ScenarioIDsForProduct(ctx context.Context, productID uint) ([]uint, error)
 	ScenarioIDsForService(ctx context.Context, serviceID uint) ([]uint, error)
 	SetScenariosForProduct(ctx context.Context, productID uint, scenarioIDs []uint) error

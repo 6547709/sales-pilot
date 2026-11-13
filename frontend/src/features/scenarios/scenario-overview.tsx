@@ -50,7 +50,8 @@ export function ScenarioOverview() {
           if (!kw) return true;
           return (
             item.scenario.name.toLowerCase().includes(kw) ||
-            item.scenario.summary.toLowerCase().includes(kw)
+            item.scenario.summary.toLowerCase().includes(kw) ||
+            item.keywords.some((name) => name.toLowerCase().includes(kw))
           );
         }),
       }))

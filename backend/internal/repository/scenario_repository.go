@@ -117,6 +117,39 @@ func (r *ScenarioRepository) ServiceIDs(ctx context.Context, scenarioID uint) ([
 	return ids, err
 }
 
+type nameRow struct {
+	ScenarioID uint
+	Name       string
+}
+
+func (r *ScenarioRepository) ProductNamesByScenario(ctx context.Context) (map[uint][]string, error) {
+	var rows []nameRow
+	err := r.db.WithContext(ctx).Table("scenario_products AS sp").
+		Select("sp.scenario_id AS scenario_id, p.name AS name").
+		Joins("JOIN products AS p ON p.id = sp.product_id").
+		Where("p.is_draft = ?", false).
+		Scan(&rows).Error
+	out := make(map[uint][]string, len(rows))
+	for _, row := range rows {
+		out[row.ScenarioID] = append(out[row.ScenarioID], row.Name)
+	}
+	return out, err
+}
+
+func (r *ScenarioRepository) ServiceNamesByScenario(ctx context.Context) (map[uint][]string, error) {
+	var rows []nameRow
+	err := r.db.WithContext(ctx).Table("scenario_services AS ss").
+		Select("ss.scenario_id AS scenario_id, s.name AS name").
+		Joins("JOIN services AS s ON s.id = ss.service_id").
+		Where("s.is_active = ?", true).
+		Scan(&rows).Error
+	out := make(map[uint][]string, len(rows))
+	for _, row := range rows {
+		out[row.ScenarioID] = append(out[row.ScenarioID], row.Name)
+	}
+	return out, err
+}
+
 func (r *ScenarioRepository) ListByIDs(ctx context.Context, ids []uint) ([]models.Scenario, error) {
 	if len(ids) == 0 {
 		return []models.Scenario{}, nil

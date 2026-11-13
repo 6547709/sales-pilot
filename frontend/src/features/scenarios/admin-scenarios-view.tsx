@@ -64,7 +64,13 @@ export function AdminScenariosView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [groupForm, setGroupForm] = useState<{ id?: number; name: string; slug: string; description: string } | null>(null);
+  const [groupForm, setGroupForm] = useState<{
+    id?: number;
+    name: string;
+    slug: string;
+    description: string;
+    sortOrder: number;
+  } | null>(null);
   const [scenarioForm, setScenarioForm] = useState<ScenarioForm | null>(null);
   const [deleteScenario, setDeleteScenario] = useState<ScenarioSummary | null>(null);
   const [deleteGroup, setDeleteGroup] = useState<AdminScenarioGroupRow | null>(null);
@@ -142,9 +148,18 @@ export function AdminScenariosView() {
     setBusy(true);
     try {
       if (groupForm.id) {
-        await adminScenariosApi.updateGroup(groupForm.id, groupForm);
+        await adminScenariosApi.updateGroup(groupForm.id, {
+          name: groupForm.name,
+          slug: groupForm.slug,
+          description: groupForm.description,
+          sort_order: groupForm.sortOrder,
+        });
       } else {
-        await adminScenariosApi.createGroup(groupForm);
+        await adminScenariosApi.createGroup({
+          name: groupForm.name,
+          slug: groupForm.slug,
+          description: groupForm.description,
+        });
       }
       setGroupForm(null);
       await load();
@@ -298,7 +313,7 @@ export function AdminScenariosView() {
             size="sm"
             className="mt-2 w-full"
             disabled={groups.length >= MAX_GROUPS}
-            onClick={() => setGroupForm({ name: "", slug: "", description: "" })}
+            onClick={() => setGroupForm({ name: "", slug: "", description: "", sortOrder: 0 })}
           >
             <Plus className="mr-1 h-3.5 w-3.5" />
             新建场景组{groups.length >= MAX_GROUPS ? "（已达上限）" : ""}
@@ -314,6 +329,7 @@ export function AdminScenariosView() {
                     name: activeGroup.name,
                     slug: activeGroup.slug,
                     description: activeGroup.description,
+                    sortOrder: activeGroup.sort_order,
                   })
                 }
               >
@@ -358,7 +374,7 @@ export function AdminScenariosView() {
             recordCount={scenarios.length}
             isLoading={loading}
             emptyMessage="该组还没有场景"
-            tableLayout={{ dense: true, headerBackground: true }}
+            tableLayout={{ dense: true, headerBackground: true, stripped: true }}
           >
             <DataGridContainer>
               <DataGridTable />
@@ -385,6 +401,15 @@ export function AdminScenariosView() {
                 <Input
                   value={groupForm.description}
                   onChange={(e) => setGroupForm({ ...groupForm, description: e.target.value })}
+                />
+              </FormField>
+              <FormField label="排序">
+                <Input
+                  type="number"
+                  value={groupForm.sortOrder}
+                  onChange={(e) =>
+                    setGroupForm({ ...groupForm, sortOrder: Number(e.target.value) || 0 })
+                  }
                 />
               </FormField>
             </div>

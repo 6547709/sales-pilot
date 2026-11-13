@@ -566,7 +566,10 @@ export const adminScenariosApi = {
       method: "POST",
       body: JSON.stringify(input),
     }),
-  updateGroup: (id: number | string, input: { name: string; slug: string; description?: string }) =>
+  updateGroup: (
+    id: number | string,
+    input: { name: string; slug: string; description?: string; sort_order?: number },
+  ) =>
     apiJson<AdminScenarioGroupRow>(`/api/v1/admin/scenario-groups/${id}`, {
       method: "PUT",
       body: JSON.stringify(input),

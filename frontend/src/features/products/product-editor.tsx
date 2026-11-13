@@ -34,6 +34,7 @@ import { ClipboardList, MessageSquare, Pencil, Trash2, X } from "lucide-react";
 import { Badge } from "@/components/reui/badge";
 import { Alert, AlertDescription } from "@/components/reui/alert";
 import { VisibilityLegend } from "@/components/patterns/visibility-legend";
+import { VisibilityBadge } from "@/components/patterns/visibility-badge";
 
 function emptyPresetRecord(): Record<string, string> {
   return Object.fromEntries(PERSONA_PRESET_ROLES.map((r) => [r, ""]));
@@ -457,7 +458,12 @@ export function ProductEditor({ productId }: { productId: string }) {
         </Label>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="rounded-lg border-l-4 border-l-warning bg-warning/[0.04] p-3">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-sm font-semibold">联系方式</span>
+          <VisibilityBadge kind="internal" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label>销售联系人</Label>
           <Input
@@ -531,6 +537,7 @@ export function ProductEditor({ productId }: { productId: string }) {
           />
         </div>
       </div>
+      </div>
 
       <div className="space-y-2">
         <Label>描述（支持 Markdown）</Label>
@@ -563,8 +570,11 @@ export function ProductEditor({ productId }: { productId: string }) {
         <Input placeholder="亮点 3" value={h3} onChange={(e) => setH3(e.target.value)} />
       </div>
 
-      <div className="space-y-3">
-        <Label>黄金三问</Label>
+      <div className="space-y-3 rounded-lg border-l-4 border-l-warning bg-warning/[0.04] p-3">
+        <div className="flex items-center gap-2">
+          <Label>黄金三问</Label>
+          <VisibilityBadge kind="internal" />
+        </div>
         <Textarea rows={2} value={q1} onChange={(e) => setQ1(e.target.value)} />
         <Textarea rows={2} value={q2} onChange={(e) => setQ2(e.target.value)} />
         <Textarea rows={2} value={q3} onChange={(e) => setQ3(e.target.value)} />
@@ -675,8 +685,11 @@ export function ProductEditor({ productId }: { productId: string }) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>竞品分析（Markdown）</Label>
+      <div className="space-y-2 rounded-lg border-l-4 border-l-warning bg-warning/[0.04] p-3">
+        <div className="flex items-center gap-2">
+          <Label>竞品分析（Markdown）</Label>
+          <VisibilityBadge kind="internal" />
+        </div>
         <Tabs defaultValue="edit">
           <TabsList>
             <TabsTrigger value="edit">编辑</TabsTrigger>
@@ -702,8 +715,11 @@ export function ProductEditor({ productId }: { productId: string }) {
         </Tabs>
       </div>
 
-      <div className="space-y-2">
-        <Label>ROI 指标</Label>
+      <div className="space-y-2 rounded-lg border-l-4 border-l-warning bg-warning/[0.04] p-3">
+        <div className="flex items-center gap-2">
+          <Label>ROI 指标</Label>
+          <VisibilityBadge kind="internal" />
+        </div>
         <Textarea
           rows={4}
           value={product.roiMetrics}
@@ -980,6 +996,7 @@ export function ProductEditor({ productId }: { productId: string }) {
           <CardTitle className="flex items-center gap-2 text-lg">
             <MessageSquare className="h-5 w-5 text-primary" />
             销售话术
+            <VisibilityBadge kind="internal" />
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             话术以「场景 + 正文」拆分维护；保存后立即作用于前台产品详情页的「销售话术」区块。
