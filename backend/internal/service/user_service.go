@@ -83,6 +83,15 @@ func (s *UserService) UpdateLocal(ctx context.Context, id uint, in UpdateLocalUs
 		if *in.Role != "admin" && *in.Role != "user" {
 			return nil, apperr.Invalid("invalid_role", "角色只能是 admin 或 user")
 		}
+		if u.AuthProvider == "local" && u.Role == "admin" && u.IsActive && *in.Role != "admin" {
+			n, err := s.repo.CountActiveLocalAdmins(ctx)
+			if err != nil {
+				return nil, apperr.Internal(err)
+			}
+			if n <= 1 {
+				return nil, apperr.Conflict("last_admin", "至少保留一名可用管理员")
+			}
+		}
 		u.Role = *in.Role
 	}
 	if in.IsActive != nil {

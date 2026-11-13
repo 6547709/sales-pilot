@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { apiFetch, fetchSolutionCategories, parseJsonArray, type Product } from "@/lib/api";
+import { useViewMode } from "@/lib/view-mode";
+import { withView } from "@/lib/view-mode-shared";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -39,6 +41,7 @@ function ProductsInner() {
   const [q, setQ] = useState(initialQ);
   const [marketFilter, setMarketFilter] = useState(initialMarket);
   const [mfrFilter, setMfrFilter] = useState(initialMfg);
+  const { mode } = useViewMode();
   const [list, setList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<
@@ -84,13 +87,17 @@ function ProductsInner() {
           ? "/api/v1/products"
           : `/api/v1/products?${params.toString()}`;
     }
-    const res = await apiFetch(path);
+    const res = await apiFetch(withView(path, mode));
     if (res.ok) {
       const data = await res.json();
       // 如果只有1个结果，自动跳转到详情页
       if (data.length === 1 && !isFirstLoad.current) {
         isFirstLoad.current = true;
-        router.replace(`/products/${data[0].id}`);
+        router.replace(
+          mode === "customer"
+            ? `/products/${data[0].id}?view=customer`
+            : `/products/${data[0].id}`,
+        );
         setLoading(false);
         return;
       }
@@ -100,7 +107,7 @@ function ProductsInner() {
     }
     isFirstLoad.current = false;
     setLoading(false);
-  }, [q, solutionFilter, marketFilter, mfrFilter]);
+  }, [q, solutionFilter, marketFilter, mfrFilter, mode, router]);
 
   useEffect(() => {
     load();

@@ -144,6 +144,9 @@ func (r *ProductRepository) Delete(ctx context.Context, id uint) error {
 		if err := tx.Where("product_id = ?", id).Delete(&models.Case{}).Error; err != nil {
 			return err
 		}
+		if err := tx.Where("product_id = ?", id).Delete(&models.ScenarioProduct{}).Error; err != nil {
+			return err
+		}
 		return tx.Delete(&models.Product{}, id).Error
 	})
 }

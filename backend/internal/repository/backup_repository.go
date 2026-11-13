@@ -126,6 +126,15 @@ var v2Tables = []string{
 	"services",
 }
 
+var v2IDTables = []string{"scenarios", "scenario_groups", "services"}
+
+func sequenceTables(version int) []string {
+	if version >= 2 {
+		return append(append([]string{}, backupTables...), v2IDTables...)
+	}
+	return backupTables
+}
+
 func truncateTables(version int) []string {
 	if version >= 2 {
 		return append(append([]string{}, backupTables...), v2Tables...)
@@ -232,7 +241,7 @@ func (r *BackupRepository) Restore(ctx context.Context, payload *models.BackupPa
 				}
 			}
 		}
-		for _, tbl := range backupTables {
+		for _, tbl := range sequenceTables(payload.Version) {
 			q := fmt.Sprintf(
 				`SELECT setval(pg_get_serial_sequence('%s', 'id'), COALESCE((SELECT MAX(id) FROM %s), 1))`,
 				tbl, tbl,

@@ -198,6 +198,24 @@ func (r *ScenarioRepository) ListCasesByProductIDs(ctx context.Context, ids []ui
 	return list, err
 }
 
+func (r *ScenarioRepository) ListProductsByIDsAll(ctx context.Context, ids []uint) ([]models.Product, error) {
+	if len(ids) == 0 {
+		return []models.Product{}, nil
+	}
+	var list []models.Product
+	err := r.db.WithContext(ctx).Where("id IN ?", dedupeIDs(ids)).Order("updated_at desc").Find(&list).Error
+	return list, err
+}
+
+func (r *ScenarioRepository) ListServicesByIDsAll(ctx context.Context, ids []uint) ([]models.Service, error) {
+	if len(ids) == 0 {
+		return []models.Service{}, nil
+	}
+	var list []models.Service
+	err := r.db.WithContext(ctx).Where("id IN ?", dedupeIDs(ids)).Order("sort_order ASC, id ASC").Find(&list).Error
+	return list, err
+}
+
 func (r *ScenarioRepository) DeleteLinksForProduct(ctx context.Context, productID uint) error {
 	return r.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&models.ScenarioProduct{}).Error
 }

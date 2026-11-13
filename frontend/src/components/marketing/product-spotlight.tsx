@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiFetch, fetchTopology, parseJsonArray, type Product } from "@/lib/api";
+import { useViewMode } from "@/lib/view-mode";
+import { withView } from "@/lib/view-mode-shared";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -36,6 +38,7 @@ export function ProductSpotlight({
   keyword = "",
   vendorMarket,
 }: Props) {
+  const { mode } = useViewMode();
   const [list, setList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolvedLabel, setResolvedLabel] = useState(solutionLabel ?? "");
@@ -79,13 +82,13 @@ export function ProductSpotlight({
       if (vendorMarket) q.set("vendor_market", vendorMarket);
       path = `/api/v1/products/search?${q.toString()}`;
     }
-    const res = await apiFetch(path);
+    const res = await apiFetch(withView(path, mode));
     if (res.ok) {
       const data: Product[] = await res.json();
       setList(data.slice(0, 12));
     } else setList([]);
     setLoading(false);
-  }, [solutionId, keyword, vendorMarket]);
+  }, [solutionId, keyword, vendorMarket, mode]);
 
   useEffect(() => {
     load();

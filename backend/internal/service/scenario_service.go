@@ -113,6 +113,35 @@ func (s *ScenarioService) GetBySlug(ctx context.Context, slug string, mode view.
 	}, nil
 }
 
+// GetAdminDetail 后台关联编辑：不过滤停用场景、草稿产品与停用服务。
+func (s *ScenarioService) GetAdminDetail(ctx context.Context, id uint) (*ScenarioDetail, error) {
+	scenario, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperr.NotFound("scenario_not_found", "未找到")
+		}
+		return nil, apperr.Internal(err)
+	}
+	group, _ := s.repo.FindGroup(ctx, scenario.GroupID)
+	productIDs, err := s.repo.ProductIDs(ctx, id)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	serviceIDs, err := s.repo.ServiceIDs(ctx, id)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	products, err := s.repo.ListProductsByIDsAll(ctx, productIDs)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	services, err := s.repo.ListServicesByIDsAll(ctx, serviceIDs)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	return &ScenarioDetail{Scenario: *scenario, Group: group, Products: products, Services: services}, nil
+}
+
 func (s *ScenarioService) CreateGroup(ctx context.Context, name, slug, description string) (*models.ScenarioGroup, error) {
 	if strings.TrimSpace(name) == "" || strings.TrimSpace(slug) == "" {
 		return nil, apperr.Invalid("invalid_body", "name 与 slug 必填")

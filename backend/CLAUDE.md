@@ -54,3 +54,21 @@ cmd/server → httpapi → service → repository → models
 ```bash
 go build ./... && go vet ./... && go test ./...
 ```
+
+## 双视图（销售 / 客户）
+
+- 目录接口支持 `?view=customer`，缺省 `sales`。
+- 投影在 `internal/httpapi/dto`：客户视图只返回白名单字段，联系人、黄金三问、目标画像、竞品、ROI、话术一律不下发。
+- 新增目录字段时，必须同时更新 `dto.Project*` 与投影测试。
+
+## 服务与场景
+
+- `Service` 挂在 `SolutionCategory` 上（`service_categories`），因此首页架构方框能展示服务。
+- `Scenario` 固定两级：`ScenarioGroup` → `Scenario`；组数上限 6，场景必须归组。
+- 场景通过 `scenario_products` / `scenario_services` 关联产品与服务。
+- 客户视图只展示已发布产品与公开案例（`Case.is_public`）。
+
+## 备份
+
+- 载荷版本 2：包含服务、场景与关联表。
+- 导入 v1 时不清空新表；导入 v2 时全量清空并恢复。

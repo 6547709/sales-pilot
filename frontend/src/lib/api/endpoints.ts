@@ -12,6 +12,7 @@ import {
   toProductDTO,
   toProducts,
   toSalesScripts,
+  toScenario,
   toScenarioDetail,
   toScenarioGroups,
   toService,
@@ -40,6 +41,7 @@ import type {
   LocalUserDTO,
   LoginOptionsDTO,
   ProductDTO,
+  ScenarioDTO,
   ScenarioDetailDTO,
   ScenarioGroupDTO,
   SalesScriptDTO,
@@ -525,6 +527,18 @@ export type AdminScenarioGroupRow = {
 };
 
 export const adminScenariosApi = {
+  async get(id: number | string) {
+    const data = await apiJson<{
+      scenario: ScenarioDTO;
+      services: ServiceDTO[];
+      products: ProductDTO[];
+    }>(`/api/v1/admin/scenarios/${id}`);
+    return {
+      scenario: toScenario(data.scenario),
+      services: toServices(data.services ?? []),
+      products: toProducts(data.products ?? []),
+    };
+  },
   groups: () => apiJson<AdminScenarioGroupRow[]>("/api/v1/admin/scenario-groups"),
   createGroup: (input: { name: string; slug: string; description?: string }) =>
     apiJson<AdminScenarioGroupRow>("/api/v1/admin/scenario-groups", {

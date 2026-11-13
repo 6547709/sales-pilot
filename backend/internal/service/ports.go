@@ -123,7 +123,9 @@ type ScenarioRepo interface {
 	CountProducts(ctx context.Context) (map[uint]int64, error)
 	CountServices(ctx context.Context) (map[uint]int64, error)
 	ListProductsByIDs(ctx context.Context, ids []uint) ([]models.Product, error)
+	ListProductsByIDsAll(ctx context.Context, ids []uint) ([]models.Product, error)
 	ListServicesByIDs(ctx context.Context, ids []uint) ([]models.Service, error)
+	ListServicesByIDsAll(ctx context.Context, ids []uint) ([]models.Service, error)
 	ListPublicCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
 	ListCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
 }

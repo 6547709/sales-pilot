@@ -68,6 +68,24 @@ func (h *Handlers) getScenario(c *gin.Context) {
 	})
 }
 
+func (h *Handlers) adminGetScenario(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	detail, err := h.Scenarios.GetAdminDetail(c.Request.Context(), id)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, gin.H{
+		"scenario": detail.Scenario,
+		"group":    detail.Group,
+		"services": detail.Services,
+		"products": detail.Products,
+	})
+}
+
 func (h *Handlers) adminListScenarios(c *gin.Context) {
 	h.listScenarios(c)
 }

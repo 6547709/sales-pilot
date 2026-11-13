@@ -36,7 +36,6 @@ import {
   adminProductsApi,
   adminScenariosApi,
   adminServicesApi,
-  scenariosApi,
   type AdminScenarioGroupRow,
   type Product,
   type Service,
@@ -111,7 +110,7 @@ export function AdminScenariosView() {
     setError(null);
     try {
       const [detail, products, services] = await Promise.all([
-        scenariosApi.get(item.scenario.slug, "sales"),
+        adminScenariosApi.get(item.scenario.id),
         adminProductsApi.list({ page: 1, pageSize: 100 }),
         adminServicesApi.list(),
       ]);

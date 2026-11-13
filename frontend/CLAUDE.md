@@ -60,3 +60,10 @@ npm run build
 ```
 
 涉及页面的改动还要在浏览器确认：空/加载/错误三态、375px 窄屏、深色模式。
+
+## 双视图与场景
+
+- 视图状态由 `ViewModeProvider` 提供：`useViewMode()` 返回 `mode` 与 `setMode`，URL 使用 `?view=sales|customer`。
+- 目录请求统一走 `withView(path, mode)`；不要在组件里手拼 query。
+- 客户视图隐藏内部区块：给内部区块加 `data-internal="true"`，根容器加 `view-customer` 类（`globals.css` 已定义）。
+- 场景页：`/scenarios` 总览、`/scenarios/[slug]` 详情；零计数场景不展示。

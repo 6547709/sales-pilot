@@ -80,8 +80,8 @@ export function BackupView() {
       return;
     }
     const summary = summarize(backup);
-    if (!summary || summary.version !== 1) {
-      setMsg({ kind: "error", text: "备份文件格式无效（需 version: 1）" });
+    if (!summary || (summary.version !== 1 && summary.version !== 2)) {
+      setMsg({ kind: "error", text: "备份文件格式无效（需 version: 1 或 2）" });
       return;
     }
     setPending({ backup, summary });

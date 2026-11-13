@@ -93,6 +93,7 @@ func NewRouter(d Deps) *gin.Engine {
 		admin.DELETE("/scenario-groups/:id", h.adminDeleteScenarioGroup)
 		admin.GET("/scenarios", h.adminListScenarios)
 		admin.POST("/scenarios", h.adminCreateScenario)
+		admin.GET("/scenarios/:id", h.adminGetScenario)
 		admin.PUT("/scenarios/:id", h.adminUpdateScenario)
 		admin.DELETE("/scenarios/:id", h.adminDeleteScenario)
 		admin.PUT("/scenarios/:id/links", h.adminSetScenarioLinks)

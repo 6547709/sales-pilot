@@ -228,3 +228,72 @@ func TestTopologyTreeAttachesServices(t *testing.T) {
 		t.Fatalf("services not attached: %+v", tree.Security)
 	}
 }
+
+func TestDemoteLastAdminConflicts(t *testing.T) {
+	role := "user"
+	repo := &fakeUserRepo{
+		user:   &models.User{ID: 7, AuthProvider: "local", Role: "admin", IsActive: true},
+		admins: 1,
+	}
+	svc := service.NewUserService(repo)
+	_, err := svc.UpdateLocal(context.Background(), 7, service.UpdateLocalUserInput{Role: &role})
+	if code := apperr.CodeOf(err); code != "last_admin" {
+		t.Fatalf("code=%s err=%v", code, err)
+	}
+}
+
+type fakeScenarioAdminRepo struct {
+	service.ScenarioRepo
+	scenario models.Scenario
+	products []models.Product
+	services []models.Service
+}
+
+func (f *fakeScenarioAdminRepo) FindByID(ctx context.Context, id uint) (*models.Scenario, error) {
+	s := f.scenario
+	return &s, nil
+}
+
+func (f *fakeScenarioAdminRepo) FindGroup(ctx context.Context, id uint) (*models.ScenarioGroup, error) {
+	return &models.ScenarioGroup{ID: id, Name: "数据保护"}, nil
+}
+
+func (f *fakeScenarioAdminRepo) ProductIDs(ctx context.Context, id uint) ([]uint, error) {
+	ids := make([]uint, 0, len(f.products))
+	for _, p := range f.products {
+		ids = append(ids, p.ID)
+	}
+	return ids, nil
+}
+
+func (f *fakeScenarioAdminRepo) ServiceIDs(ctx context.Context, id uint) ([]uint, error) {
+	ids := make([]uint, 0, len(f.services))
+	for _, s := range f.services {
+		ids = append(ids, s.ID)
+	}
+	return ids, nil
+}
+
+func (f *fakeScenarioAdminRepo) ListProductsByIDsAll(ctx context.Context, ids []uint) ([]models.Product, error) {
+	return f.products, nil
+}
+
+func (f *fakeScenarioAdminRepo) ListServicesByIDsAll(ctx context.Context, ids []uint) ([]models.Service, error) {
+	return f.services, nil
+}
+
+func TestAdminScenarioDetailIncludesInactiveAndDraft(t *testing.T) {
+	repo := &fakeScenarioAdminRepo{
+		scenario: models.Scenario{ID: 11, GroupID: 1, Name: "核心数据库备份", IsActive: false},
+		products: []models.Product{{ID: 1, Name: "草稿产品", IsDraft: true}},
+		services: []models.Service{{ID: 2, Name: "停用服务", IsActive: false}},
+	}
+	svc := service.NewScenarioService(repo)
+	detail, err := svc.GetAdminDetail(context.Background(), 11)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(detail.Products) != 1 || len(detail.Services) != 1 {
+		t.Fatalf("links filtered: %+v", detail)
+	}
+}
