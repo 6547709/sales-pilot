@@ -70,13 +70,13 @@ export function ArchCardButton({
         type="button"
         onClick={onClick}
         className={cn(
-          "flex w-full flex-col items-center gap-2 p-3 text-center outline-none transition-colors hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring",
-          compact && "p-2",
+          "flex w-full flex-col items-center gap-1.5 p-2.5 text-center outline-none transition-colors hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring",
+          compact && "p-1.5",
           hasFooter ? "rounded-t-xl" : "rounded-xl",
         )}
       >
-        <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary shadow-inner group-hover:bg-primary/15">
-          <Icon className="h-5 w-5" strokeWidth={1.75} />
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary shadow-inner group-hover:bg-primary/15">
+          <Icon className="h-4 w-4" strokeWidth={1.75} />
         </span>
         <span className="text-xs font-semibold leading-tight text-foreground sm:text-sm">
           {label}
@@ -90,8 +90,8 @@ export function ArchCardButton({
       {hasFooter ? (
         <div
           className={cn(
-            "flex w-full flex-col gap-1.5 rounded-b-xl border-t border-border/60 bg-muted/50 px-2 py-2 dark:bg-muted/30",
-            compact && "gap-1 py-1.5",
+            "flex w-full flex-col gap-1 rounded-b-xl border-t border-border/60 bg-muted/50 px-2 py-1.5 dark:bg-muted/30",
+            compact && "gap-1 py-1",
           )}
         >
           {hasServiceBar ? (
