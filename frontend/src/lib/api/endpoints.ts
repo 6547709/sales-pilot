@@ -403,7 +403,13 @@ export const apiKeysApi = {
 
 export const settingsApi = {
   auth: () => apiJson<AuthSettingsDTO>("/api/v1/admin/auth-settings"),
-  patchAuth: (input: Partial<AuthSettingsDTO>) =>
+  patchAuth: (input: {
+    local_login_enabled?: boolean;
+    ldap_enabled?: boolean;
+    ldap_config?: unknown;
+    oidc_enabled?: boolean;
+    oidc_config?: unknown;
+  }) =>
     apiJson<AuthSettingsDTO>("/api/v1/admin/auth-settings", {
       method: "PATCH",
       body: JSON.stringify(input),
