@@ -9,6 +9,7 @@ import {
 } from "@/components/reui/data-grid/data-grid";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -47,23 +48,35 @@ export function LayersGrid({
   onDelete: (id: number) => void;
 }) {
   const columns: GridColumns<LayerRow> = [
-    { accessorKey: "id", header: "ID", size: 64 },
-    { accessorKey: "level", header: "层级", size: 72 },
+    {
+      accessorKey: "id",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="ID" />,
+      size: 64,
+    },
+    {
+      accessorKey: "level",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="层级" />,
+      size: 72,
+    },
     {
       accessorKey: "title",
-      header: "标题",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="标题" />,
       cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
     },
     {
       accessorKey: "subtitle",
-      header: "副标题",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="副标题" />,
       cell: ({ row }) => (
         <span className="line-clamp-1 text-muted-foreground">
           {row.original.subtitle || "—"}
         </span>
       ),
     },
-    { accessorKey: "sort_order", header: "排序", size: 72 },
+    {
+      accessorKey: "sort_order",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="排序" />,
+      size: 72,
+    },
     {
       id: "actions",
       header: () => <span className="text-right">操作</span>,
@@ -94,7 +107,7 @@ export function LayersGrid({
       table={table}
       recordCount={layers.length}
       emptyMessage="暂无分层"
-      tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+      tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
     >
       <DataGridContainer>
         <DataGridTable />
@@ -114,23 +127,31 @@ export function CategoriesGrid({
   onDelete: (id: number) => void;
 }) {
   const columns: GridColumns<CategoryRow> = [
-    { accessorKey: "id", header: "ID", size: 64 },
+    {
+      accessorKey: "id",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="ID" />,
+      size: 64,
+    },
     {
       accessorKey: "label",
-      header: "名称",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="名称" />,
       cell: ({ row }) => <span className="font-medium">{row.original.label}</span>,
     },
     {
       accessorKey: "slug",
-      header: "slug",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="slug" />,
       cell: ({ row }) => (
         <span className="text-muted-foreground">{row.original.slug}</span>
       ),
     },
-    { accessorKey: "column_type", header: "栏目", size: 96 },
+    {
+      accessorKey: "column_type",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="栏目" />,
+      size: 96,
+    },
     {
       accessorKey: "layer_id",
-      header: "分层",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="分层" />,
       size: 80,
       cell: ({ row }) => row.original.layer_id ?? "—",
     },
@@ -173,7 +194,7 @@ export function CategoriesGrid({
       table={table}
       recordCount={categories.length}
       emptyMessage="暂无解决方案节点"
-      tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+      tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
     >
       <DataGridContainer>
         <DataGridTable />
@@ -191,10 +212,15 @@ export function VendorsGrid({
   onDelete: (id: number) => void;
 }) {
   const columns: GridColumns<VendorRow> = [
-    { accessorKey: "id", header: "ID", size: 64 },
+    {
+      accessorKey: "id",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="ID" />,
+      size: 64,
+    },
     {
       id: "category",
-      header: "方案",
+      accessorFn: (row) => row.category_label,
+      header: ({ column }) => <DataGridColumnHeader column={column} title="方案" />,
       cell: ({ row }) => (
         <span>
           {row.original.category_label}{" "}
@@ -204,7 +230,7 @@ export function VendorsGrid({
     },
     {
       id: "market",
-      header: "市场",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="市场" />,
       size: 88,
       cell: ({ row }) => (
         <Badge variant={row.original.market === "foreign" ? "secondary" : "info-light"}>
@@ -214,7 +240,7 @@ export function VendorsGrid({
     },
     {
       accessorKey: "name",
-      header: "名称",
+      header: ({ column }) => <DataGridColumnHeader column={column} title="名称" />,
       cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
     },
     {
@@ -243,7 +269,7 @@ export function VendorsGrid({
       table={table}
       recordCount={rows.length}
       emptyMessage="暂无数据或拓扑加载失败"
-      tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+      tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
     >
       <DataGridContainer>
         <DataGridTable />

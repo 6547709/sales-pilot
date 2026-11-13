@@ -87,6 +87,10 @@ type SettingsRepo interface {
 type BackupRepo interface {
 	Dump(ctx context.Context) (*models.BackupPayload, error)
 	Restore(ctx context.Context, payload *models.BackupPayload) error
+	ExportContent(ctx context.Context) (*models.BackupContent, error)
+	ExportConfig(ctx context.Context) (*models.BackupConfig, error)
+	ExportUsers(ctx context.Context) (*models.BackupUsers, error)
+	RestoreSections(ctx context.Context, sections map[string]bool, content *models.BackupContent, cfg *models.BackupConfig, users *models.BackupUsers) error
 }
 
 type ServiceRepo interface {

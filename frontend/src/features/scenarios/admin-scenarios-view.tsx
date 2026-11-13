@@ -10,6 +10,7 @@ import {
   type DataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
@@ -200,7 +201,8 @@ export function AdminScenariosView() {
     () => [
       {
         id: "name",
-        header: "场景",
+        accessorFn: (row) => row.scenario.name,
+        header: ({ column }) => <DataGridColumnHeader column={column} title="场景" />,
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-medium">{row.original.scenario.name}</span>
@@ -217,8 +219,18 @@ export function AdminScenariosView() {
           </span>
         ),
       },
-      { id: "products", header: "产品", cell: ({ row }) => row.original.productCount },
-      { id: "services", header: "服务", cell: ({ row }) => row.original.serviceCount },
+      {
+        id: "products",
+        accessorFn: (row) => row.productCount,
+        header: ({ column }) => <DataGridColumnHeader column={column} title="产品" />,
+        cell: ({ row }) => row.original.productCount,
+      },
+      {
+        id: "services",
+        accessorFn: (row) => row.serviceCount,
+        header: ({ column }) => <DataGridColumnHeader column={column} title="服务" />,
+        cell: ({ row }) => row.original.serviceCount,
+      },
       {
         id: "status",
         header: "状态",
@@ -343,7 +355,7 @@ export function AdminScenariosView() {
         </aside>
 
         <div className="flex min-w-0 flex-col gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-3">
             <Button variant="outline" size="sm" onClick={() => load()}>
               刷新
             </Button>
@@ -374,7 +386,7 @@ export function AdminScenariosView() {
             recordCount={scenarios.length}
             isLoading={loading}
             emptyMessage="该组还没有场景"
-            tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+            tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
           >
             <DataGridContainer>
               <DataGridTable />

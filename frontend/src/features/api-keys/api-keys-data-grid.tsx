@@ -10,6 +10,7 @@ import {
   type DataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { Alert, AlertDescription, AlertTitle } from "@/components/reui/alert";
 import { Badge } from "@/components/reui/badge";
@@ -88,12 +89,12 @@ export function ApiKeysDataGrid() {
     () => [
       {
         accessorKey: "name",
-        header: "名称",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="名称" />,
         cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
       },
       {
         accessorKey: "prefix",
-        header: "前缀",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="前缀" />,
         cell: ({ row }) => (
           <span className="font-mono text-xs text-muted-foreground">{row.original.prefix}</span>
         ),
@@ -108,7 +109,7 @@ export function ApiKeysDataGrid() {
       },
       {
         id: "expires",
-        header: "过期时间",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="过期时间" />,
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-muted-foreground">
             {formatTime(row.original.expiresAt)}
@@ -117,7 +118,7 @@ export function ApiKeysDataGrid() {
       },
       {
         id: "lastUsed",
-        header: "最后使用",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="最后使用" />,
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-muted-foreground">
             {formatTime(row.original.lastUsedAt)}
@@ -196,7 +197,7 @@ export function ApiKeysDataGrid() {
         recordCount={list.length}
         isLoading={loading}
         emptyMessage="暂无 API 密钥"
-        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
       >
         <DataGridContainer>
           <DataGridTable />

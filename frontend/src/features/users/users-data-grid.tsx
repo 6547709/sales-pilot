@@ -14,6 +14,7 @@ import {
   type DataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
@@ -122,12 +123,12 @@ export function UsersDataGrid() {
     () => [
       {
         accessorKey: "username",
-        header: "用户名",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="用户名" />,
         cell: ({ row }) => <span className="font-medium">{row.original.username}</span>,
       },
       {
         accessorKey: "email",
-        header: "邮箱",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="邮箱" />,
         cell: ({ row }) => (
           <span className="line-clamp-1 text-muted-foreground">{row.original.email || "—"}</span>
         ),
@@ -152,7 +153,7 @@ export function UsersDataGrid() {
       },
       {
         accessorKey: "createdAt",
-        header: "创建时间",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="创建时间" />,
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-muted-foreground">
             {formatTime(row.original.createdAt)}
@@ -229,7 +230,7 @@ export function UsersDataGrid() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3">
         <Input
           value={q}
           onChange={(e) => {
@@ -286,7 +287,7 @@ export function UsersDataGrid() {
         recordCount={total}
         isLoading={loading}
         emptyMessage="暂无本地用户"
-        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
       >
         <DataGridContainer>
           <DataGridTable />
