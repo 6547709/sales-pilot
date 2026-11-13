@@ -100,3 +100,17 @@ func (h *Handlers) listCases(c *gin.Context) {
 	}
 	OK(c, dto.ProjectCases(list, mode))
 }
+
+func (h *Handlers) getProductScenarios(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	mode := view.Parse(c.Query("view"))
+	list, err := h.Scenarios.ListForProduct(c.Request.Context(), id, mode)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, dto.ProjectScenarios(list, mode))
+}

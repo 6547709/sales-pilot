@@ -218,3 +218,35 @@ func (h *Handlers) adminListScenarioGroups(c *gin.Context) {
 	}
 	OK(c, list)
 }
+
+func (h *Handlers) adminGetProductLinks(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	ids, err := h.Scenarios.ScenarioIDsForProduct(c.Request.Context(), id)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, gin.H{"scenario_ids": ids})
+}
+
+func (h *Handlers) adminSetProductLinks(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	var body struct {
+		ScenarioIDs []uint `json:"scenario_ids"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		Fail(c, apperr.Invalid("invalid_body", "参数错误"))
+		return
+	}
+	if err := h.Scenarios.SetProductScenarios(c.Request.Context(), id, body.ScenarioIDs); err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, gin.H{"ok": true})
+}

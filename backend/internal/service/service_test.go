@@ -11,6 +11,7 @@ import (
 	"github.com/6547709/sales-pilot/backend/internal/models"
 	"github.com/6547709/sales-pilot/backend/internal/repository"
 	"github.com/6547709/sales-pilot/backend/internal/service"
+	"github.com/6547709/sales-pilot/backend/internal/view"
 )
 
 type fakeUserRepo struct {
@@ -323,5 +324,46 @@ func TestUpdateGroupDoesNotZeroUnownedFields(t *testing.T) {
 	}
 	if _, ok := repo.fields["created_at"]; ok {
 		t.Fatalf("must not overwrite created_at: %v", repo.fields)
+	}
+}
+
+type fakeProductScenariosRepo struct {
+	service.ScenarioRepo
+	list []models.Scenario
+}
+
+func (f *fakeProductScenariosRepo) ScenarioIDsForProduct(ctx context.Context, productID uint) ([]uint, error) {
+	ids := make([]uint, 0, len(f.list))
+	for _, s := range f.list {
+		ids = append(ids, s.ID)
+	}
+	return ids, nil
+}
+
+func (f *fakeProductScenariosRepo) ListByIDs(ctx context.Context, ids []uint) ([]models.Scenario, error) {
+	return f.list, nil
+}
+
+func TestProductScenariosFilteredForCustomer(t *testing.T) {
+	repo := &fakeProductScenariosRepo{list: []models.Scenario{
+		{ID: 1, Name: "启用场景", IsActive: true},
+		{ID: 2, Name: "停用场景", IsActive: false},
+	}}
+	svc := service.NewScenarioService(repo)
+
+	customer, err := svc.ListForProduct(context.Background(), 9, view.Customer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(customer) != 1 || customer[0].ID != 1 {
+		t.Fatalf("customer=%+v", customer)
+	}
+
+	sales, err := svc.ListForProduct(context.Background(), 9, view.Sales)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(sales) != 2 {
+		t.Fatalf("sales=%+v", sales)
 	}
 }

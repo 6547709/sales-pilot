@@ -11,12 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
-  apiFetch,
+  productsApi,
+  fetchTopology,
   parseJsonArray,
   parsePersonas,
   type Case,
   type Product,
   type SalesScript,
+  type Scenario,
+  type TopologyResponse,
 } from "@/lib/api";
 import { useViewMode } from "@/lib/view-mode";
 import {
@@ -27,6 +30,7 @@ import {
   BookOpen,
   Building2,
   ClipboardList,
+  Compass,
   Copy,
   Lightbulb,
   Mail,
@@ -35,6 +39,7 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  Wrench,
   UserCircle,
   Users,
   Zap,
@@ -138,24 +143,37 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [scripts, setScripts] = useState<SalesScript[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
+  const [relatedScenarios, setRelatedScenarios] = useState<Scenario[]>([]);
+  const [topology, setTopology] = useState<TopologyResponse | null>(null);
   const [activeSection, setActiveSection] = useState<string>("overview");
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const load = useCallback(async () => {
-    const query = `?view=${mode}`;
-    const [pr, sr, cr] = await Promise.all([
-      apiFetch(`/api/v1/products/${id}${query}`),
-      apiFetch(`/api/v1/products/${id}/scripts${query}`),
-      apiFetch(`/api/v1/products/${id}/cases${query}`),
-    ]);
-    if (pr.ok) setProduct(await pr.json());
-    if (sr.ok) setScripts(await sr.json());
-    if (cr.ok) setCases(await cr.json());
+    try {
+      const [p, s, c, sc] = await Promise.all([
+        productsApi.get(id, mode),
+        productsApi.scripts(id, mode),
+        productsApi.cases(id, mode),
+        productsApi.scenarios(id, mode).catch(() => []),
+      ]);
+      setProduct(p);
+      setScripts(s);
+      setCases(c);
+      setRelatedScenarios(sc);
+    } catch {
+      setProduct(null);
+    }
   }, [id, mode]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    fetchTopology(mode)
+      .then(setTopology)
+      .catch(() => setTopology(null));
+  }, [mode]);
 
   useEffect(() => {
     const sections = sectionNav.map((s) => document.getElementById(s.id)).filter(Boolean);
@@ -182,7 +200,25 @@ export default function ProductDetailPage() {
   }
 
   const prod = product;
-  const internalSections = new Set(["questions", "personas", "competitor", "roi", "scripts"]);
+  const allCategories = topology
+    ? [
+        ...topology.security,
+        ...topology.ops,
+        ...topology.central_layers.flatMap((b) => b.categories),
+      ]
+    : [];
+  const relatedServices =
+    (prod.solutionCategoryId
+      ? allCategories.find((c) => c.id === prod.solutionCategoryId)?.services
+      : undefined) ?? [];
+  const internalSections = new Set([
+    "contacts",
+    "questions",
+    "personas",
+    "competitor",
+    "roi",
+    "scripts",
+  ]);
   const visibleNav =
     mode === "customer" ? sectionNav.filter((s) => !internalSections.has(s.id)) : sectionNav;
   const highlights = parseJsonArray(prod.highlights);
@@ -315,6 +351,7 @@ export default function ProductDetailPage() {
               </Card>
             </motion.section>
 
+            {mode === "sales" ? (
             <motion.section id="contacts" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
@@ -377,6 +414,7 @@ export default function ProductDetailPage() {
                 </CardContent>
               </Card>
             </motion.section>
+            ) : null}
 
             {mode === "customer" ? (
               <div className="grid gap-4 md:grid-cols-2">
@@ -405,7 +443,7 @@ export default function ProductDetailPage() {
                     </CardHeader>
                     <CardContent>
                       <ul className="list-disc space-y-1 pl-5 text-sm">
-                        {(prod.customerFeatures.length > 0
+                        {(prod.customerFeatures?.length > 0
                           ? prod.customerFeatures
                           : highlights
                         ).map((item) => (
@@ -415,6 +453,53 @@ export default function ProductDetailPage() {
                     </CardContent>
                   </Card>
                 </motion.section>
+              </div>
+            ) : null}
+
+            {relatedServices.length > 0 || relatedScenarios.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {relatedServices.length > 0 ? (
+                  <motion.section id="services" {...cardMotion}>
+                    <Card className="h-full">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <Wrench className="h-5 w-5 text-primary" />
+                          相关服务
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-1.5">
+                          {relatedServices.map((svc) => (
+                            <Link key={svc.id} href={`/services/${svc.slug}`}>
+                              <Badge variant="secondary">{svc.name}</Badge>
+                            </Link>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.section>
+                ) : null}
+                {relatedScenarios.length > 0 ? (
+                  <motion.section id="scenarios" {...cardMotion}>
+                    <Card className="h-full">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <Compass className="h-5 w-5 text-primary" />
+                          相关场景
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-1.5">
+                          {relatedScenarios.map((sc) => (
+                            <Link key={sc.id} href={`/scenarios/${sc.slug}`}>
+                              <Badge variant="outline">{sc.name}</Badge>
+                            </Link>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.section>
+                ) : null}
               </div>
             ) : null}
 

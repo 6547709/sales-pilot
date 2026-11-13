@@ -13,9 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   apiFetch,
+  adminProductsApi,
+  adminScenariosApi,
   fetchSolutionCategories,
   parseJsonArray,
   parsePersonas,
+  toProduct,
   toProductDTO,
   type Case,
   type Product,
@@ -55,6 +58,11 @@ export function ProductEditor({ productId }: { productId: string }) {
     { id: number; label: string; slug: string; is_active: boolean }[]
   >([]);
   const [cases, setCases] = useState<Case[]>([]);
+  const [scenarioOptions, setScenarioOptions] = useState<
+    { id: number; name: string; group: string }[]
+  >([]);
+  const [linkedScenarioIds, setLinkedScenarioIds] = useState<number[]>([]);
+  const [linkMsg, setLinkMsg] = useState("");
   const [scripts, setScripts] = useState<SalesScript[]>([]);
   const [editingScriptId, setEditingScriptId] = useState<number | null>(null);
   const [editingScenario, setEditingScenario] = useState("");
@@ -71,16 +79,41 @@ export function ProductEditor({ productId }: { productId: string }) {
     fetchSolutionCategories(false).then(setSolutionOptions);
   }, []);
 
+  useEffect(() => {
+    adminScenariosApi
+      .list()
+      .then((groups) =>
+        setScenarioOptions(
+          groups.flatMap((g) =>
+            g.scenarios.map((item) => ({
+              id: item.scenario.id,
+              name: item.scenario.name,
+              group: g.name,
+            })),
+          ),
+        ),
+      )
+      .catch(() => setScenarioOptions([]));
+    adminProductsApi
+      .getScenarioLinks(id)
+      .then(setLinkedScenarioIds)
+      .catch(() => setLinkedScenarioIds([]));
+  }, [id]);
+
   const refreshCases = useCallback(async () => {
-    const cr = await apiFetch(`/api/v1/admin/products/${id}/cases`);
-    if (cr.ok) setCases(await cr.json());
-    else setCases([]);
+    try {
+      setCases(await adminProductsApi.listCases(id));
+    } catch {
+      setCases([]);
+    }
   }, [id]);
 
   const refreshScripts = useCallback(async () => {
-    const sr = await apiFetch(`/api/v1/admin/products/${id}/scripts`);
-    if (sr.ok) setScripts(await sr.json());
-    else setScripts([]);
+    try {
+      setScripts(await adminProductsApi.listScripts(id));
+    } catch {
+      setScripts([]);
+    }
   }, [id]);
 
   const load = useCallback(async () => {
@@ -93,7 +126,7 @@ export function ProductEditor({ productId }: { productId: string }) {
       setProduct(null);
       return;
     }
-    const p: Product = await pr.json();
+    const p: Product = toProduct(await pr.json());
     setProduct(p);
     const hl = parseJsonArray(p.highlights);
     setH1(hl[0] || "");
@@ -232,6 +265,56 @@ export function ProductEditor({ productId }: { productId: string }) {
           蓝色区块客户可见；琥珀色区块仅内部可见，不会出现在客户视图。
         </AlertDescription>
       </Alert>
+
+      <details className="rounded-lg border border-primary/20 bg-card p-3 text-sm">
+        <summary className="cursor-pointer font-medium text-primary">
+          关联场景（已选 {linkedScenarioIds.length}）
+        </summary>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {scenarioOptions.map((opt) => {
+            const checked = linkedScenarioIds.includes(opt.id);
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() =>
+                  setLinkedScenarioIds((prev) =>
+                    checked ? prev.filter((id) => id !== opt.id) : [...prev, opt.id],
+                  )
+                }
+                className={
+                  checked
+                    ? "rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                    : "rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground"
+                }
+                title={opt.group}
+              >
+                {opt.name}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Button
+            type="button"
+            size="sm"
+            onClick={async () => {
+              setLinkMsg("");
+              try {
+                await adminProductsApi.setScenarioLinks(id, linkedScenarioIds);
+                setLinkMsg("场景关联已保存");
+              } catch (e) {
+                setLinkMsg(e instanceof Error ? e.message : "保存失败");
+              }
+            }}
+          >
+            保存关联
+          </Button>
+          {linkMsg ? (
+            <span className="text-xs text-muted-foreground">{linkMsg}</span>
+          ) : null}
+        </div>
+      </details>
 
       <details className="rounded-lg border border-primary/20 bg-primary/[0.04] p-4 text-sm">
         <summary className="cursor-pointer font-medium text-primary">
@@ -698,7 +781,14 @@ export function ProductEditor({ productId }: { productId: string }) {
                         `/api/v1/admin/cases/${c.id}`,
                         {
                           method: "PUT",
-                          body: JSON.stringify(c),
+                          body: JSON.stringify({
+                            client_name: c.clientName,
+                            industry: c.industry ?? "",
+                            is_public: c.isPublic ?? false,
+                            pain_points: c.painPoints,
+                            solution: c.solution,
+                            value_delivered: c.valueDelivered,
+                          }),
                         },
                       );
                       if (res.ok) {

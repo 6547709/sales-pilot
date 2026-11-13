@@ -142,6 +142,63 @@ func (s *ScenarioService) GetAdminDetail(ctx context.Context, id uint) (*Scenari
 	return &ScenarioDetail{Scenario: *scenario, Group: group, Products: products, Services: services}, nil
 }
 
+func (s *ScenarioService) ListForProduct(ctx context.Context, productID uint, mode view.Mode) ([]models.Scenario, error) {
+	ids, err := s.repo.ScenarioIDsForProduct(ctx, productID)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	list, err := s.repo.ListByIDs(ctx, ids)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	if mode.IsCustomer() {
+		out := make([]models.Scenario, 0, len(list))
+		for _, item := range list {
+			if item.IsActive {
+				out = append(out, item)
+			}
+		}
+		return out, nil
+	}
+	return list, nil
+}
+
+func (s *ScenarioService) ListForService(ctx context.Context, serviceID uint, mode view.Mode) ([]models.Scenario, error) {
+	ids, err := s.repo.ScenarioIDsForService(ctx, serviceID)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	list, err := s.repo.ListByIDs(ctx, ids)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	if mode.IsCustomer() {
+		out := make([]models.Scenario, 0, len(list))
+		for _, item := range list {
+			if item.IsActive {
+				out = append(out, item)
+			}
+		}
+		return out, nil
+	}
+	return list, nil
+}
+
+func (s *ScenarioService) ScenarioIDsForProduct(ctx context.Context, productID uint) ([]uint, error) {
+	ids, err := s.repo.ScenarioIDsForProduct(ctx, productID)
+	if err != nil {
+		return nil, apperr.Internal(err)
+	}
+	return ids, nil
+}
+
+func (s *ScenarioService) SetProductScenarios(ctx context.Context, productID uint, scenarioIDs []uint) error {
+	if err := s.repo.SetScenariosForProduct(ctx, productID, scenarioIDs); err != nil {
+		return apperr.Internal(err)
+	}
+	return nil
+}
+
 func (s *ScenarioService) CreateGroup(ctx context.Context, name, slug, description string) (*models.ScenarioGroup, error) {
 	if strings.TrimSpace(name) == "" || strings.TrimSpace(slug) == "" {
 		return nil, apperr.Invalid("invalid_body", "name 与 slug 必填")

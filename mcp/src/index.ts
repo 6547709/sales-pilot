@@ -80,6 +80,21 @@ server.registerTool(
 );
 
 server.registerTool(
+  "products_link_scenarios",
+  {
+    description: "设置产品关联的场景",
+    inputSchema: { id: z.number(), scenario_ids: z.array(z.number()) },
+  },
+  async (args) =>
+    text(
+      await api(`/api/v1/admin/products/${args.id}/links`, {
+        method: "PUT",
+        body: JSON.stringify({ scenario_ids: args.scenario_ids }),
+      }),
+    ),
+);
+
+server.registerTool(
   "products_set_publish",
   {
     description: "切换产品草稿/发布状态",

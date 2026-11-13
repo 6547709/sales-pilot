@@ -200,6 +200,8 @@ func (r *ProductRepository) UpdateCase(ctx context.Context, c *models.Case) erro
 	return r.db.WithContext(ctx).Model(&models.Case{}).Where("id = ?", c.ID).
 		Updates(map[string]any{
 			"client_name":     c.ClientName,
+			"industry":        c.Industry,
+			"is_public":       c.IsPublic,
 			"pain_points":     c.PainPoints,
 			"solution":        c.Solution,
 			"value_delivered": c.ValueDelivered,
