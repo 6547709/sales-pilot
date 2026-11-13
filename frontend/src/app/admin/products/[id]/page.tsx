@@ -16,6 +16,7 @@ import {
   fetchSolutionCategories,
   parseJsonArray,
   parsePersonas,
+  toProductDTO,
   type Case,
   type Product,
   type SalesScript,
@@ -96,12 +97,12 @@ export default function AdminProductEditPage() {
     setH1(hl[0] || "");
     setH2(hl[1] || "");
     setH3(hl[2] || "");
-    const qs = parseJsonArray(p.discovery_questions);
+    const qs = parseJsonArray(p.discoveryQuestions);
     setQ1(qs[0] || "");
     setQ2(qs[1] || "");
     setQ3(qs[2] || "");
     const { preset, extra } = splitPersonasForForm(
-      parsePersonas(p.target_personas),
+      parsePersonas(p.targetPersonas),
     );
     setPresetPersonas(preset);
     setExtraPersonas(extra);
@@ -119,11 +120,8 @@ export default function AdminProductEditPage() {
     if (!product) return;
     setMsg("");
     const personas = mergePersonasFromForm(presetPersonas, extraPersonas);
-    const { solution_category: _sc, ...clean } = product;
     const body = {
-      ...clean,
-      solution_category_id: product.solution_category_id ?? null,
-      is_draft: product.is_draft ?? false,
+      ...toProductDTO(product),
       highlights: [h1, h2, h3].filter(Boolean),
       discovery_questions: [q1, q2, q3].filter(Boolean),
       target_personas: personas,
@@ -268,14 +266,14 @@ export default function AdminProductEditPage() {
           <Label>所属解决方案</Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            value={product.solution_category_id ?? ""}
+            value={product.solutionCategoryId ?? ""}
             onChange={(e) => {
               const raw = e.target.value;
               const idNum = raw ? Number(raw) : null;
               const hit = solutionOptions.find((c) => c.id === idNum);
               setProduct({
                 ...product,
-                solution_category_id: idNum,
+                solutionCategoryId: idNum,
                 category: hit?.label ?? product.category,
               });
             }}
@@ -295,9 +293,9 @@ export default function AdminProductEditPage() {
         <Label>市场定位（国内 / 国外标签）</Label>
         <select
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:max-w-md"
-          value={(product.vendor_market || "all").toLowerCase()}
+          value={(product.vendorMarket || "all").toLowerCase()}
           onChange={(e) =>
-            setProduct({ ...product, vendor_market: e.target.value })
+            setProduct({ ...product, vendorMarket: e.target.value })
           }
         >
           <option value="all">不区分（不展示国内/国外标签）</option>
@@ -314,13 +312,13 @@ export default function AdminProductEditPage() {
           <Label>分类（展示文案）</Label>
           <Input
             value={product.category}
-            readOnly={!!product.solution_category_id}
-            className={product.solution_category_id ? "bg-muted/60" : ""}
+            readOnly={!!product.solutionCategoryId}
+            className={product.solutionCategoryId ? "bg-muted/60" : ""}
             onChange={(e) =>
               setProduct({ ...product, category: e.target.value })
             }
           />
-          {product.solution_category_id ? (
+          {product.solutionCategoryId ? (
             <p className="text-xs text-muted-foreground">
               已关联解决方案，保存时后台会用方案名称覆盖此字段。
             </p>
@@ -329,11 +327,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>厂商名称</Label>
           <Input
-            value={product.manufacturer_name ?? ""}
+            value={product.manufacturerName ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                manufacturer_name: e.target.value,
+                manufacturerName: e.target.value,
               })
             }
           />
@@ -342,11 +340,11 @@ export default function AdminProductEditPage() {
           <Label>厂商 Logo URL（可选）</Label>
           <Input
             placeholder="https://..."
-            value={product.manufacturer_logo ?? ""}
+            value={product.manufacturerLogo ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                manufacturer_logo: e.target.value,
+                manufacturerLogo: e.target.value,
               })
             }
           />
@@ -357,9 +355,9 @@ export default function AdminProductEditPage() {
         <input
           id="is-draft"
           type="checkbox"
-          checked={product.is_draft ?? false}
+          checked={product.isDraft ?? false}
           onChange={(e) =>
-            setProduct({ ...product, is_draft: e.target.checked })
+            setProduct({ ...product, isDraft: e.target.checked })
           }
         />
         <Label htmlFor="is-draft" className="cursor-pointer font-normal">
@@ -371,11 +369,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>销售联系人</Label>
           <Input
-            value={product.sales_contact_name ?? ""}
+            value={product.salesContactName ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                sales_contact_name: e.target.value,
+                salesContactName: e.target.value,
               })
             }
           />
@@ -383,11 +381,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>销售电话</Label>
           <Input
-            value={product.sales_contact_phone ?? ""}
+            value={product.salesContactPhone ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                sales_contact_phone: e.target.value,
+                salesContactPhone: e.target.value,
               })
             }
           />
@@ -395,11 +393,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>销售邮箱</Label>
           <Input
-            value={product.sales_contact_email ?? ""}
+            value={product.salesContactEmail ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                sales_contact_email: e.target.value,
+                salesContactEmail: e.target.value,
               })
             }
           />
@@ -407,11 +405,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>售前联系人</Label>
           <Input
-            value={product.presales_contact_name ?? ""}
+            value={product.presalesContactName ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                presales_contact_name: e.target.value,
+                presalesContactName: e.target.value,
               })
             }
           />
@@ -419,11 +417,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>售前电话</Label>
           <Input
-            value={product.presales_contact_phone ?? ""}
+            value={product.presalesContactPhone ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                presales_contact_phone: e.target.value,
+                presalesContactPhone: e.target.value,
               })
             }
           />
@@ -431,11 +429,11 @@ export default function AdminProductEditPage() {
         <div className="space-y-2">
           <Label>售前邮箱</Label>
           <Input
-            value={product.presales_contact_email ?? ""}
+            value={product.presalesContactEmail ?? ""}
             onChange={(e) =>
               setProduct({
                 ...product,
-                presales_contact_email: e.target.value,
+                presalesContactEmail: e.target.value,
               })
             }
           />
@@ -484,9 +482,9 @@ export default function AdminProductEditPage() {
         <Label>触发事件</Label>
         <Textarea
           rows={3}
-          value={product.trigger_events}
+          value={product.triggerEvents}
           onChange={(e) =>
-            setProduct({ ...product, trigger_events: e.target.value })
+            setProduct({ ...product, triggerEvents: e.target.value })
           }
         />
       </div>
@@ -595,18 +593,18 @@ export default function AdminProductEditPage() {
           <TabsContent value="edit">
             <Textarea
               rows={12}
-              value={product.competitor_analysis}
+              value={product.competitorAnalysis}
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  competitor_analysis: e.target.value,
+                  competitorAnalysis: e.target.value,
                 })
               }
             />
           </TabsContent>
           <TabsContent value="preview">
             <div className="rounded-md border p-4">
-              <MarkdownContent>{product.competitor_analysis}</MarkdownContent>
+              <MarkdownContent>{product.competitorAnalysis}</MarkdownContent>
             </div>
           </TabsContent>
         </Tabs>
@@ -616,9 +614,9 @@ export default function AdminProductEditPage() {
         <Label>ROI 指标</Label>
         <Textarea
           rows={4}
-          value={product.roi_metrics}
+          value={product.roiMetrics}
           onChange={(e) =>
-            setProduct({ ...product, roi_metrics: e.target.value })
+            setProduct({ ...product, roiMetrics: e.target.value })
           }
         />
       </div>
@@ -691,7 +689,7 @@ export default function AdminProductEditPage() {
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label>客户名称</Label>
                   <Input
-                    value={c.client_name}
+                    value={c.clientName}
                     onChange={(e) =>
                       setCases((prev) =>
                         prev.map((x) =>
@@ -707,7 +705,7 @@ export default function AdminProductEditPage() {
                   <Label>痛点</Label>
                   <Textarea
                     rows={3}
-                    value={c.pain_points}
+                    value={c.painPoints}
                     onChange={(e) =>
                       setCases((prev) =>
                         prev.map((x) =>
@@ -739,7 +737,7 @@ export default function AdminProductEditPage() {
                   <Label>交付价值</Label>
                   <Textarea
                     rows={3}
-                    value={c.value_delivered}
+                    value={c.valueDelivered}
                     onChange={(e) =>
                       setCases((prev) =>
                         prev.map((x) =>

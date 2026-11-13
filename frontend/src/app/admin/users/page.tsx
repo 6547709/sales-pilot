@@ -65,7 +65,7 @@ export default function AdminUsersPage() {
       body: JSON.stringify({
         email: u.email,
         role: u.role,
-        is_active: u.is_active,
+        is_active: u.isActive,
       }),
     });
     if (res.ok) {
@@ -241,7 +241,7 @@ export default function AdminUsersPage() {
                   <td className="px-3 py-2">
                     <input
                       type="checkbox"
-                      checked={u.is_active}
+                      checked={u.isActive}
                       onChange={(e) =>
                         setList((prev) =>
                           prev.map((x) =>

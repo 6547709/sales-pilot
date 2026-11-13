@@ -51,8 +51,8 @@ export default function LoginPage() {
     setErr("");
     setLoading(true);
     try {
-      const { access_token, user } = await loginLocal(u, p);
-      setToken(access_token);
+      const { accessToken, user } = await loginLocal(u, p);
+      setToken(accessToken);
       router.replace(user.role === "admin" ? "/admin" : "/");
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : "登录失败");
@@ -66,8 +66,8 @@ export default function LoginPage() {
     setErr("");
     setLoading(true);
     try {
-      const { access_token, user } = await loginLdap(u, p);
-      setToken(access_token);
+      const { accessToken, user } = await loginLdap(u, p);
+      setToken(accessToken);
       router.replace(user.role === "admin" ? "/admin" : "/");
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : "LDAP 失败");
@@ -80,9 +80,9 @@ export default function LoginPage() {
     window.location.href = `${API_BASE}/api/v1/auth/oidc/start`;
   }
 
-  const showLocal = opts?.local_enabled ?? true;
-  const showLdap = opts?.ldap_enabled ?? false;
-  const showOidc = opts?.oidc_enabled ?? false;
+  const showLocal = opts?.localEnabled ?? true;
+  const showLdap = opts?.ldapEnabled ?? false;
+  const showOidc = opts?.oidcEnabled ?? false;
   const passwordTabs = (showLocal ? 1 : 0) + (showLdap ? 1 : 0);
 
   if (!opts) {

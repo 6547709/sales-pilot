@@ -63,7 +63,7 @@ export default function AdminProductsPage() {
 
   async function toggleDraft(p: Product) {
     setMsg("");
-    const next = !p.is_draft;
+    const next = !p.isDraft;
     const res = await apiFetch(`/api/v1/admin/products/${p.id}/draft`, {
       method: "PATCH",
       body: JSON.stringify({ is_draft: next }),
@@ -139,7 +139,7 @@ export default function AdminProductsPage() {
                     <span className="line-clamp-2">{p.name}</span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5">
-                    {p.is_draft ? (
+                    {p.isDraft ? (
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
                         草稿
                       </span>
@@ -156,21 +156,21 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="max-w-[100px] px-3 py-2.5 text-muted-foreground">
                     <span className="line-clamp-1">
-                      {p.manufacturer_name?.trim() || "—"}
+                      {p.manufacturerName?.trim() || "—"}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">
-                    {p.vendor_market === "foreign"
+                    {p.vendorMarket === "foreign"
                       ? "国外"
-                      : p.vendor_market === "domestic"
+                      : p.vendorMarket === "domestic"
                         ? "国内"
                         : "不区分"}
                   </td>
                   <td className="px-3 py-2.5 tabular-nums text-muted-foreground">
-                    {p.solution_category_id ?? "—"}
+                    {p.solutionCategoryId ?? "—"}
                   </td>
                   <td className="whitespace-nowrap px-3 py-2.5 text-muted-foreground">
-                    {formatTime(p.updated_at)}
+                    {formatTime(p.updatedAt)}
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     <div className="flex flex-wrap justify-end gap-1">
@@ -192,7 +192,7 @@ export default function AdminProductsPage() {
                         onClick={() => toggleDraft(p)}
                       >
                         <FileEdit className="h-3.5 w-3.5" />
-                        {p.is_draft ? "发布" : "转草稿"}
+                        {p.isDraft ? "发布" : "转草稿"}
                       </Button>
                       <Button
                         type="button"

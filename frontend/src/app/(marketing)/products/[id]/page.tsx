@@ -180,8 +180,8 @@ export default function ProductDetailPage() {
 
   const prod = product;
   const highlights = parseJsonArray(prod.highlights);
-  const questions = parseJsonArray(prod.discovery_questions);
-  const personas = parsePersonas(prod.target_personas);
+  const questions = parseJsonArray(prod.discoveryQuestions);
+  const personas = parsePersonas(prod.targetPersonas);
   const highlightsJoined = highlights.join("\n\n");
   const questionsJoined = questions.join("\n\n");
   const scriptsJoined = scripts
@@ -197,10 +197,10 @@ export default function ProductDetailPage() {
 
   function formatCaseText(c: Case) {
     return [
-      c.client_name,
-      `痛点：${c.pain_points}`,
+      c.clientName,
+      `痛点：${c.painPoints}`,
       `方案：${c.solution}`,
-      `价值：${c.value_delivered}`,
+      `价值：${c.valueDelivered}`,
     ].join("\n");
   }
 
@@ -284,12 +284,12 @@ export default function ProductDetailPage() {
                 <CardHeader className="pb-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge>{prod.category || "方案"}</Badge>
-                    {vendorMarketBadgeText(prod.vendor_market) ? (
+                    {vendorMarketBadgeText(prod.vendorMarket) ? (
                       <Badge
                         variant="outline"
-                        className={`font-medium ${vendorMarketBadgeClass(prod.vendor_market)}`}
+                        className={`font-medium ${vendorMarketBadgeClass(prod.vendorMarket)}`}
                       >
-                        {vendorMarketBadgeText(prod.vendor_market)}
+                        {vendorMarketBadgeText(prod.vendorMarket)}
                       </Badge>
                     ) : null}
                     <Badge variant="outline" className="gap-1">
@@ -323,7 +323,7 @@ export default function ProductDetailPage() {
                       厂商
                     </p>
                     <p className="text-sm font-medium">
-                      {prod.manufacturer_name?.trim() || "—"}
+                      {prod.manufacturerName?.trim() || "—"}
                     </p>
                   </div>
                   <div className="rounded-xl border bg-muted/20 p-4">
@@ -334,16 +334,16 @@ export default function ProductDetailPage() {
                       <li className="flex items-start gap-2">
                         <UserCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <span>
-                          {prod.sales_contact_name?.trim() || "—"}
+                          {prod.salesContactName?.trim() || "—"}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <ContactPhoneLink value={prod.sales_contact_phone} />
+                        <ContactPhoneLink value={prod.salesContactPhone} />
                       </li>
                       <li className="flex items-start gap-2">
                         <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <ContactEmailLink value={prod.sales_contact_email} />
+                        <ContactEmailLink value={prod.salesContactEmail} />
                       </li>
                     </ul>
                   </div>
@@ -355,16 +355,16 @@ export default function ProductDetailPage() {
                       <li className="flex items-start gap-2 text-sm">
                         <UserCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <span>
-                          {prod.presales_contact_name?.trim() || "—"}
+                          {prod.presalesContactName?.trim() || "—"}
                         </span>
                       </li>
                       <li className="flex items-start gap-2 text-sm">
                         <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <ContactPhoneLink value={prod.presales_contact_phone} />
+                        <ContactPhoneLink value={prod.presalesContactPhone} />
                       </li>
                       <li className="flex items-start gap-2 text-sm">
                         <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        <ContactEmailLink value={prod.presales_contact_email} />
+                        <ContactEmailLink value={prod.presalesContactEmail} />
                       </li>
                     </ul>
                   </div>
@@ -474,7 +474,7 @@ export default function ProductDetailPage() {
                         触发事件
                       </CardTitle>
                       <CopyTextControl
-                        text={prod.trigger_events || ""}
+                        text={prod.triggerEvents || ""}
                         mode="text"
                         label="复制本段"
                       />
@@ -482,7 +482,7 @@ export default function ProductDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                      {prod.trigger_events}
+                      {prod.triggerEvents}
                     </p>
                   </CardContent>
                 </Card>
@@ -498,7 +498,7 @@ export default function ProductDetailPage() {
                       竞品分析
                     </CardTitle>
                     <CopyTextControl
-                      text={prod.competitor_analysis || ""}
+                      text={prod.competitorAnalysis || ""}
                       mode="text"
                       label="复制原文"
                     />
@@ -507,7 +507,7 @@ export default function ProductDetailPage() {
                 <CardContent>
                   <div className="rounded-xl border bg-muted/20 p-4">
                     <MarkdownContent className="markdown-body text-sm">
-                      {prod.competitor_analysis}
+                      {prod.competitorAnalysis}
                     </MarkdownContent>
                   </div>
                 </CardContent>
@@ -523,7 +523,7 @@ export default function ProductDetailPage() {
                       ROI 指标
                     </CardTitle>
                     <CopyTextControl
-                      text={prod.roi_metrics || ""}
+                      text={prod.roiMetrics || ""}
                       mode="text"
                       label="复制本段"
                     />
@@ -531,7 +531,7 @@ export default function ProductDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                    {prod.roi_metrics}
+                    {prod.roiMetrics}
                   </p>
                 </CardContent>
               </Card>
@@ -594,17 +594,17 @@ export default function ProductDetailPage() {
                         className="rounded-xl border border-primary/10 bg-gradient-to-br from-muted/40 to-background p-4"
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <p className="min-w-0 flex-1 font-semibold">{c.client_name}</p>
+                          <p className="min-w-0 flex-1 font-semibold">{c.clientName}</p>
                           <CopyTextControl text={formatCaseText(c)} mode="icon" />
                         </div>
                         <p className="mt-2 text-xs text-muted-foreground">
                           痛点
                         </p>
-                        <p className="text-sm">{c.pain_points}</p>
+                        <p className="text-sm">{c.painPoints}</p>
                         <p className="mt-2 text-xs text-muted-foreground">方案</p>
                         <p className="text-sm">{c.solution}</p>
                         <p className="mt-2 text-xs text-muted-foreground">价值</p>
-                        <p className="text-sm">{c.value_delivered}</p>
+                        <p className="text-sm">{c.valueDelivered}</p>
                       </li>
                     ))}
                   </ul>
