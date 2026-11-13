@@ -6,6 +6,7 @@ import (
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/models"
 	"github.com/6547709/sales-pilot/backend/internal/paging"
+	"github.com/6547709/sales-pilot/backend/internal/repository"
 	"github.com/6547709/sales-pilot/backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +23,12 @@ func (h *Handlers) adminListLocalUsers(c *gin.Context) {
 		return
 	}
 	p := paging.New(QueryInt(c, "page", 1), QueryInt(c, "page_size", 20))
-	list, total, err := h.Users.ListLocalPage(ctx, p)
+	f := repository.LocalUserFilter{Q: c.Query("q"), Role: c.Query("role")}
+	if raw := c.Query("active"); raw == "true" || raw == "false" {
+		v := raw == "true"
+		f.Active = &v
+	}
+	list, total, err := h.Users.ListLocalPage(ctx, f, p)
 	if err != nil {
 		Fail(c, err)
 		return

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/6547709/sales-pilot/backend/internal/paging"
@@ -70,14 +71,34 @@ func (r *UserRepository) CountActiveLocalAdmins(ctx context.Context) (int64, err
 	return n, err
 }
 
-func (r *UserRepository) ListLocalPage(ctx context.Context, p paging.Request) ([]models.User, int64, error) {
-	q := r.db.WithContext(ctx).Model(&models.User{}).Where("auth_provider = ?", "local")
+type LocalUserFilter struct {
+	Q      string
+	Role   string
+	Active *bool
+}
+
+func (f LocalUserFilter) apply(q *gorm.DB) *gorm.DB {
+	q = q.Where("auth_provider = ?", "local")
+	if kw := strings.TrimSpace(strings.ToLower(f.Q)); kw != "" {
+		pat := "%" + kw + "%"
+		q = q.Where("LOWER(username) LIKE ? OR LOWER(email) LIKE ?", pat, pat)
+	}
+	if f.Role == "admin" || f.Role == "user" {
+		q = q.Where("role = ?", f.Role)
+	}
+	if f.Active != nil {
+		q = q.Where("is_active = ?", *f.Active)
+	}
+	return q
+}
+
+func (r *UserRepository) ListLocalPage(ctx context.Context, f LocalUserFilter, p paging.Request) ([]models.User, int64, error) {
 	var total int64
-	if err := q.Count(&total).Error; err != nil {
+	if err := f.apply(r.db.WithContext(ctx).Model(&models.User{})).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 	var list []models.User
-	err := r.db.WithContext(ctx).Model(&models.User{}).Where("auth_provider = ?", "local").
+	err := f.apply(r.db.WithContext(ctx).Model(&models.User{})).
 		Order("id asc").Limit(p.Limit()).Offset(p.Offset()).Find(&list).Error
 	return list, total, err
 }

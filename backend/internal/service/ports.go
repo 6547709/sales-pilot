@@ -12,7 +12,7 @@ import (
 
 type UserRepo interface {
 	ListLocal(ctx context.Context) ([]models.User, error)
-	ListLocalPage(ctx context.Context, p paging.Request) ([]models.User, int64, error)
+	ListLocalPage(ctx context.Context, f repository.LocalUserFilter, p paging.Request) ([]models.User, int64, error)
 	ListAll(ctx context.Context) ([]models.User, error)
 	FindByUsernameAndProvider(ctx context.Context, username, provider string) (*models.User, error)
 	FindByID(ctx context.Context, id uint) (*models.User, error)
