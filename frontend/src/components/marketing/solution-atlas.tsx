@@ -114,6 +114,13 @@ function buildProductChipMap(list: Product[]): Map<number, ArchCardProductChips>
 }
 
 /** 无产品时勿传 productChips，避免空灰条 */
+function serviceChipsFor(c: TopologyCategoryNode): ArchCardManufacturerChip[] {
+  return (c.services ?? []).map((svc) => ({
+    label: svc.name,
+    href: `/services/${svc.slug}`,
+  }));
+}
+
 function chipsFor(
   map: Map<number, ArchCardProductChips>,
   categoryId: number,
@@ -318,6 +325,7 @@ export function SolutionAtlas({
                     hint={c.hint || null}
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
+                    services={serviceChipsFor(c)}
                   />
                 </li>
               ))}
@@ -356,6 +364,7 @@ export function SolutionAtlas({
                       hint={c.hint || null}
                       onClick={() => archMainClick(c)}
                       productChips={chipsFor(productChipMap, c.id)}
+                      services={serviceChipsFor(c)}
                     />
                   ))}
                 </div>
@@ -399,6 +408,7 @@ export function SolutionAtlas({
                     hint={c.hint || null}
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
+                    services={serviceChipsFor(c)}
                   />
                 </li>
               ))}

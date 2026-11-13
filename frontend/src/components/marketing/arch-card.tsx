@@ -28,6 +28,8 @@ type Props = {
   hint?: string | null;
   /** 有已发布且关联本方案的产品时才传入；无产品则不展示底部区域 */
   productChips?: ArchCardProductChips;
+  /** 本方案下的我方服务，展示在产品芯片之上 */
+  services?: ArchCardManufacturerChip[];
 };
 
 /** 架构图卡片：仅展示真实录入的产品；无关联产品时无底部内容 */
@@ -40,6 +42,7 @@ export function ArchCardButton({
   compact,
   hint,
   productChips,
+  services,
 }: Props) {
   const rawHint = hint?.trim() ?? "";
   const legacyPlaceholders = new Set(["如 Dify 等", "如Dify等", "如 dify 等"]);
@@ -50,6 +53,8 @@ export function ArchCardButton({
     (productChips.domestic.length > 0 ||
       productChips.foreign.length > 0 ||
       productChips.neutral.length > 0);
+  const hasServiceBar = !!services && services.length > 0;
+  const hasFooter = hasProductBar || hasServiceBar;
 
   return (
     <motion.div
@@ -67,7 +72,7 @@ export function ArchCardButton({
         className={cn(
           "flex w-full flex-col items-center gap-2 p-3 text-center outline-none transition-colors hover:bg-muted/20 focus-visible:ring-2 focus-visible:ring-ring",
           compact && "p-2",
-          hasProductBar ? "rounded-t-xl" : "rounded-xl",
+          hasFooter ? "rounded-t-xl" : "rounded-xl",
         )}
       >
         <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary shadow-inner group-hover:bg-primary/15">
@@ -82,14 +87,35 @@ export function ArchCardButton({
           </span>
         ) : null}
       </button>
-      {hasProductBar ? (
+      {hasFooter ? (
         <div
           className={cn(
             "flex w-full flex-col gap-1.5 rounded-b-xl border-t border-border/60 bg-muted/50 px-2 py-2 dark:bg-muted/30",
             compact && "gap-1 py-1.5",
           )}
         >
-          {productChips!.domestic.length > 0 ? (
+          {hasServiceBar ? (
+            <div className="flex flex-wrap items-center justify-center gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-primary">
+                服务
+              </span>
+              {services!.map((chip) => (
+                <Link
+                  key={chip.href}
+                  href={chip.href}
+                  onClick={(e) => e.stopPropagation()}
+                  title={chip.label}
+                  className={cn(
+                    "max-w-[10rem] truncate rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary underline-offset-2 hover:underline",
+                    compact && "max-w-[7rem]",
+                  )}
+                >
+                  {chip.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {productChips && productChips.domestic.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-1">
               <span className="text-[9px] font-bold uppercase tracking-wide text-red-700 dark:text-red-400">
                 国内
@@ -110,7 +136,7 @@ export function ArchCardButton({
               ))}
             </div>
           ) : null}
-          {productChips!.foreign.length > 0 ? (
+          {productChips && productChips.foreign.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-1">
               <span className="text-[9px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                 国外
@@ -131,7 +157,7 @@ export function ArchCardButton({
               ))}
             </div>
           ) : null}
-          {productChips!.neutral.length > 0 ? (
+          {productChips && productChips.neutral.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-1">
               <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
                 不区分
