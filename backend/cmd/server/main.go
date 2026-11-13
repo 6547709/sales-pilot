@@ -27,6 +27,8 @@ func main() {
 	seed.EnsureTopology(db)
 	seed.FixLegacyTopologyHints(db)
 	seed.Run(db)
+	seed.EnsureServices(db)
+	seed.EnsureScenarios(db)
 
 	userRepo := repository.NewUserRepository(db)
 	apiKeyRepo := repository.NewAPIKeyRepository(db)
