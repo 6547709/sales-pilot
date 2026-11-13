@@ -104,3 +104,18 @@ func (h *Handlers) adminSetServiceCategories(c *gin.Context) {
 	}
 	OK(c, gin.H{"ok": true})
 }
+
+func (h *Handlers) getServiceScenarios(c *gin.Context) {
+	mode := view.Parse(c.Query("view"))
+	svc, err := h.Services.GetBySlug(c.Request.Context(), c.Param("slug"))
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	list, err := h.Scenarios.ListForService(c.Request.Context(), svc.ID, mode)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, dto.ProjectScenarios(list, mode))
+}

@@ -26,3 +26,11 @@ func ProjectScenario(s models.Scenario, _ view.Mode) Scenario {
 		SortOrder: s.SortOrder, IsActive: s.IsActive,
 	}
 }
+
+func ProjectScenarios(list []models.Scenario, mode view.Mode) []Scenario {
+	out := make([]Scenario, 0, len(list))
+	for _, s := range list {
+		out = append(out, ProjectScenario(s, mode))
+	}
+	return out
+}

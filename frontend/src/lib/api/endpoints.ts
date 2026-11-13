@@ -25,6 +25,7 @@ import {
   type LoginOptions,
   type PageResult,
   type Product,
+  type Scenario,
   type ScenarioDetail,
   type ScenarioGroup,
   type Service,
@@ -163,6 +164,12 @@ export const productsApi = {
       await apiJson<CaseDTO[]>(withView(`/api/v1/products/${id}/cases`, view)),
     );
   },
+  async scenarios(id: number | string, view: ViewMode = "sales"): Promise<Scenario[]> {
+    const data = await apiJson<ScenarioDTO[]>(
+      withView(`/api/v1/products/${id}/scenarios`, view),
+    );
+    return data.map(toScenario);
+  },
 };
 
 export type AdminProductQuery = {
@@ -227,6 +234,14 @@ export const adminProductsApi = {
     });
     if (!res.ok) throw new Error("删除失败");
   },
+  getScenarioLinks: (id: number | string) =>
+    apiJson<{ scenario_ids: number[] }>(`/api/v1/admin/products/${id}/links`).then(
+      (d) => d.scenario_ids ?? [],
+    ),
+  setScenarioLinks: (id: number | string, scenarioIds: number[]) =>
+    writeJSON(`/api/v1/admin/products/${id}/links`, "PUT", {
+      scenario_ids: scenarioIds,
+    }),
   async listScripts(id: number | string): Promise<SalesScript[]> {
     return toSalesScripts(
       await apiJson<SalesScriptDTO[]>(`/api/v1/admin/products/${id}/scripts`),
@@ -465,6 +480,12 @@ export const servicesApi = {
   },
   async get(slug: string, view: ViewMode = "sales"): Promise<Service> {
     return toService(await apiJson<ServiceDTO>(withView(`/api/v1/services/${slug}`, view)));
+  },
+  async scenarios(slug: string, view: ViewMode = "sales"): Promise<Scenario[]> {
+    const data = await apiJson<ScenarioDTO[]>(
+      withView(`/api/v1/services/${slug}/scenarios`, view),
+    );
+    return data.map(toScenario);
   },
 };
 

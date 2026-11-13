@@ -117,6 +117,43 @@ func (r *ScenarioRepository) ServiceIDs(ctx context.Context, scenarioID uint) ([
 	return ids, err
 }
 
+func (r *ScenarioRepository) ListByIDs(ctx context.Context, ids []uint) ([]models.Scenario, error) {
+	if len(ids) == 0 {
+		return []models.Scenario{}, nil
+	}
+	var list []models.Scenario
+	err := r.db.WithContext(ctx).Where("id IN ?", dedupeIDs(ids)).Order("sort_order ASC, id ASC").Find(&list).Error
+	return list, err
+}
+
+func (r *ScenarioRepository) ScenarioIDsForProduct(ctx context.Context, productID uint) ([]uint, error) {
+	var ids []uint
+	err := r.db.WithContext(ctx).Model(&models.ScenarioProduct{}).
+		Where("product_id = ?", productID).Pluck("scenario_id", &ids).Error
+	return ids, err
+}
+
+func (r *ScenarioRepository) ScenarioIDsForService(ctx context.Context, serviceID uint) ([]uint, error) {
+	var ids []uint
+	err := r.db.WithContext(ctx).Model(&models.ScenarioService{}).
+		Where("service_id = ?", serviceID).Pluck("scenario_id", &ids).Error
+	return ids, err
+}
+
+func (r *ScenarioRepository) SetScenariosForProduct(ctx context.Context, productID uint, scenarioIDs []uint) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("product_id = ?", productID).Delete(&models.ScenarioProduct{}).Error; err != nil {
+			return err
+		}
+		for _, sid := range dedupeIDs(scenarioIDs) {
+			if err := tx.Create(&models.ScenarioProduct{ScenarioID: sid, ProductID: productID}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
 func (r *ScenarioRepository) SetLinks(ctx context.Context, scenarioID uint, productIDs, serviceIDs []uint) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("scenario_id = ?", scenarioID).Delete(&models.ScenarioProduct{}).Error; err != nil {

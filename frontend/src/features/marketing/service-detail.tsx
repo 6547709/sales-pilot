@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Frame, FramePanel } from "@/components/reui/frame";
 import { Badge } from "@/components/reui/badge";
 import { PageHeader } from "@/components/patterns/page-header";
 import { ErrorState } from "@/components/patterns/error-state";
 import { LoadingState } from "@/components/patterns/loading-state";
-import { servicesApi, type Service } from "@/lib/api";
+import { servicesApi, type Scenario, type Service } from "@/lib/api";
 import { useViewMode } from "@/lib/view-mode";
 
 const KIND_LABEL: Record<string, string> = {
@@ -24,6 +25,7 @@ export function ServiceDetail() {
   const slug = String(params.slug ?? "");
   const { mode } = useViewMode();
   const [service, setService] = useState<Service | null>(null);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -32,10 +34,14 @@ export function ServiceDetail() {
     let alive = true;
     setLoading(true);
     setError(null);
-    servicesApi
-      .get(slug, mode)
-      .then((s) => {
-        if (alive) setService(s);
+    Promise.all([
+      servicesApi.get(slug, mode),
+      servicesApi.scenarios(slug, mode).catch(() => []),
+    ])
+      .then(([s, sc]) => {
+        if (!alive) return;
+        setService(s);
+        setScenarios(sc);
       })
       .catch((e) => {
         if (alive) setError(e instanceof Error ? e.message : "加载失败");
@@ -112,6 +118,19 @@ export function ServiceDetail() {
           </FramePanel>
         </Frame>
       </div>
+
+      {scenarios.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold">适用场景</h2>
+          <div className="flex flex-wrap gap-1.5">
+            {scenarios.map((sc) => (
+              <Link key={sc.id} href={`/scenarios/${sc.slug}`}>
+                <Badge variant="secondary">{sc.name}</Badge>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {service.highlights.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
