@@ -64,6 +64,8 @@ func NewRouter(d Deps) *gin.Engine {
 
 		admin.GET("/backup/export", h.adminExportBackup)
 		admin.POST("/backup/import", h.adminImportBackup)
+		admin.GET("/backup/export.zip", h.adminExportBackupZip)
+		admin.POST("/backup/import-zip", h.adminImportBackupZip)
 
 		admin.GET("/meta/product-maintain", h.adminProductMaintainMeta)
 

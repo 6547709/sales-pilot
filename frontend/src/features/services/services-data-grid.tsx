@@ -10,6 +10,7 @@ import {
   type DataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
@@ -152,7 +153,7 @@ export function ServicesDataGrid() {
     () => [
       {
         accessorKey: "name",
-        header: "名称",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="名称" />,
         cell: ({ row }) => (
           <div className="flex flex-col">
             <span className="font-medium">{row.original.name}</span>
@@ -162,7 +163,7 @@ export function ServicesDataGrid() {
       },
       {
         id: "kind",
-        header: "类型",
+        header: ({ column }) => <DataGridColumnHeader column={column} title="类型" />,
         cell: ({ row }) => <Badge variant="secondary">{kindLabel(row.original.kind)}</Badge>,
       },
       {
@@ -174,7 +175,7 @@ export function ServicesDataGrid() {
           </span>
         ),
       },
-      { id: "sort", header: "排序", cell: ({ row }) => row.original.sortOrder },
+      { accessorKey: "sortOrder", header: ({ column }) => <DataGridColumnHeader column={column} title="排序" />, cell: ({ row }) => row.original.sortOrder },
       {
         id: "visible",
         header: "可见性",
@@ -245,7 +246,7 @@ export function ServicesDataGrid() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded-xl border border-border bg-card p-3">
         <Button variant="outline" onClick={() => load()}>
           刷新
         </Button>
@@ -262,7 +263,7 @@ export function ServicesDataGrid() {
         recordCount={list.length}
         isLoading={loading}
         emptyMessage="暂无服务"
-        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
       >
         <DataGridContainer>
           <DataGridTable />

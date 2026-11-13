@@ -217,7 +217,7 @@ export function AdminProductsList() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3">
         <Input
           value={q}
           onChange={(e) => {
@@ -292,7 +292,7 @@ export function AdminProductsList() {
         recordCount={total}
         isLoading={loading}
         emptyMessage="暂无产品"
-        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true, rowRounded: true }}
       >
         <DataGridContainer>
           <DataGridTable />

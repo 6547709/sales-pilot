@@ -463,6 +463,29 @@ export const settingsApi = {
 
 export const backupApi = {
   exportPath: "/api/v1/admin/backup/export",
+  exportZipPath: "/api/v1/admin/backup/export.zip",
+  async importZip(file: File, sections: string[], confirm = BACKUP_RESTORE_CONFIRM) {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("sections", sections.join(","));
+    form.append("confirm", confirm);
+    const res = await apiFetch("/api/v1/admin/backup/import-zip", {
+      method: "POST",
+      body: form,
+    });
+    if (!res.ok) {
+      const body: unknown = await res.json().catch(() => null);
+      const msg =
+        body && typeof body === "object" && "error" in body
+          ? String((body as { error: unknown }).error)
+          : `恢复失败（${res.status}）`;
+      throw new Error(msg);
+    }
+    return (await res.json()) as {
+      sections: string[];
+      counts: Record<string, number>;
+    };
+  },
   import: (backup: unknown, confirm = BACKUP_RESTORE_CONFIRM) =>
     apiJson<{ ok: boolean; message: string }>("/api/v1/admin/backup/import", {
       method: "POST",
