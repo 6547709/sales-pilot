@@ -74,6 +74,8 @@ export type CaseDTO = {
   id: number;
   product_id: number;
   client_name: string;
+  industry?: string;
+  is_public?: boolean;
   pain_points: string;
   solution: string;
   value_delivered: string;

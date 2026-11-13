@@ -83,6 +83,8 @@ export type Case = {
   id: number;
   productId: number;
   clientName: string;
+  industry?: string;
+  isPublic?: boolean;
   painPoints: string;
   solution: string;
   valueDelivered: string;
@@ -266,6 +268,8 @@ export function toCase(dto: CaseDTO): Case {
     id: dto.id,
     productId: dto.product_id,
     clientName: dto.client_name,
+    industry: dto.industry,
+    isPublic: dto.is_public,
     painPoints: dto.pain_points,
     solution: dto.solution,
     valueDelivered: dto.value_delivered,
