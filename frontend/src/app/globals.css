@@ -171,3 +171,8 @@
   font-weight: 600;
 }
 
+
+/* 客户视图：隐藏仅内部可见的区块 */
+.view-customer [data-internal="true"] {
+  display: none;
+}

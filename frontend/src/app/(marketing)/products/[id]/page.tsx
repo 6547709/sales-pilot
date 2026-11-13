@@ -18,6 +18,7 @@ import {
   type Product,
   type SalesScript,
 } from "@/lib/api";
+import { useViewMode } from "@/lib/view-mode";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -133,6 +134,7 @@ const sectionNav = [
 export default function ProductDetailPage() {
   const params = useParams();
   const id = params.id as string;
+  const { mode } = useViewMode();
   const [product, setProduct] = useState<Product | null>(null);
   const [scripts, setScripts] = useState<SalesScript[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
@@ -140,15 +142,16 @@ export default function ProductDetailPage() {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   const load = useCallback(async () => {
+    const query = `?view=${mode}`;
     const [pr, sr, cr] = await Promise.all([
-      apiFetch(`/api/v1/products/${id}`),
-      apiFetch(`/api/v1/products/${id}/scripts`),
-      apiFetch(`/api/v1/products/${id}/cases`),
+      apiFetch(`/api/v1/products/${id}${query}`),
+      apiFetch(`/api/v1/products/${id}/scripts${query}`),
+      apiFetch(`/api/v1/products/${id}/cases${query}`),
     ]);
     if (pr.ok) setProduct(await pr.json());
     if (sr.ok) setScripts(await sr.json());
     if (cr.ok) setCases(await cr.json());
-  }, [id]);
+  }, [id, mode]);
 
   useEffect(() => {
     load();
@@ -179,6 +182,9 @@ export default function ProductDetailPage() {
   }
 
   const prod = product;
+  const internalSections = new Set(["questions", "personas", "competitor", "roi", "scripts"]);
+  const visibleNav =
+    mode === "customer" ? sectionNav.filter((s) => !internalSections.has(s.id)) : sectionNav;
   const highlights = parseJsonArray(prod.highlights);
   const questions = parseJsonArray(prod.discoveryQuestions);
   const personas = parsePersonas(prod.targetPersonas);
@@ -212,7 +218,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="relative pb-10">
+    <div className={cn("relative pb-10", mode === "customer" && "view-customer")}>
       <div className="mx-auto max-w-[1200px] px-4 py-6 sm:py-8">
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Link
@@ -238,7 +244,7 @@ export default function ProductDetailPage() {
         {/* 移动端：横向章节导航 */}
         <div className="sticky top-14 z-30 -mx-4 mb-6 border-y bg-background/95 py-2 backdrop-blur lg:hidden">
           <div className="flex gap-1 overflow-x-auto px-4 pb-1">
-            {sectionNav.map((s) => (
+            {visibleNav.map((s) => (
               <button
                 key={s.id}
                 type="button"
@@ -259,7 +265,7 @@ export default function ProductDetailPage() {
         <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-10">
           <aside className="mb-8 hidden lg:block">
             <nav className="sticky top-24 space-y-0.5 text-sm">
-              {sectionNav.map((s) => (
+              {visibleNav.map((s) => (
                 <button
                   key={s.id}
                   type="button"
@@ -372,6 +378,46 @@ export default function ProductDetailPage() {
               </Card>
             </motion.section>
 
+            {mode === "customer" ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <motion.section id="value" {...cardMotion}>
+                  <Card className="h-full">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Target className="h-5 w-5 text-primary" />
+                        解决方案价值
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                        {prod.customerValue || "—"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.section>
+                <motion.section id="features" {...cardMotion}>
+                  <Card className="h-full">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        产品特点
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-disc space-y-1 pl-5 text-sm">
+                        {(prod.customerFeatures.length > 0
+                          ? prod.customerFeatures
+                          : highlights
+                        ).map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </motion.section>
+              </div>
+            ) : null}
+
             <div className="grid gap-4 md:grid-cols-2">
               {/* 三大亮点 — 三张小卡 */}
               <motion.section id="highlights" {...cardMotion} className="md:col-span-1">
@@ -403,7 +449,7 @@ export default function ProductDetailPage() {
               </motion.section>
 
               {/* 黄金三问 */}
-              <motion.section id="questions" {...cardMotion} className="md:col-span-1">
+              <motion.section id="questions" data-internal="true" {...cardMotion} className="md:col-span-1">
                 <Card className="h-full">
                   <CardHeader className="pb-2">
                     <div className="flex flex-wrap items-start justify-between gap-2">
@@ -433,7 +479,7 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <motion.section id="personas" {...cardMotion}>
+              <motion.section id="personas" data-internal="true" {...cardMotion}>
                 <Card className="h-full">
                   <CardHeader className="pb-2">
                     <div className="flex flex-wrap items-start justify-between gap-2">
@@ -489,7 +535,7 @@ export default function ProductDetailPage() {
               </motion.section>
             </div>
 
-            <motion.section id="competitor" {...cardMotion}>
+            <motion.section id="competitor" data-internal="true" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex flex-wrap items-start justify-between gap-2">
@@ -514,7 +560,7 @@ export default function ProductDetailPage() {
               </Card>
             </motion.section>
 
-            <motion.section id="roi" {...cardMotion}>
+            <motion.section id="roi" data-internal="true" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex flex-wrap items-start justify-between gap-2">
@@ -537,7 +583,7 @@ export default function ProductDetailPage() {
               </Card>
             </motion.section>
 
-            <motion.section id="scripts" {...cardMotion}>
+            <motion.section id="scripts" data-internal="true" {...cardMotion}>
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex flex-wrap items-start justify-between gap-2">

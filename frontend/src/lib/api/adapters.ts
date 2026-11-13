@@ -61,6 +61,8 @@ export type Product = {
   presalesContactEmail?: string;
   description: string;
   highlights: string[];
+  customerValue?: string;
+  customerFeatures: string[];
   targetPersonas: Record<string, string>;
   triggerEvents: string;
   discoveryQuestions: string[];
@@ -199,6 +201,8 @@ export function toProduct(dto: ProductDTO): Product {
     presalesContactEmail: dto.presales_contact_email,
     description: dto.description,
     highlights: parseJsonArray(dto.highlights),
+    customerValue: dto.customer_value,
+    customerFeatures: parseJsonArray(dto.customer_features),
     targetPersonas: parsePersonas(dto.target_personas),
     triggerEvents: dto.trigger_events,
     discoveryQuestions: parseJsonArray(dto.discovery_questions),
@@ -232,6 +236,8 @@ export function toProductDTO(p: Product): ProductDTO {
     presales_contact_email: p.presalesContactEmail,
     description: p.description,
     highlights: p.highlights,
+    customer_value: p.customerValue,
+    customer_features: p.customerFeatures,
     target_personas: p.targetPersonas,
     trigger_events: p.triggerEvents,
     discovery_questions: p.discoveryQuestions,

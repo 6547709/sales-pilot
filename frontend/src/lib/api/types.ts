@@ -52,6 +52,8 @@ export type ProductDTO = {
   presales_contact_email?: string;
   description: string;
   highlights: string | string[];
+  customer_value?: string;
+  customer_features?: string | string[];
   target_personas: Record<string, string> | string;
   trigger_events: string;
   discovery_questions: string | string[];
