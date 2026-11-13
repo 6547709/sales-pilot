@@ -18,11 +18,10 @@ import {
   type TopologyResponse,
 } from "@/lib/api";
 import { topologyIcon } from "@/lib/topology-icons";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Compass, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 
 type Props = {
   initialSolutionId?: string;
@@ -290,10 +289,6 @@ export function SolutionAtlas({
           animate={{ opacity: 1, y: 0 }}
           className="mb-5 text-center sm:mb-6"
         >
-          <Badge variant="secondary" className="mb-3 gap-1">
-            <Compass className="h-3 w-3" />
-            全局视角
-          </Badge>
           <h1 className="text-balance text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
             按架构层级与体系
             <span className="text-primary"> 选择解决方案</span>
