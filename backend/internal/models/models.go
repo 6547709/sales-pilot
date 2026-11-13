@@ -67,6 +67,8 @@ type Case struct {
 	PainPoints     string    `gorm:"type:text" json:"pain_points"`
 	Solution       string    `gorm:"type:text" json:"solution"`
 	ValueDelivered string    `gorm:"type:text" json:"value_delivered"`
+	Industry       string    `gorm:"size:64" json:"industry"`
+	IsPublic       bool      `gorm:"default:false" json:"is_public"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
