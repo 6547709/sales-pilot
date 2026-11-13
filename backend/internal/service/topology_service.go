@@ -7,6 +7,7 @@ import (
 
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/models"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -219,6 +220,21 @@ func (s *TopologyService) UpdateCategory(ctx context.Context, id uint, c *models
 		"customer_value": c.CustomerValue, "customer_features": c.CustomerFeatures,
 	}
 	if err := s.repo.UpdateCategoryFields(ctx, id, fields); err != nil {
+		return nil, apperr.Internal(err)
+	}
+	return s.repo.FindCategory(ctx, id)
+}
+
+func (s *TopologyService) UpdateCategoryCustomer(ctx context.Context, id uint, value string, features datatypes.JSON) (*models.SolutionCategory, error) {
+	if _, err := s.repo.FindCategory(ctx, id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperr.NotFound("category_not_found", "未找到")
+		}
+		return nil, apperr.Internal(err)
+	}
+	if err := s.repo.UpdateCategoryFields(ctx, id, map[string]any{
+		"customer_value": value, "customer_features": features,
+	}); err != nil {
 		return nil, apperr.Internal(err)
 	}
 	return s.repo.FindCategory(ctx, id)

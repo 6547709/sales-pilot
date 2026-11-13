@@ -249,6 +249,24 @@ func (s *ProductService) UpdateCase(ctx context.Context, id uint, c *models.Case
 	return c, nil
 }
 
+func (s *ProductService) SetCasePublic(ctx context.Context, id uint, isPublic bool, industry string) (*models.Case, error) {
+	c, err := s.repo.FindCase(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperr.NotFound("case_not_found", "未找到")
+		}
+		return nil, apperr.Internal(err)
+	}
+	if industry != "" {
+		c.Industry = industry
+	}
+	c.IsPublic = isPublic
+	if err := s.repo.UpdateCasePublish(ctx, id, isPublic, c.Industry); err != nil {
+		return nil, apperr.Internal(err)
+	}
+	return c, nil
+}
+
 func (s *ProductService) DeleteCase(ctx context.Context, id uint) error {
 	if err := s.repo.DeleteCase(ctx, id); err != nil {
 		return apperr.Internal(err)

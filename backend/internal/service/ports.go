@@ -51,6 +51,7 @@ type ProductRepo interface {
 	CreateCase(ctx context.Context, c *models.Case) error
 	FindCase(ctx context.Context, id uint) (*models.Case, error)
 	UpdateCase(ctx context.Context, c *models.Case) error
+	UpdateCasePublish(ctx context.Context, id uint, isPublic bool, industry string) error
 	DeleteCase(ctx context.Context, id uint) error
 	FindCategoryLabel(ctx context.Context, id uint) (string, error)
 	CountByCategory(ctx context.Context, categoryID uint) (int64, error)
@@ -124,4 +125,5 @@ type ScenarioRepo interface {
 	ListProductsByIDs(ctx context.Context, ids []uint) ([]models.Product, error)
 	ListServicesByIDs(ctx context.Context, ids []uint) ([]models.Service, error)
 	ListPublicCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
+	ListCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
 }

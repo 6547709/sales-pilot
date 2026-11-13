@@ -4,6 +4,7 @@ import (
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/datatypes"
 )
 
 func (h *Handlers) getTopology(c *gin.Context) {
@@ -173,4 +174,25 @@ func (h *Handlers) adminDeleteVendor(c *gin.Context) {
 		return
 	}
 	NoContent(c)
+}
+
+func (h *Handlers) adminUpdateCategoryCustomer(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	var body struct {
+		Value    string         `json:"value"`
+		Features datatypes.JSON `json:"features"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		Fail(c, apperr.Invalid("invalid_body", "参数错误"))
+		return
+	}
+	updated, err := h.Topology.UpdateCategoryCustomer(c.Request.Context(), id, body.Value, body.Features)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, updated)
 }

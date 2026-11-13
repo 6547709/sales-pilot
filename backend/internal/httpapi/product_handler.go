@@ -4,7 +4,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/6547709/sales-pilot/backend/internal/httpapi/dto"
+	"github.com/6547709/sales-pilot/backend/internal/models"
 	"github.com/6547709/sales-pilot/backend/internal/service"
+	"github.com/6547709/sales-pilot/backend/internal/view"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,12 +27,13 @@ func publicFilter(c *gin.Context) service.PublicProductFilter {
 }
 
 func (h *Handlers) listProducts(c *gin.Context) {
+	mode := view.Parse(c.Query("view"))
 	list, err := h.Products.ListPublic(c.Request.Context(), publicFilter(c))
 	if err != nil {
 		Fail(c, err)
 		return
 	}
-	OK(c, list)
+	OK(c, dto.ProjectProducts(list, mode))
 }
 
 func (h *Handlers) searchProducts(c *gin.Context) {
@@ -47,15 +51,21 @@ func (h *Handlers) getProduct(c *gin.Context) {
 	if !ok {
 		return
 	}
+	mode := view.Parse(c.Query("view"))
 	p, err := h.Products.GetPublic(c.Request.Context(), id)
 	if err != nil {
 		Fail(c, err)
 		return
 	}
-	OK(c, p)
+	OK(c, dto.ProjectProduct(*p, mode))
 }
 
 func (h *Handlers) listScripts(c *gin.Context) {
+	mode := view.Parse(c.Query("view"))
+	if mode.IsCustomer() {
+		OK(c, []models.SalesScript{})
+		return
+	}
 	id, ok := ParseID(c, "id")
 	if !ok {
 		return
@@ -73,10 +83,20 @@ func (h *Handlers) listCases(c *gin.Context) {
 	if !ok {
 		return
 	}
+	mode := view.Parse(c.Query("view"))
 	list, err := h.Products.ListCasesPublic(c.Request.Context(), id)
 	if err != nil {
 		Fail(c, err)
 		return
 	}
-	OK(c, list)
+	if mode.IsCustomer() {
+		public := make([]models.Case, 0, len(list))
+		for _, item := range list {
+			if item.IsPublic {
+				public = append(public, item)
+			}
+		}
+		list = public
+	}
+	OK(c, dto.ProjectCases(list, mode))
 }

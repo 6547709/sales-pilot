@@ -203,6 +203,11 @@ func (r *ProductRepository) UpdateCase(ctx context.Context, c *models.Case) erro
 		}).Error
 }
 
+func (r *ProductRepository) UpdateCasePublish(ctx context.Context, id uint, isPublic bool, industry string) error {
+	return r.db.WithContext(ctx).Model(&models.Case{}).Where("id = ?", id).
+		Updates(map[string]any{"is_public": isPublic, "industry": industry}).Error
+}
+
 func (r *ProductRepository) DeleteCase(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.Case{}, id).Error
 }

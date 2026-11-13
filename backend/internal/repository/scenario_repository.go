@@ -189,6 +189,15 @@ func (r *ScenarioRepository) ListPublicCasesByProductIDs(ctx context.Context, id
 	return list, err
 }
 
+func (r *ScenarioRepository) ListCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error) {
+	if len(ids) == 0 {
+		return []models.Case{}, nil
+	}
+	var list []models.Case
+	err := r.db.WithContext(ctx).Where("product_id IN ?", dedupeIDs(ids)).Order("id asc").Find(&list).Error
+	return list, err
+}
+
 func (r *ScenarioRepository) DeleteLinksForProduct(ctx context.Context, productID uint) error {
 	return r.db.WithContext(ctx).Where("product_id = ?", productID).Delete(&models.ScenarioProduct{}).Error
 }

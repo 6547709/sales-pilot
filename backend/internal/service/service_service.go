@@ -116,3 +116,16 @@ func (s *ServiceService) Delete(ctx context.Context, id uint) error {
 	}
 	return nil
 }
+
+func (s *ServiceService) SetCategories(ctx context.Context, id uint, categoryIDs []uint) error {
+	if _, err := s.repo.FindByID(ctx, id); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return apperr.NotFound("service_not_found", "未找到")
+		}
+		return apperr.Internal(err)
+	}
+	if err := s.repo.SetCategories(ctx, id, categoryIDs); err != nil {
+		return apperr.Internal(err)
+	}
+	return nil
+}

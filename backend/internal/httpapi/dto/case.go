@@ -25,3 +25,11 @@ func ProjectCase(c models.Case, mode view.Mode) Case {
 	}
 	return out
 }
+
+func ProjectCases(list []models.Case, mode view.Mode) []Case {
+	out := make([]Case, 0, len(list))
+	for _, c := range list {
+		out = append(out, ProjectCase(c, mode))
+	}
+	return out
+}

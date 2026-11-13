@@ -7,6 +7,7 @@ import (
 
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/models"
+	"github.com/6547709/sales-pilot/backend/internal/view"
 	"gorm.io/gorm"
 )
 
@@ -69,7 +70,7 @@ func (s *ScenarioService) Groups(ctx context.Context) ([]ScenarioGroupView, erro
 	return out, nil
 }
 
-func (s *ScenarioService) GetBySlug(ctx context.Context, slug string) (*ScenarioDetail, error) {
+func (s *ScenarioService) GetBySlug(ctx context.Context, slug string, mode view.Mode) (*ScenarioDetail, error) {
 	scenario, err := s.repo.FindBySlug(ctx, slug)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -97,7 +98,12 @@ func (s *ScenarioService) GetBySlug(ctx context.Context, slug string) (*Scenario
 	if err != nil {
 		return nil, apperr.Internal(err)
 	}
-	cases, err := s.repo.ListPublicCasesByProductIDs(ctx, productIDs)
+	var cases []models.Case
+	if mode.IsCustomer() {
+		cases, err = s.repo.ListPublicCasesByProductIDs(ctx, productIDs)
+	} else {
+		cases, err = s.repo.ListCasesByProductIDs(ctx, productIDs)
+	}
 	if err != nil {
 		return nil, apperr.Internal(err)
 	}

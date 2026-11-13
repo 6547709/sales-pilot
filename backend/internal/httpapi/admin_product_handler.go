@@ -242,3 +242,28 @@ func (h *Handlers) deleteCase(c *gin.Context) {
 	}
 	NoContent(c)
 }
+
+func (h *Handlers) adminPatchCasePublish(c *gin.Context) {
+	id, ok := ParseID(c, "id")
+	if !ok {
+		return
+	}
+	var body struct {
+		IsPublic *bool   `json:"is_public"`
+		Industry *string `json:"industry"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.IsPublic == nil {
+		Fail(c, apperr.Invalid("invalid_body", "请提供 is_public"))
+		return
+	}
+	industry := ""
+	if body.Industry != nil {
+		industry = *body.Industry
+	}
+	updated, err := h.Products.SetCasePublic(c.Request.Context(), id, *body.IsPublic, industry)
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, updated)
+}

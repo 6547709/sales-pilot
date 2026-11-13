@@ -36,6 +36,10 @@ func NewRouter(d Deps) *gin.Engine {
 		session.GET("/products/:id", h.getProduct)
 		session.GET("/products/:id/scripts", h.listScripts)
 		session.GET("/products/:id/cases", h.listCases)
+		session.GET("/services", h.listServices)
+		session.GET("/services/:slug", h.getService)
+		session.GET("/scenarios", h.listScenarios)
+		session.GET("/scenarios/:slug", h.getScenario)
 	}
 
 	admin := api.Group("/admin")
@@ -75,6 +79,24 @@ func NewRouter(d Deps) *gin.Engine {
 		admin.POST("/products/:id/cases", h.createCase)
 		admin.PUT("/cases/:id", h.updateCase)
 		admin.DELETE("/cases/:id", h.deleteCase)
+		admin.PATCH("/cases/:id/publish", h.adminPatchCasePublish)
+
+		admin.GET("/services", h.adminListServices)
+		admin.POST("/services", h.adminCreateService)
+		admin.PUT("/services/:id", h.adminUpdateService)
+		admin.DELETE("/services/:id", h.adminDeleteService)
+		admin.PUT("/services/:id/categories", h.adminSetServiceCategories)
+
+		admin.GET("/scenario-groups", h.adminListScenarioGroups)
+		admin.POST("/scenario-groups", h.adminCreateScenarioGroup)
+		admin.PUT("/scenario-groups/:id", h.adminUpdateScenarioGroup)
+		admin.DELETE("/scenario-groups/:id", h.adminDeleteScenarioGroup)
+		admin.GET("/scenarios", h.adminListScenarios)
+		admin.POST("/scenarios", h.adminCreateScenario)
+		admin.PUT("/scenarios/:id", h.adminUpdateScenario)
+		admin.DELETE("/scenarios/:id", h.adminDeleteScenario)
+		admin.PUT("/scenarios/:id/links", h.adminSetScenarioLinks)
+		admin.PUT("/solution-categories/:id/customer", h.adminUpdateCategoryCustomer)
 
 		admin.GET("/topology/layers", h.adminListLayers)
 		admin.POST("/topology/layers", h.adminCreateLayer)
