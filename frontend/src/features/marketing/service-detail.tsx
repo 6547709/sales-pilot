@@ -8,7 +8,15 @@ import { Badge } from "@/components/reui/badge";
 import { PageHeader } from "@/components/patterns/page-header";
 import { ErrorState } from "@/components/patterns/error-state";
 import { LoadingState } from "@/components/patterns/loading-state";
-import { servicesApi, type Scenario, type Service } from "@/lib/api";
+import {
+  scenariosApi,
+  servicesApi,
+  type Case,
+  type Product,
+  type Scenario,
+  type Service,
+} from "@/lib/api";
+import { ProductCard } from "@/components/domain/product-card";
 import { useViewMode } from "@/lib/view-mode";
 
 const KIND_LABEL: Record<string, string> = {
@@ -26,6 +34,8 @@ export function ServiceDetail() {
   const { mode } = useViewMode();
   const [service, setService] = useState<Service | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [relatedCases, setRelatedCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -53,6 +63,32 @@ export function ServiceDetail() {
       alive = false;
     };
   }, [slug, mode, reloadKey]);
+
+  useEffect(() => {
+    if (scenarios.length === 0) {
+      setRelatedProducts([]);
+      setRelatedCases([]);
+      return;
+    }
+    let alive = true;
+    Promise.all(
+      scenarios.map((sc) => scenariosApi.get(sc.slug, mode).catch(() => null)),
+    ).then((details) => {
+      if (!alive) return;
+      const products = new Map<number, Product>();
+      const cases = new Map<number, Case>();
+      for (const detail of details) {
+        if (!detail) continue;
+        detail.products.forEach((p) => products.set(p.id, p));
+        detail.cases.forEach((c) => cases.set(c.id, c));
+      }
+      setRelatedProducts(Array.from(products.values()));
+      setRelatedCases(Array.from(cases.values()));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [scenarios, mode]);
 
   if (loading) {
     return (
@@ -118,6 +154,37 @@ export function ServiceDetail() {
           </FramePanel>
         </Frame>
       </div>
+
+      {relatedProducts.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold">涉及产品 · {relatedProducts.length}</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {relatedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} href={`/products/${p.id}`} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {relatedCases.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold">行业案例</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            {relatedCases.map((c) => (
+              <Frame key={c.id}>
+                <FramePanel>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {c.industry ? <Badge variant="info-light">{c.industry}</Badge> : null}
+                    <span className="font-medium">{c.clientName}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">{c.solution}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{c.valueDelivered}</p>
+                </FramePanel>
+              </Frame>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {scenarios.length > 0 ? (
         <div className="flex flex-col gap-2">

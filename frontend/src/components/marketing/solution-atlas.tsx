@@ -317,6 +317,7 @@ export function SolutionAtlas({
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
                     services={serviceChipsFor(c)}
+                    moreHref={`/products?solution_category_id=${c.id}`}
                   />
                 </li>
               ))}
@@ -349,6 +350,7 @@ export function SolutionAtlas({
                       onClick={() => archMainClick(c)}
                       productChips={chipsFor(productChipMap, c.id)}
                       services={serviceChipsFor(c)}
+                      moreHref={`/products?solution_category_id=${c.id}`}
                     />
                   ))}
                 </div>
@@ -389,6 +391,7 @@ export function SolutionAtlas({
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
                     services={serviceChipsFor(c)}
+                    moreHref={`/products?solution_category_id=${c.id}`}
                   />
                 </li>
               ))}

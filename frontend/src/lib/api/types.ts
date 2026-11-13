@@ -196,6 +196,7 @@ export type ScenarioDTO = {
 export type ScenarioSummaryDTO = ScenarioDTO & {
   product_count: number;
   service_count: number;
+  keywords?: string[];
 };
 
 export type ScenarioGroupDTO = {

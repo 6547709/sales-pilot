@@ -71,6 +71,14 @@ func (f *fakeScenarioRepo) CountServices(ctx context.Context) (map[uint]int64, e
 	return f.sc, nil
 }
 
+func (f *fakeScenarioRepo) ProductNamesByScenario(ctx context.Context) (map[uint][]string, error) {
+	return map[uint][]string{11: {"产品 A"}}, nil
+}
+
+func (f *fakeScenarioRepo) ServiceNamesByScenario(ctx context.Context) (map[uint][]string, error) {
+	return map[uint][]string{11: {"服务 B"}}, nil
+}
+
 func newTestRouter() (*httptest.ResponseRecorder, http.Handler, config.Config) {
 	cfg := config.Config{JWTSecret: "test-secret", FrontendOrigin: "http://localhost:3000"}
 	products := service.NewProductService(&fakeProductRepo{

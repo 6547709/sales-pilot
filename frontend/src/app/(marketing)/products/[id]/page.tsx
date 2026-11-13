@@ -207,6 +207,14 @@ export default function ProductDetailPage() {
         ...topology.central_layers.flatMap((b) => b.categories),
       ]
     : [];
+  const groupedCases = (() => {
+    const map = new Map<string, Case[]>();
+    for (const item of cases) {
+      const key = item.industry?.trim() || "其他";
+      map.set(key, [...(map.get(key) ?? []), item]);
+    }
+    return Array.from(map.entries());
+  })();
   const relatedServices =
     (prod.solutionCategoryId
       ? allCategories.find((c) => c.id === prod.solutionCategoryId)?.services
@@ -718,27 +726,41 @@ export default function ProductDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <ul className="grid gap-4 md:grid-cols-2">
-                    {cases.map((c) => (
-                      <li
-                        key={c.id}
-                        className="rounded-xl border border-primary/10 bg-gradient-to-br from-muted/40 to-background p-4"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="min-w-0 flex-1 font-semibold">{c.clientName}</p>
-                          <CopyTextControl text={formatCaseText(c)} mode="icon" />
+                  <div className="flex flex-col gap-5">
+                    {groupedCases.map(([industry, items]) => (
+                      <div key={industry}>
+                        <div className="mb-2 flex items-center gap-2">
+                          <Badge variant="secondary">{industry}</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {items.length} 个案例
+                          </span>
                         </div>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          痛点
-                        </p>
-                        <p className="text-sm">{c.painPoints}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">方案</p>
-                        <p className="text-sm">{c.solution}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">价值</p>
-                        <p className="text-sm">{c.valueDelivered}</p>
-                      </li>
+                        <ul className="grid gap-4 md:grid-cols-2">
+                          {items.map((c) => (
+                            <li
+                              key={c.id}
+                              className="rounded-xl border border-primary/10 bg-gradient-to-br from-muted/40 to-background p-4"
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <p className="min-w-0 flex-1 font-semibold">{c.clientName}</p>
+                                <CopyTextControl text={formatCaseText(c)} mode="icon" />
+                              </div>
+                              {c.painPoints ? (
+                                <>
+                                  <p className="mt-2 text-xs text-muted-foreground">痛点</p>
+                                  <p className="text-sm">{c.painPoints}</p>
+                                </>
+                              ) : null}
+                              <p className="mt-2 text-xs text-muted-foreground">方案</p>
+                              <p className="text-sm">{c.solution}</p>
+                              <p className="mt-2 text-xs text-muted-foreground">价值</p>
+                              <p className="text-sm">{c.valueDelivered}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </CardContent>
               </Card>
             </motion.section>

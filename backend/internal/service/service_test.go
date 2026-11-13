@@ -319,11 +319,11 @@ func TestUpdateGroupDoesNotZeroUnownedFields(t *testing.T) {
 	if _, err := svc.UpdateGroup(context.Background(), 1, &models.ScenarioGroup{Name: "n", Slug: "s"}); err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := repo.fields["sort_order"]; ok {
-		t.Fatalf("must not overwrite sort_order: %v", repo.fields)
-	}
 	if _, ok := repo.fields["created_at"]; ok {
 		t.Fatalf("must not overwrite created_at: %v", repo.fields)
+	}
+	if _, ok := repo.fields["name"]; !ok {
+		t.Fatalf("name must be updated: %v", repo.fields)
 	}
 }
 

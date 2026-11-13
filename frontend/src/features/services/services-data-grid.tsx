@@ -262,7 +262,7 @@ export function ServicesDataGrid() {
         recordCount={list.length}
         isLoading={loading}
         emptyMessage="暂无服务"
-        tableLayout={{ dense: true, headerBackground: true }}
+        tableLayout={{ dense: true, headerBackground: true, stripped: true }}
       >
         <DataGridContainer>
           <DataGridTable />

@@ -30,6 +30,8 @@ type Props = {
   productChips?: ArchCardProductChips;
   /** 本方案下的我方服务，展示在产品芯片之上 */
   services?: ArchCardManufacturerChip[];
+  /** 产品超过 4 个时的「查看全部」链接 */
+  moreHref?: string;
 };
 
 /** 架构图卡片：仅展示真实录入的产品；无关联产品时无底部内容 */
@@ -43,6 +45,7 @@ export function ArchCardButton({
   hint,
   productChips,
   services,
+  moreHref,
 }: Props) {
   const rawHint = hint?.trim() ?? "";
   const legacyPlaceholders = new Set(["如 Dify 等", "如Dify等", "如 dify 等"]);
@@ -53,6 +56,15 @@ export function ArchCardButton({
     (productChips.domestic.length > 0 ||
       productChips.foreign.length > 0 ||
       productChips.neutral.length > 0);
+  const productEntries = productChips
+    ? [
+        ...productChips.domestic.map((chip) => ({ chip, market: "domestic" as const })),
+        ...productChips.foreign.map((chip) => ({ chip, market: "foreign" as const })),
+        ...productChips.neutral.map((chip) => ({ chip, market: "neutral" as const })),
+      ]
+    : [];
+  const shownProducts = productEntries.slice(0, 4);
+  const hiddenProducts = productEntries.length - shownProducts.length;
   const hasServiceBar = !!services && services.length > 0;
   const hasFooter = hasProductBar || hasServiceBar;
 
@@ -94,6 +106,62 @@ export function ArchCardButton({
             compact && "gap-1 py-1",
           )}
         >
+          {hasServiceBar ? (
+            <div className="flex flex-wrap items-center justify-center gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-primary">
+                服务
+              </span>
+              {services!.map((chip) => (
+                <Link
+                  key={chip.href}
+                  href={chip.href}
+                  onClick={(e) => e.stopPropagation()}
+                  title={chip.label}
+                  className={cn(
+                    "max-w-[10rem] truncate rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary underline-offset-2 hover:underline",
+                    compact && "max-w-[7rem]",
+                  )}
+                >
+                  {chip.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {hasProductBar ? (
+            <div className="flex flex-wrap items-center justify-center gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                产品
+              </span>
+              {shownProducts.map(({ chip, market }) => (
+                <Link
+                  key={chip.href}
+                  href={chip.href}
+                  onClick={(e) => e.stopPropagation()}
+                  title={chip.label}
+                  className={cn(
+                    "max-w-[10rem] truncate rounded-md border px-1.5 py-0.5 text-[9px] font-medium underline-offset-2 hover:underline",
+                    market === "domestic" &&
+                      "border-red-200 bg-red-50 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200",
+                    market === "foreign" &&
+                      "border-slate-200 bg-slate-100 text-slate-800 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200",
+                    market === "neutral" && "border-border bg-background text-foreground",
+                    compact && "max-w-[7rem]",
+                  )}
+                >
+                  {chip.label}
+                </Link>
+              ))}
+              {hiddenProducts > 0 ? (
+                <Link
+                  href={moreHref ?? "/products"}
+                  onClick={(e) => e.stopPropagation()}
+                  className="rounded-md border border-dashed border-border px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground hover:text-foreground"
+                >
+                  +{hiddenProducts}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
           {hasServiceBar ? (
             <div className="flex flex-wrap items-center justify-center gap-1">
               <span className="text-[9px] font-bold uppercase tracking-wide text-primary">

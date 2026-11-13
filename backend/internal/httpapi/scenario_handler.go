@@ -10,8 +10,9 @@ import (
 
 type scenarioOut struct {
 	dto.Scenario
-	ProductCount int64 `json:"product_count"`
-	ServiceCount int64 `json:"service_count"`
+	ProductCount int64    `json:"product_count"`
+	ServiceCount int64    `json:"service_count"`
+	Keywords     []string `json:"keywords"`
 }
 
 type scenarioGroupOut struct {
@@ -41,6 +42,7 @@ func (h *Handlers) listScenarios(c *gin.Context) {
 				Scenario:     dto.ProjectScenario(item.Scenario, mode),
 				ProductCount: item.ProductCount,
 				ServiceCount: item.ServiceCount,
+				Keywords:     item.Keywords,
 			})
 		}
 		out = append(out, scenarioGroupOut{
