@@ -33,6 +33,8 @@ type AdminCategory = {
   keywords?: unknown;
   hint: string;
   is_active: boolean;
+  customer_value?: string;
+  customer_features?: unknown;
 };
 
 type VendorRow = {
@@ -241,6 +243,15 @@ export function TopologyEditor() {
       setMsg("关键词须为 JSON 数组");
       return;
     }
+    let features: unknown = editCat.customer_features ?? [];
+    if (typeof features === "string") {
+      try {
+        features = JSON.parse(features || "[]");
+      } catch {
+        setMsg("客户特点须为 JSON 数组");
+        return;
+      }
+    }
     const res = await apiFetch(
       `/api/v1/admin/topology/categories/${editCat.id}`,
       {
@@ -248,6 +259,7 @@ export function TopologyEditor() {
         body: JSON.stringify({
           ...editCat,
           keywords: keywordsJson,
+          customer_features: features,
         }),
       },
     );
@@ -676,6 +688,30 @@ export function TopologyEditor() {
                           ...editCat,
                           sort_order: Number(e.target.value) || 0,
                         })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label>客户价值（客户视图）</Label>
+                    <Textarea
+                      rows={2}
+                      value={editCat.customer_value ?? ""}
+                      onChange={(e) =>
+                        setEditCat({ ...editCat, customer_value: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label>客户特点 JSON（字符串数组）</Label>
+                    <Textarea
+                      rows={2}
+                      value={
+                        typeof editCat.customer_features === "string"
+                          ? editCat.customer_features
+                          : JSON.stringify(editCat.customer_features ?? [], null, 0)
+                      }
+                      onChange={(e) =>
+                        setEditCat({ ...editCat, customer_features: e.target.value })
                       }
                     />
                   </div>

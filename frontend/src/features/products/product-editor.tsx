@@ -28,6 +28,9 @@ import {
   type PersonaExtraRow,
 } from "@/lib/personas-presets";
 import { ClipboardList, MessageSquare, Pencil, Trash2, X } from "lucide-react";
+import { Badge } from "@/components/reui/badge";
+import { Alert, AlertDescription } from "@/components/reui/alert";
+import { VisibilityLegend } from "@/components/patterns/visibility-legend";
 
 function emptyPresetRecord(): Record<string, string> {
   return Object.fromEntries(PERSONA_PRESET_ROLES.map((r) => [r, ""]));
@@ -222,6 +225,13 @@ export function ProductEditor({ productId }: { productId: string }) {
         </Link>
         <h1 className="text-xl font-bold text-primary">编辑产品</h1>
       </div>
+
+      <VisibilityLegend />
+      <Alert variant="warning">
+        <AlertDescription>
+          蓝色区块客户可见；琥珀色区块仅内部可见，不会出现在客户视图。
+        </AlertDescription>
+      </Alert>
 
       <details className="rounded-lg border border-primary/20 bg-primary/[0.04] p-4 text-sm">
         <summary className="cursor-pointer font-medium text-primary">
@@ -635,10 +645,49 @@ export function ProductEditor({ productId }: { productId: string }) {
             <div key={c.id}>
               {idx > 0 ? <Separator className="mb-6" /> : null}
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-muted-foreground">
                   案例 #{c.id}
+                  <Badge variant={c.isPublic ? "success-light" : "outline"}>
+                    {c.isPublic ? "客户可见" : "仅内部"}
+                  </Badge>
+                  <Input
+                    value={c.industry ?? ""}
+                    onChange={(e) =>
+                      setCases((prev) =>
+                        prev.map((x) =>
+                          x.id === c.id ? { ...x, industry: e.target.value } : x,
+                        ),
+                      )
+                    }
+                    placeholder="行业"
+                    className="h-7 w-24 text-xs"
+                  />
                 </span>
                 <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      setMsg("");
+                      const res = await apiFetch(`/api/v1/admin/cases/${c.id}/publish`, {
+                        method: "PATCH",
+                        body: JSON.stringify({
+                          is_public: !c.isPublic,
+                          industry: c.industry ?? "",
+                        }),
+                      });
+                      if (res.ok) {
+                        setMsg(c.isPublic ? "已取消公开" : "已公开到客户视图");
+                        await refreshCases();
+                      } else {
+                        const e = await res.json().catch(() => ({}));
+                        setMsg(e.error || "操作失败");
+                      }
+                    }}
+                  >
+                    {c.isPublic ? "取消公开" : "公开到客户视图"}
+                  </Button>
                   <Button
                     type="button"
                     size="sm"
