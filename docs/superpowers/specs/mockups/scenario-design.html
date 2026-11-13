@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sales-Pilot 首页 / 双视图 / 场景 设计样张</title>
+<style>
+  :root{
+    --brand:#0052cc; --brand-weak:#e8f0fd; --ink:#111827; --muted:#6b7280;
+    --line:#e5e7eb; --bg:#f6f7f9;
+    --warn:#b45309; --warn-bg:#fdf3e3; --warn-line:#f0c78a;
+    --success:#0f766e; --success-bg:#e6f4f1;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;}
+  .screen{display:none;max-width:1240px;margin:0 auto;padding:0 18px 60px}
+  .screen.active{display:block}
+  .switcher{position:sticky;top:0;z-index:20;background:rgba(246,247,249,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:9px 18px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .switcher button{border:1px solid var(--line);background:#fff;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer;font-size:12.5px}
+  .switcher button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .note{max-width:1240px;margin:14px auto 0;padding:0 18px;color:var(--muted);font-size:11.5px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);margin-top:14px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:650}
+  .brand .mark{width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:12px}
+  .navlinks{display:flex;gap:2px;color:var(--muted);font-size:12.5px}
+  .navlinks span{padding:5px 9px;border-radius:7px;cursor:pointer}
+  .navlinks span.on{background:var(--brand-weak);color:var(--brand);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:#fff}
+  .seg button{border:0;background:transparent;padding:4px 11px;border-radius:999px;cursor:pointer;font-size:11.5px;color:var(--muted)}
+  .seg button.on{background:var(--brand);color:#fff}
+
+  /* ===== 三栏架构图（对齐现有首页） ===== */
+  .atlas3{display:grid;grid-template-columns:250px 1fr 250px;gap:12px;margin-top:14px;align-items:start}
+  .panel{background:#eef5ff;border:1px solid #dfeafc;border-radius:14px;padding:12px}
+  .panel-head{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--brand);margin-top:5px;flex:none}
+  .panel-head h2{margin:0;font-size:13.5px;font-weight:700}
+  .panel-head p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+  .vstack{display:flex;flex-direction:column;gap:8px}
+  .layer{margin-bottom:10px}
+  .layer:last-child{margin-bottom:0}
+  .layer-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .layer-head h3{margin:0;font-size:13.5px}
+  .layer-head p{margin:1px 0 0;font-size:10.5px;color:var(--muted)}
+  .spark{color:#9dbcf0;font-size:12px}
+  .cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center;
+    box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .icon{width:32px;height:32px;border-radius:9px;background:#eef4ff;color:var(--brand);display:grid;place-items:center;
+    margin:0 auto 6px;font-size:11px;font-weight:700}
+  .ctitle{font-size:12px;font-weight:600;line-height:1.3}
+  /* 服务行：在产品之上 */
+  .srow{margin-top:8px;padding-top:6px;border-top:1px dashed #e3ecfb;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+  .svc{font-size:10px;background:var(--brand-weak);color:var(--brand);border-radius:5px;padding:1.5px 6px;font-weight:600;white-space:nowrap}
+  /* 厂商行 */
+  .vrow{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center}
+  .mlabel{font-size:9.5px;border-radius:4px;padding:1px 5px;white-space:nowrap}
+  .mlabel.cn{background:#fee2e2;color:#b91c1c}
+  .mlabel.en{background:#eef2f7;color:#475569}
+  .vchip{font-size:10px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#374151;background:#fff;white-space:nowrap}
+  /* 内部内容 */
+  .internal{background:var(--warn-bg);color:var(--warn);border:1px dashed var(--warn-line);border-radius:5px;
+    padding:1.5px 6px;font-size:10px;white-space:nowrap}
+  body.customer .internal{display:none!important}
+  .legend{display:flex;gap:14px;align-items:center;margin-top:10px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:11.5px;color:var(--muted)}
+  .sw{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px}
+  .sw.blue{background:var(--brand)} .sw.amber{background:var(--warn)}
+
+  /* ===== 通用 ===== */
+  .section{margin-top:14px}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+  .section-head h2{font-size:16px;margin:0}
+  .section-head p{margin:0;color:var(--muted);font-size:11.5px}
+  .frame{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .block{padding:14px}
+  .block h3{margin:0 0 6px;font-size:14px}
+  .block p{margin:0;color:#374151;font-size:12.5px}
+  .grid{display:grid;gap:10px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:1.5px 7px;border-radius:999px;background:#f3f4f6;color:#374151;white-space:nowrap}
+  .badge.brand{background:var(--brand-weak);color:var(--brand)}
+  .badge.warn{background:var(--warn-bg);color:var(--warn)}
+  .badge.success{background:var(--success-bg);color:var(--success)}
+  .badge.info{background:var(--brand-weak);color:var(--brand)}
+  .muted{color:var(--muted)}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+
+  /* 详情 */
+  .detailhero{padding:18px}
+  .detailhero h1{margin:0;font-size:21px}
+  .detailhero p{margin:5px 0 0;color:var(--muted);font-size:12.5px}
+  .ul{margin:6px 0 0;padding-left:17px;color:#374151;font-size:12.5px}
+  .ul li{margin:2px 0}
+  .case{border:1px solid var(--line);border-radius:9px;padding:11px}
+  .case .ct{display:flex;gap:7px;align-items:center;margin-bottom:4px}
+
+  /* 场景 */
+  .search{border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--muted);background:#fff;min-width:250px}
+  .gtabs{display:flex;gap:5px;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--line);background:#fbfbfc}
+  .gtab{border:1px solid transparent;background:transparent;padding:5px 11px;border-radius:999px;cursor:pointer;color:var(--muted);font-size:12px}
+  .gtab.on{background:var(--brand-weak);color:var(--brand);border-color:#c7dafb;font-weight:600}
+  .sgroup{padding:13px 15px;border-bottom:1px solid #f1f2f4}
+  .sgroup:last-child{border-bottom:0}
+  .sgroup h3{margin:0 0 8px;font-size:13.5px}
+  .scards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .scard{border:1px solid var(--line);border-radius:9px;padding:11px;background:#fff;display:flex;flex-direction:column;gap:5px;cursor:pointer}
+  .scard:hover{border-color:#c7dafb}
+  .scard .sn{font-weight:650;font-size:13px}
+  .scard .ss{color:var(--muted);font-size:11.5px;min-height:30px}
+  .scard .meta{display:flex;gap:8px;font-size:10.5px;color:var(--muted)}
+  .cta{color:var(--brand);font-size:11.5px;font-weight:600}
+
+  /* 后台 */
+  .admin{display:grid;grid-template-columns:190px 1fr;gap:14px;margin-top:14px}
+  .side{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:9px}
+  .side .nav{display:flex;flex-direction:column;gap:1px}
+  .side .nav a{padding:7px 9px;border-radius:7px;color:var(--muted);font-size:12.5px}
+  .side .nav a.on{background:var(--brand-weak);color:var(--brand);font-weight:600}
+  .main{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:14px;border-bottom:1px solid var(--line)}
+  .pagehead h2{margin:0;font-size:16px}
+  .pagehead p{margin:3px 0 0;color:var(--muted);font-size:11.5px}
+  .cols{display:grid;grid-template-columns:220px 1fr;min-height:420px}
+  .groups-panel{border-right:1px solid var(--line);padding:9px;background:#fbfbfc}
+  .gitem{display:flex;justify-content:space-between;align-items:center;padding:8px 9px;border-radius:7px;font-size:12.5px;color:#374151;cursor:pointer}
+  .gitem.on{background:var(--brand-weak);color:var(--brand);font-weight:600}
+  .gitem .count{font-size:10.5px;color:var(--muted)}
+  .addgroup{margin-top:7px;width:100%;border:1px dashed var(--line);background:#fff;color:var(--muted);padding:7px;border-radius:7px;font-size:11.5px;cursor:not-allowed}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{background:#fbfbfc;color:var(--muted);font-weight:600;font-size:11px}
+  td .acts{display:flex;gap:6px}
+  .lnk{color:var(--brand);font-size:11.5px;cursor:pointer}
+
+  /* 可见性编辑示例 */
+  .legendbar{display:flex;gap:16px;align-items:center;padding:10px 14px;background:#fbfbfc;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+  .group2{padding:14px}
+  .vgroup{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .vgroup .vh{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--line);font-size:12.5px}
+  .vgroup.customer .vh{background:linear-gradient(90deg,rgba(0,82,204,.09),transparent);border-left:3px solid var(--brand)}
+  .vgroup.internal .vh{background:linear-gradient(90deg,rgba(180,83,9,.09),transparent);border-left:3px solid var(--warn)}
+  .vgroup .fields{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:12px}
+  .field label{display:block;font-size:10.5px;color:var(--muted);margin-bottom:3px}
+  .field .input{border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:12px;color:#374151;background:#fff}
+  .field.wide{grid-column:1/-1}
+  .footer{color:var(--muted);font-size:10.5px;text-align:center;padding:22px 0}
+</style>
+</head>
+<body>
+
+<div class="switcher">
+  <button class="on" data-target="home">首页（对齐现状）</button>
+  <button data-target="visibility">后台可见性维护</button>
+  <button data-target="scenarios">按场景看 · 总览</button>
+  <button data-target="scdetail">场景详情</button>
+  <button data-target="admin">后台场景维护</button>
+</div>
+<p class="note">首页页签可切换「销售视图 / 客户视图」：只有琥珀色的内部内容会消失，布局与内容位置完全不变。</p>
+
+<!-- ================= 首页 ================= -->
+<section id="home" class="screen active">
+  <div class="topbar">
+    <div class="brand"><span class="mark">SP</span> Sales Pilot</div>
+    <div class="navlinks"><span class="on">首页</span><span>方案库</span><span>按场景看</span></div>
+    <div class="seg">
+      <button id="salesBtn" class="on" onclick="setView('sales')">销售视图</button>
+      <button id="custBtn" onclick="setView('customer')">客户视图</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw blue"></i>客户可见：服务、产品、公开案例</span>
+    <span><i class="sw amber"></i>仅销售可见：联系人、黄金三问、竞品、ROI、话术</span>
+  </div>
+
+  <div class="atlas3">
+    <!-- 左：安全体系 -->
+    <div class="panel">
+      <div class="panel-head"><span class="dot"></span><div><h2>安全体系</h2><p>身份、边界与数据全生命周期</p></div></div>
+      <div class="vstack">
+        <div class="card"><div class="icon">主机</div><div class="ctitle">主机安全</div>
+          <div class="srow"><span class="svc">基线加固服务</span></div>
+          <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">安当</span></div>
+        </div>
+        <div class="card"><div class="icon">边界</div><div class="ctitle">边界安全</div>
+          <div class="srow"><span class="svc">安全评估服务</span></div>
+        </div>
+        <div class="card"><div class="icon">密钥</div><div class="ctitle">机密管理</div>
+          <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">安当</span></div>
+        </div>
+        <div class="card"><div class="icon">身份</div><div class="ctitle">身份认证</div></div>
+        <div class="card"><div class="icon">零信</div><div class="ctitle">零信任</div></div>
+        <div class="card"><div class="icon">加密</div><div class="ctitle">数据加密</div></div>
+        <div class="card"><div class="icon">态势</div><div class="ctitle">态势感知</div>
+          <div class="internal">内部：竞品对比</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中：云平台 / 网络 / 硬件 -->
+    <div class="panel">
+      <div class="layer">
+        <div class="layer-head"><div><h3>云平台层 · 应用与服务</h3><p>中间件与智能化</p></div><span class="spark">✦</span></div>
+        <div class="cards4">
+          <div class="card"><div class="icon">Web</div><div class="ctitle">Web / 中间件</div>
+            <div class="srow"><span class="svc">中间件迁移服务</span></div></div>
+          <div class="card"><div class="icon">DB</div><div class="ctitle">数据库</div>
+            <div class="srow"><span class="svc">数据库迁移服务</span></div>
+            <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">达梦</span></div></div>
+          <div class="card"><div class="icon">AI</div><div class="ctitle">AI 中间件</div></div>
+          <div class="card"><div class="icon">AI</div><div class="ctitle">AI / Agent / MCP</div>
+            <div class="srow"><span class="svc">AI 落地咨询</span></div></div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-head"><div><h3>云平台层 · 基础设施</h3><p>虚拟化与容器底座</p></div><span class="spark">✦</span></div>
+        <div class="cards4">
+          <div class="card"><div class="icon">虚</div><div class="ctitle">虚拟化</div>
+            <div class="srow"><span class="svc">V2V 迁移服务</span><span class="svc">升级服务</span></div>
+            <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">SmartX</span></div>
+            <div class="vrow"><span class="mlabel en">国外</span><span class="vchip">Redhat</span><span class="vchip">VMware</span></div>
+          </div>
+          <div class="card"><div class="icon">容</div><div class="ctitle">容器云</div>
+            <div class="vrow"><span class="mlabel en">国外</span><span class="vchip">Red Hat</span></div>
+          </div>
+          <div class="card"><div class="icon">云</div><div class="ctitle">AI 云</div></div>
+          <div class="card"><div class="icon">多</div><div class="ctitle">多云管理</div>
+            <div class="srow"><span class="svc">上云迁移服务</span></div></div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-head"><div><h3>网络与连接层</h3><p>连通与调度</p></div><span class="spark">✦</span></div>
+        <div class="cards4">
+          <div class="card"><div class="icon">网</div><div class="ctitle">核心网络</div></div>
+          <div class="card"><div class="icon">SDN</div><div class="ctitle">SDN / SD-WAN</div>
+            <div class="srow"><span class="svc">网络割接服务</span></div>
+            <div class="vrow"><span class="mlabel en">国外</span><span class="vchip">Palo Alto Networks</span></div>
+          </div>
+          <div class="card"><div class="icon">LB</div><div class="ctitle">负载均衡</div></div>
+          <div class="card"><div class="icon">DNS</div><div class="ctitle">DNS / IPAM</div>
+            <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">牙木网络科技</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer" style="margin-bottom:0">
+        <div class="layer-head"><div><h3>基础硬件层</h3><p>算力与存储</p></div><span class="spark">✦</span></div>
+        <div class="cards4">
+          <div class="card"><div class="icon">算</div><div class="ctitle">计算</div></div>
+          <div class="card"><div class="icon">SAN</div><div class="ctitle">SAN 存储</div>
+            <div class="srow"><span class="svc">存储扩容服务</span></div></div>
+          <div class="card"><div class="icon">文</div><div class="ctitle">文件 / 对象</div></div>
+          <div class="card"><div class="icon">GPU</div><div class="ctitle">GPU</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：运维体系 -->
+    <div class="panel">
+      <div class="panel-head"><span class="dot"></span><div><h2>运维体系</h2><p>可观测、自动化与连续性</p></div></div>
+      <div class="vstack">
+        <div class="card"><div class="icon">AI</div><div class="ctitle">AIOps</div>
+          <div class="srow"><span class="svc">AIOps 落地服务</span></div>
+          <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">擎创科技</span></div></div>
+        <div class="card"><div class="icon">CM</div><div class="ctitle">CMDB</div></div>
+        <div class="card"><div class="icon">拨</div><div class="ctitle">拨测</div>
+          <div class="vrow"><span class="mlabel cn">国内</span><span class="vchip">基调听云</span></div></div>
+        <div class="card"><div class="icon">监</div><div class="ctitle">全链路监控</div></div>
+        <div class="card"><div class="icon">日</div><div class="ctitle">日志分析</div></div>
+        <div class="card"><div class="icon">自</div><div class="ctitle">自动化运维</div>
+          <div class="srow"><span class="svc">运维托管服务</span></div></div>
+        <div class="card"><div class="icon">灾</div><div class="ctitle">灾备</div>
+          <div class="srow"><span class="svc">容灾编排服务</span></div>
+          <div class="vrow"><span class="mlabel en">国外</span><span class="vchip">Veeam</span></div>
+          <div class="internal">内部：ROI 测算</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">首页布局与现有版本一致，只在每个方框的厂商芯片之上增加了服务行。</div>
+</section>
+
+<!-- ================= 后台可见性维护 ================= -->
+<section id="visibility" class="screen">
+  <div class="admin">
+    <div class="side">
+      <div class="brand" style="padding:5px 8px 10px"><span class="mark">SP</span> 管理后台</div>
+      <div class="nav"><a>控制台</a><a class="on">产品维护</a><a>服务维护</a><a>场景维护</a><a>拓扑维护</a><a>API 密钥</a></div>
+    </div>
+    <div class="main">
+      <div class="pagehead">
+        <div><h2>编辑产品 · 厂商甲 vSphere 替代</h2><p>字段按可见性分组，颜色与前台一致</p></div>
+        <div><button class="btn">取消</button> <button class="btn primary">保存</button></div>
+      </div>
+      <div class="legendbar">
+        <span><i class="sw blue"></i>蓝色 = 客户可见</span>
+        <span><i class="sw amber"></i>琥珀 = 仅销售可见</span>
+        <span class="muted">客户视图下琥珀字段既不下发也不渲染</span>
+      </div>
+      <div class="group2">
+        <div class="vgroup customer">
+          <div class="vh"><strong>客户可见内容</strong><span class="badge info">客户可见</span></div>
+          <div class="fields">
+            <div class="field"><label>产品名称</label><div class="input">厂商甲 vSphere 替代</div></div>
+            <div class="field"><label>厂商 / 市场</label><div class="input">厂商甲 · 国内</div></div>
+            <div class="field wide"><label>产品描述</label><div class="input">面向国产化替代的虚拟化平台</div></div>
+            <div class="field wide"><label>产品亮点（每行一条）</label><div class="input">兼容主流 x86 服务器与存储 / 支持在线迁移与回滚</div></div>
+            <div class="field"><label>解决方案价值</label><div class="input">业务不中断完成平台替换</div></div>
+            <div class="field"><label>特点</label><div class="input">国产化适配清单</div></div>
+          </div>
+        </div>
+
+        <div class="vgroup internal">
+          <div class="vh"><strong>仅销售可见</strong><span class="badge warn">仅销售</span></div>
+          <div class="fields">
+            <div class="field"><label>销售联系人</label><div class="input">张三 · 138****0000</div></div>
+            <div class="field"><label>售前联系人</label><div class="input">李四 · 139****0000</div></div>
+            <div class="field wide"><label>黄金三问</label><div class="input">现在用的什么平台？替换窗口在哪个月？…</div></div>
+            <div class="field"><label>目标画像</label><div class="input">金融 / 制造 IT 负责人</div></div>
+            <div class="field"><label>竞品分析</label><div class="input">对比 Nutanix / 国产超融合</div></div>
+            <div class="field wide"><label>ROI 指标</label><div class="input">授权成本下降 35%</div></div>
+          </div>
+        </div>
+
+        <div class="vgroup customer">
+          <div class="vh"><strong>行业案例</strong><span class="badge info">可勾选公开</span></div>
+          <table>
+            <thead><tr><th>客户</th><th>行业</th><th>价值</th><th>客户视图</th></tr></thead>
+            <tbody>
+              <tr><td>某城商行</td><td>金融</td><td class="muted">600 台虚拟机零中断迁移</td><td><span class="badge success">已公开</span></td></tr>
+              <tr><td>某制造集团</td><td>制造</td><td class="muted">升级与回滚演练</td><td><span class="badge">未公开</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 按场景看 · 总览 ================= -->
+<section id="scenarios" class="screen">
+  <div class="topbar">
+    <div class="brand"><span class="mark">SP</span> Sales Pilot</div>
+    <div class="navlinks"><span>首页</span><span>方案库</span><span class="on">按场景看</span></div>
+    <div class="seg"><button class="on">销售视图</button><button>客户视图</button></div>
+  </div>
+
+  <div class="section frame">
+    <div class="detailhero" style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px">
+      <div><h1>按场景找方案</h1><p>从客户真实需要出发，找到对应的服务、产品与案例。</p></div>
+      <div class="search">搜索场景或关键字，例如「数据库备份」</div>
+    </div>
+    <div class="gtabs">
+      <button class="gtab on">全部</button><button class="gtab">数据保护</button><button class="gtab">基础架构升级</button>
+      <button class="gtab">虚拟化替代</button><button class="gtab">容灾与迁移</button>
+    </div>
+    <div class="sgroup"><h3>数据保护</h3><div class="scards">
+      <div class="scard"><span class="sn">核心数据库备份</span><span class="ss">备份窗口不足，恢复结果不可验证</span><span class="meta"><span>服务 3</span><span>产品 2</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">虚拟机备份</span><span class="ss">多平台统一备份与快速恢复</span><span class="meta"><span>服务 2</span><span>产品 4</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">文件与对象归档</span><span class="ss">长期留存、合规与低成本存储</span><span class="meta"><span>服务 1</span><span>产品 1</span></span><span class="cta">查看方案 →</span></div>
+    </div></div>
+    <div class="sgroup"><h3>基础架构升级</h3><div class="scards">
+      <div class="scard"><span class="sn">VMware 升级</span><span class="ss">版本升级、兼容性验证与回滚</span><span class="meta"><span>服务 2</span><span>产品 3</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">存储扩容</span><span class="ss">容量评估、扩容与数据再平衡</span><span class="meta"><span>服务 1</span><span>产品 2</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">操作系统升级</span><span class="ss">批量升级与兼容性清单</span><span class="meta"><span>服务 1</span><span>产品 1</span></span><span class="cta">查看方案 →</span></div>
+    </div></div>
+    <div class="sgroup"><h3>虚拟化替代</h3><div class="scards">
+      <div class="scard"><span class="sn">VMware → 国产虚拟化</span><span class="ss">平滑替换，保留运维习惯</span><span class="meta"><span>服务 3</span><span>产品 5</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">VMware → 超融合</span><span class="ss">一体化架构替换与容量规划</span><span class="meta"><span>服务 2</span><span>产品 3</span></span><span class="cta">查看方案 →</span></div>
+    </div></div>
+    <div class="sgroup"><h3>容灾与迁移</h3><div class="scards">
+      <div class="scard"><span class="sn">V2V 迁移</span><span class="ss">异构平台批量迁移与校验</span><span class="meta"><span>服务 2</span><span>产品 4</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">双活容灾</span><span class="ss">按 RTO/RPO 分级设计切换</span><span class="meta"><span>服务 2</span><span>产品 3</span></span><span class="cta">查看方案 →</span></div>
+      <div class="scard"><span class="sn">上云迁移</span><span class="ss">私有云与公有云之间迁移</span><span class="meta"><span>服务 1</span><span>产品 2</span></span><span class="cta">查看方案 →</span></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ================= 场景详情 ================= -->
+<section id="scdetail" class="screen">
+  <div class="topbar">
+    <div class="brand"><span class="mark">SP</span> Sales Pilot</div>
+    <div class="navlinks"><span>首页</span><span>方案库</span><span class="on">按场景看</span></div>
+    <div class="seg"><button class="on">销售视图</button><button>客户视图</button></div>
+  </div>
+
+  <div class="crumb" style="font-size:11.5px;color:var(--muted);padding:12px 0 0">按场景 / 数据保护 / 核心数据库备份</div>
+  <div class="section frame">
+    <div class="detailhero"><span class="badge brand">数据保护</span><h1 style="margin-top:7px">核心数据库备份</h1><p>核心库备份窗口不足，恢复结果不可验证。</p></div>
+  </div>
+  <div class="section grid g2">
+    <div class="frame block"><h3>客户痛点</h3><p>全量备份经常超出窗口；恢复演练缺少标准流程，真实故障时不敢切换。</p></div>
+    <div class="frame block"><h3>我方价值</h3><p>备份窗口评估 + 策略调优 + 季度恢复演练，交付可量化的 RTO / RPO。</p></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>推荐服务</h2><p>3 项</p></div>
+    <div class="grid g3">
+      <div class="frame block"><h3>备份服务</h3><p class="muted">策略设计与恢复演练</p></div>
+      <div class="frame block"><h3>容灾编排服务</h3><p class="muted">切换流程编排与验证</p></div>
+      <div class="frame block"><h3>运维托管服务</h3><p class="muted">持续巡检与告警响应</p></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>推荐产品</h2><p>国内 / 国外</p></div>
+    <div class="grid g2">
+      <div class="frame block"><h3>备份一体机 A 系列</h3><p class="muted">国内 · 厂商甲</p></div>
+      <div class="frame block"><h3>数据保护平台 B</h3><p class="muted">国外 · 厂商乙</p></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>行业案例</h2><p>已脱敏</p></div>
+    <div class="grid g2">
+      <div class="frame case"><div class="ct"><span class="badge brand">金融</span><strong style="font-size:12.5px">某城商行核心库备份改造</strong></div><p class="muted" style="margin:0;font-size:12px">备份窗口从 8 小时缩短到 3 小时，季度恢复演练通过。</p></div>
+      <div class="frame case"><div class="ct"><span class="badge brand">制造</span><strong style="font-size:12.5px">某制造企业备份策略优化</strong></div><p class="muted" style="margin:0;font-size:12px">统一多库策略，恢复成功率提升到 100%。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 后台场景维护 ================= -->
+<section id="admin" class="screen">
+  <div class="admin">
+    <div class="side">
+      <div class="brand" style="padding:5px 8px 10px"><span class="mark">SP</span> 管理后台</div>
+      <div class="nav"><a>控制台</a><a>产品维护</a><a>服务维护</a><a class="on">场景维护</a><a>拓扑维护</a><a>API 密钥</a></div>
+    </div>
+    <div class="main">
+      <div class="pagehead">
+        <div><h2>场景维护</h2><p>两级分类：场景组下维护场景，并关联产品与服务</p></div>
+        <div><button class="btn" style="opacity:.5">新建场景组（已达上限 6）</button> <button class="btn primary">新建场景</button></div>
+      </div>
+      <div class="cols">
+        <div class="groups-panel">
+          <div class="gitem on"><span>数据保护</span><span class="count">3</span></div>
+          <div class="gitem"><span>基础架构升级</span><span class="count">3</span></div>
+          <div class="gitem"><span>虚拟化替代</span><span class="count">2</span></div>
+          <div class="gitem"><span>容灾与迁移</span><span class="count">3</span></div>
+          <div class="gitem"><span>安全与合规</span><span class="count">0</span></div>
+          <button class="addgroup">新建场景组</button>
+        </div>
+        <div>
+          <table>
+            <thead><tr><th>场景</th><th>摘要</th><th>产品</th><th>服务</th><th>状态</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><strong>核心数据库备份</strong></td><td class="muted">备份窗口不足</td><td>2</td><td>3</td><td><span class="badge success">启用</span></td><td><div class="acts"><span class="lnk">编辑</span><span class="lnk">关联</span><span class="lnk">删除</span></div></td></tr>
+              <tr><td><strong>虚拟机备份</strong></td><td class="muted">多平台统一备份</td><td>4</td><td>2</td><td><span class="badge success">启用</span></td><td><div class="acts"><span class="lnk">编辑</span><span class="lnk">关联</span><span class="lnk">删除</span></div></td></tr>
+              <tr><td><strong>文件与对象归档</strong></td><td class="muted">长期留存与合规</td><td>0</td><td>1</td><td><span class="badge warn">未关联</span></td><td><div class="acts"><span class="lnk">编辑</span><span class="lnk">关联</span><span class="lnk">删除</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll(".switcher button").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".switcher button").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(btn.dataset.target).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }));
+  function setView(mode){
+    document.body.classList.toggle("customer", mode === "customer");
+    document.getElementById("salesBtn").classList.toggle("on", mode === "sales");
+    document.getElementById("custBtn").classList.toggle("on", mode === "customer");
+  }
+</script>
+</body>
+</html>
