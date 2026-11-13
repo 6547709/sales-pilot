@@ -59,6 +59,14 @@ func (r *ScenarioRepository) SaveGroup(ctx context.Context, g *models.ScenarioGr
 	return r.db.WithContext(ctx).Save(g).Error
 }
 
+func (r *ScenarioRepository) UpdateGroupFields(ctx context.Context, id uint, fields map[string]any) error {
+	return r.db.WithContext(ctx).Model(&models.ScenarioGroup{}).Where("id = ?", id).Updates(fields).Error
+}
+
+func (r *ScenarioRepository) UpdateFields(ctx context.Context, id uint, fields map[string]any) error {
+	return r.db.WithContext(ctx).Model(&models.Scenario{}).Where("id = ?", id).Updates(fields).Error
+}
+
 func (r *ScenarioRepository) DeleteGroup(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.ScenarioGroup{}, id).Error
 }

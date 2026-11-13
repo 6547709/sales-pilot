@@ -99,7 +99,12 @@ func (s *ServiceService) Update(ctx context.Context, id uint, svc *models.Servic
 		return nil, err
 	}
 	svc.ID = id
-	if err := s.repo.Save(ctx, svc); err != nil {
+	if err := s.repo.UpdateFields(ctx, id, map[string]any{
+		"slug": svc.Slug, "name": svc.Name, "kind": svc.Kind, "summary": svc.Summary,
+		"highlights": svc.Highlights, "deliverables": svc.Deliverables,
+		"value_prop": svc.ValueProp, "features": svc.Features, "icon_key": svc.IconKey,
+		"sort_order": svc.SortOrder, "is_active": svc.IsActive,
+	}); err != nil {
 		return nil, apperr.Internal(err)
 	}
 	if categoryIDs != nil {

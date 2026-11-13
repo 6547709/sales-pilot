@@ -297,3 +297,31 @@ func TestAdminScenarioDetailIncludesInactiveAndDraft(t *testing.T) {
 		t.Fatalf("links filtered: %+v", detail)
 	}
 }
+
+type fakeGroupUpdateRepo struct {
+	service.ScenarioRepo
+	fields map[string]any
+}
+
+func (f *fakeGroupUpdateRepo) FindGroup(ctx context.Context, id uint) (*models.ScenarioGroup, error) {
+	return &models.ScenarioGroup{ID: id, Name: "数据保护", SortOrder: 30}, nil
+}
+
+func (f *fakeGroupUpdateRepo) UpdateGroupFields(ctx context.Context, id uint, fields map[string]any) error {
+	f.fields = fields
+	return nil
+}
+
+func TestUpdateGroupDoesNotZeroUnownedFields(t *testing.T) {
+	repo := &fakeGroupUpdateRepo{}
+	svc := service.NewScenarioService(repo)
+	if _, err := svc.UpdateGroup(context.Background(), 1, &models.ScenarioGroup{Name: "n", Slug: "s"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := repo.fields["sort_order"]; ok {
+		t.Fatalf("must not overwrite sort_order: %v", repo.fields)
+	}
+	if _, ok := repo.fields["created_at"]; ok {
+		t.Fatalf("must not overwrite created_at: %v", repo.fields)
+	}
+}
