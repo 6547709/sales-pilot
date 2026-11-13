@@ -9,6 +9,7 @@ import { useFooterConfig } from "@/lib/footer-config";
 import type { User } from "@/lib/api";
 import { clearToken } from "@/lib/auth";
 import {
+  Compass,
   DatabaseBackup,
   KeyRound,
   LayoutDashboard,
@@ -17,11 +18,14 @@ import {
   Settings,
   Shield,
   Users,
+  Wrench,
 } from "lucide-react";
 
 const adminNav = [
   { href: "/admin", label: "控制台", icon: LayoutDashboard },
   { href: "/admin/products", label: "产品维护", icon: Package },
+  { href: "/admin/services", label: "服务维护", icon: Wrench },
+  { href: "/admin/scenarios", label: "场景维护", icon: Compass },
   { href: "/admin/topology", label: "拓扑维护", icon: Network },
   { href: "/admin/api-keys", label: "API 密钥", icon: KeyRound },
   { href: "/admin/users", label: "本地用户", icon: Users },
