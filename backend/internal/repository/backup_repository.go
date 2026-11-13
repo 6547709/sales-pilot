@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/6547709/sales-pilot/backend/internal/models"
@@ -61,8 +62,32 @@ func (r *BackupRepository) Dump(ctx context.Context) (*models.BackupPayload, err
 		cp := st
 		stPtr = &cp
 	}
+	var services []models.Service
+	if err := db.Order("id").Find(&services).Error; err != nil {
+		return nil, err
+	}
+	var serviceCategories []models.ServiceCategory
+	if err := db.Order("service_id, category_id").Find(&serviceCategories).Error; err != nil {
+		return nil, err
+	}
+	var scenarioGroups []models.ScenarioGroup
+	if err := db.Order("id").Find(&scenarioGroups).Error; err != nil {
+		return nil, err
+	}
+	var scenarios []models.Scenario
+	if err := db.Order("id").Find(&scenarios).Error; err != nil {
+		return nil, err
+	}
+	var scenarioProducts []models.ScenarioProduct
+	if err := db.Order("scenario_id, product_id").Find(&scenarioProducts).Error; err != nil {
+		return nil, err
+	}
+	var scenarioServices []models.ScenarioService
+	if err := db.Order("scenario_id, service_id").Find(&scenarioServices).Error; err != nil {
+		return nil, err
+	}
 	return &models.BackupPayload{
-		Version:            1,
+		Version:            2,
 		ExportedAt:         time.Now().UTC().Format(time.RFC3339),
 		TopologyLayers:     layers,
 		SolutionCategories: cats,
@@ -72,6 +97,12 @@ func (r *BackupRepository) Dump(ctx context.Context) (*models.BackupPayload, err
 		SalesScripts:       scripts,
 		Cases:              cases,
 		AuthSettings:       stPtr,
+		Services:           services,
+		ServiceCategories:  serviceCategories,
+		ScenarioGroups:     scenarioGroups,
+		Scenarios:          scenarios,
+		ScenarioProducts:   scenarioProducts,
+		ScenarioServices:   scenarioServices,
 	}, nil
 }
 
@@ -86,20 +117,27 @@ var backupTables = []string{
 	"auth_settings",
 }
 
+var v2Tables = []string{
+	"scenario_services",
+	"scenario_products",
+	"scenarios",
+	"scenario_groups",
+	"service_categories",
+	"services",
+}
+
+func truncateTables(version int) []string {
+	if version >= 2 {
+		return append(append([]string{}, backupTables...), v2Tables...)
+	}
+	return backupTables
+}
+
 // Restore 全量覆盖恢复（事务 + TRUNCATE）
 func (r *BackupRepository) Restore(ctx context.Context, payload *models.BackupPayload) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		truncateSQL := `
-TRUNCATE TABLE
-	cases,
-	sales_scripts,
-	products,
-	solution_vendors,
-	solution_categories,
-	topology_layers,
-	users,
-	auth_settings
-RESTART IDENTITY CASCADE`
+		tables := truncateTables(payload.Version)
+		truncateSQL := "TRUNCATE TABLE " + strings.Join(tables, ", ") + " RESTART IDENTITY CASCADE"
 		if err := tx.Exec(truncateSQL).Error; err != nil {
 			return fmt.Errorf("清空数据失败: %w", err)
 		}
@@ -160,6 +198,38 @@ RESTART IDENTITY CASCADE`
 		} else {
 			if err := sess.Create(&models.AuthSettings{ID: 1}).Error; err != nil {
 				return fmt.Errorf("初始化认证配置失败: %w", err)
+			}
+		}
+		if payload.Version >= 2 {
+			for i := range payload.Services {
+				if err := sess.Create(&payload.Services[i]).Error; err != nil {
+					return fmt.Errorf("写入服务失败: %w", err)
+				}
+			}
+			for i := range payload.ServiceCategories {
+				if err := sess.Create(&payload.ServiceCategories[i]).Error; err != nil {
+					return fmt.Errorf("写入服务分类关联失败: %w", err)
+				}
+			}
+			for i := range payload.ScenarioGroups {
+				if err := sess.Create(&payload.ScenarioGroups[i]).Error; err != nil {
+					return fmt.Errorf("写入场景组失败: %w", err)
+				}
+			}
+			for i := range payload.Scenarios {
+				if err := sess.Create(&payload.Scenarios[i]).Error; err != nil {
+					return fmt.Errorf("写入场景失败: %w", err)
+				}
+			}
+			for i := range payload.ScenarioProducts {
+				if err := sess.Create(&payload.ScenarioProducts[i]).Error; err != nil {
+					return fmt.Errorf("写入场景产品关联失败: %w", err)
+				}
+			}
+			for i := range payload.ScenarioServices {
+				if err := sess.Create(&payload.ScenarioServices[i]).Error; err != nil {
+					return fmt.Errorf("写入场景服务关联失败: %w", err)
+				}
 			}
 		}
 		for _, tbl := range backupTables {

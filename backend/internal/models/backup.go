@@ -14,6 +14,14 @@ type BackupPayload struct {
 	SalesScripts       []SalesScript      `json:"sales_scripts"`
 	Cases              []Case             `json:"cases"`
 	AuthSettings       *AuthSettings      `json:"auth_settings"`
+
+	// v2 新增
+	Services          []Service         `json:"services"`
+	ServiceCategories []ServiceCategory `json:"service_categories"`
+	ScenarioGroups    []ScenarioGroup   `json:"scenario_groups"`
+	Scenarios         []Scenario        `json:"scenarios"`
+	ScenarioProducts  []ScenarioProduct `json:"scenario_products"`
+	ScenarioServices  []ScenarioService `json:"scenario_services"`
 }
 
 // BackupUserRow 备份中的用户行（含密码哈希，仅用于恢复）

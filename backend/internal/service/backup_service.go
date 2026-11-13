@@ -32,7 +32,7 @@ func (s *BackupService) Import(ctx context.Context, payload *models.BackupPayloa
 	if confirm != BackupConfirmToken {
 		return apperr.Invalid("invalid_confirm", "确认令牌不正确")
 	}
-	if payload.Version != 1 {
+	if payload.Version != 1 && payload.Version != 2 {
 		return apperr.Invalid("unsupported_backup_version", "不支持的备份版本")
 	}
 	admins := 0
