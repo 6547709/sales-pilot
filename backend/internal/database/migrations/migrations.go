@@ -19,6 +19,13 @@ func Migrate(db *gorm.DB) error {
 		&models.Product{},
 		&models.SalesScript{},
 		&models.Case{},
+		// 服务、场景与关联
+		&models.Service{},
+		&models.ServiceCategory{},
+		&models.ScenarioGroup{},
+		&models.Scenario{},
+		&models.ScenarioProduct{},
+		&models.ScenarioService{},
 		// 系统设置
 		&models.AuthSettings{},
 		&models.SystemSettings{},
