@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/6547709/sales-pilot/backend/internal/models"
+	"github.com/6547709/sales-pilot/backend/internal/database/migrations"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,18 +15,7 @@ func Connect(dsn string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := db.AutoMigrate(
-		&models.User{},
-		&models.AdminAPIKey{},
-		&models.TopologyLayer{},
-		&models.SolutionCategory{},
-		&models.SolutionVendor{},
-		&models.Product{},
-		&models.SalesScript{},
-		&models.Case{},
-		&models.AuthSettings{},
-		&models.SystemSettings{},
-	); err != nil {
+	if err := migrations.Migrate(db); err != nil {
 		return nil, err
 	}
 	return db, nil

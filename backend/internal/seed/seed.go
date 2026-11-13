@@ -63,8 +63,8 @@ func Run(db *gorm.DB) {
 		"您的开发团队是否抱怨过环境交付速度跟不上业务迭代？",
 	})
 	personas, _ := json.Marshal(map[string]string{
-		"CIO":  "关注合规、成本与供应商锁定风险。",
-		"架构师": "关注工作负载形态统一与运维复杂度。",
+		"CIO":   "关注合规、成本与供应商锁定风险。",
+		"架构师":   "关注工作负载形态统一与运维复杂度。",
 		"业务负责人": "关注交付速度与业务连续性。",
 	})
 
@@ -79,24 +79,24 @@ func Run(db *gorm.DB) {
 	}
 
 	p := models.Product{
-		Name:               "VMware 迁移至 OpenShift 方案",
-		Category:           catLabel,
-		SolutionCategoryID: solPtr,
-		VendorMarket:       "foreign",
-		ManufacturerName:   "红帽软件（示例）",
-		SalesContactName:   "张销售",
-		SalesContactPhone:  "13800000000",
-		SalesContactEmail:  "sales@example.com",
+		Name:                 "VMware 迁移至 OpenShift 方案",
+		Category:             catLabel,
+		SolutionCategoryID:   solPtr,
+		VendorMarket:         "foreign",
+		ManufacturerName:     "红帽软件（示例）",
+		SalesContactName:     "张销售",
+		SalesContactPhone:    "13800000000",
+		SalesContactEmail:    "sales@example.com",
 		PresalesContactName:  "李售前",
 		PresalesContactPhone: "13900000000",
 		PresalesContactEmail: "presales@example.com",
-		Description: "面向 VMware 存量客户，提供可落地的 OpenShift 迁移与并行运行路径，强调合规、成本与统一管控。",
-		Highlights:         datatypes.JSON(highlights),
-		TargetPersonas:     datatypes.JSON(personas),
-		TriggerEvents:      "授权涨价谈判、信创时间表、容器化改造立项、数据中心整合。",
-		DiscoveryQuestions: datatypes.JSON(questions),
-		CompetitorAnalysis: competitor,
-		ROIMetrics:         "典型客户：三年 TCO 下降约 25%–35%（视规模与授权结构）；环境交付从周级缩短到天级。",
+		Description:          "面向 VMware 存量客户，提供可落地的 OpenShift 迁移与并行运行路径，强调合规、成本与统一管控。",
+		Highlights:           datatypes.JSON(highlights),
+		TargetPersonas:       datatypes.JSON(personas),
+		TriggerEvents:        "授权涨价谈判、信创时间表、容器化改造立项、数据中心整合。",
+		DiscoveryQuestions:   datatypes.JSON(questions),
+		CompetitorAnalysis:   competitor,
+		ROIMetrics:           "典型客户：三年 TCO 下降约 25%–35%（视规模与授权结构）；环境交付从周级缩短到天级。",
 	}
 	if err := db.Create(&p).Error; err != nil {
 		log.Fatal(err)

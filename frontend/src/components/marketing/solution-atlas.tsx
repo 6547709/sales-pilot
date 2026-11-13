@@ -58,7 +58,7 @@ function buildBucketChips(
 ): ArchCardManufacturerChip[] {
   const groups = new Map<string, Product[]>();
   for (const p of products) {
-    const raw = (p.manufacturer_name || "").trim();
+    const raw = (p.manufacturerName || "").trim();
     const dedupeKey = raw ? raw.toLowerCase() : `__n_${p.id}`;
     if (!groups.has(dedupeKey)) groups.set(dedupeKey, []);
     groups.get(dedupeKey)!.push(p);
@@ -66,7 +66,7 @@ function buildBucketChips(
   const chips: ArchCardManufacturerChip[] = [];
   for (const [, group] of groups) {
     const first = group[0];
-    const mname = (first.manufacturer_name || "").trim();
+    const mname = (first.manufacturerName || "").trim();
     if (mname) {
       const q = new URLSearchParams({
         solution_category_id: String(categoryId),
@@ -90,14 +90,14 @@ function buildProductChipMap(list: Product[]): Map<number, ArchCardProductChips>
     { domestic: Product[]; foreign: Product[]; neutral: Product[] }
   >();
   for (const p of list) {
-    if (p.is_draft) continue;
-    const sid = p.solution_category_id;
+    if (p.isDraft) continue;
+    const sid = p.solutionCategoryId;
     if (sid == null || sid === undefined) continue;
     if (!raw.has(sid)) {
       raw.set(sid, { domestic: [], foreign: [], neutral: [] });
     }
     const g = raw.get(sid)!;
-    const vm = (p.vendor_market || "all").toLowerCase().trim();
+    const vm = (p.vendorMarket || "all").toLowerCase().trim();
     if (vm === "domestic") g.domestic.push(p);
     else if (vm === "foreign") g.foreign.push(p);
     else g.neutral.push(p);
@@ -114,6 +114,13 @@ function buildProductChipMap(list: Product[]): Map<number, ArchCardProductChips>
 }
 
 /** 无产品时勿传 productChips，避免空灰条 */
+function serviceChipsFor(c: TopologyCategoryNode): ArchCardManufacturerChip[] {
+  return (c.services ?? []).map((svc) => ({
+    label: svc.name,
+    href: `/services/${svc.slug}`,
+  }));
+}
+
 function chipsFor(
   map: Map<number, ArchCardProductChips>,
   categoryId: number,
@@ -318,6 +325,7 @@ export function SolutionAtlas({
                     hint={c.hint || null}
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
+                    services={serviceChipsFor(c)}
                   />
                 </li>
               ))}
@@ -356,6 +364,7 @@ export function SolutionAtlas({
                       hint={c.hint || null}
                       onClick={() => archMainClick(c)}
                       productChips={chipsFor(productChipMap, c.id)}
+                      services={serviceChipsFor(c)}
                     />
                   ))}
                 </div>
@@ -399,6 +408,7 @@ export function SolutionAtlas({
                     hint={c.hint || null}
                     onClick={() => archMainClick(c)}
                     productChips={chipsFor(productChipMap, c.id)}
+                    services={serviceChipsFor(c)}
                   />
                 </li>
               ))}

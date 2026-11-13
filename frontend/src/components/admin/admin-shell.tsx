@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/reui/badge";
 import { cn } from "@/lib/utils";
 import { useFooterConfig } from "@/lib/footer-config";
 import type { User } from "@/lib/api";
 import { clearToken } from "@/lib/auth";
 import {
+  Compass,
   DatabaseBackup,
   KeyRound,
   LayoutDashboard,
@@ -16,11 +18,14 @@ import {
   Settings,
   Shield,
   Users,
+  Wrench,
 } from "lucide-react";
 
 const adminNav = [
   { href: "/admin", label: "控制台", icon: LayoutDashboard },
   { href: "/admin/products", label: "产品维护", icon: Package },
+  { href: "/admin/services", label: "服务维护", icon: Wrench },
+  { href: "/admin/scenarios", label: "场景维护", icon: Compass },
   { href: "/admin/topology", label: "拓扑维护", icon: Network },
   { href: "/admin/api-keys", label: "API 密钥", icon: KeyRound },
   { href: "/admin/users", label: "本地用户", icon: Users },
@@ -70,7 +75,12 @@ export function AdminShell({
             })}
           </nav>
           <div className="border-t p-3">
-            <p className="truncate text-xs text-muted-foreground">{user.username}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="truncate text-xs text-muted-foreground">{user.username}</p>
+              <Badge variant={user.role === "admin" ? "info-light" : "secondary"}>
+                {user.role === "admin" ? "管理员" : "用户"}
+              </Badge>
+            </div>
             <Button
               variant="outline"
               size="sm"

@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { apiFetch, fetchSolutionCategories, parseJsonArray, type Product } from "@/lib/api";
+import { useViewMode } from "@/lib/view-mode";
+import { withView } from "@/lib/view-mode-shared";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -39,6 +41,7 @@ function ProductsInner() {
   const [q, setQ] = useState(initialQ);
   const [marketFilter, setMarketFilter] = useState(initialMarket);
   const [mfrFilter, setMfrFilter] = useState(initialMfg);
+  const { mode } = useViewMode();
   const [list, setList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<
@@ -84,13 +87,17 @@ function ProductsInner() {
           ? "/api/v1/products"
           : `/api/v1/products?${params.toString()}`;
     }
-    const res = await apiFetch(path);
+    const res = await apiFetch(withView(path, mode));
     if (res.ok) {
       const data = await res.json();
       // 如果只有1个结果，自动跳转到详情页
       if (data.length === 1 && !isFirstLoad.current) {
         isFirstLoad.current = true;
-        router.replace(`/products/${data[0].id}`);
+        router.replace(
+          mode === "customer"
+            ? `/products/${data[0].id}?view=customer`
+            : `/products/${data[0].id}`,
+        );
         setLoading(false);
         return;
       }
@@ -100,7 +107,7 @@ function ProductsInner() {
     }
     isFirstLoad.current = false;
     setLoading(false);
-  }, [q, solutionFilter, marketFilter, mfrFilter]);
+  }, [q, solutionFilter, marketFilter, mfrFilter, mode, router]);
 
   useEffect(() => {
     load();
@@ -208,30 +215,30 @@ function ProductsInner() {
                   <CardHeader className={(solutionFilter || mfrFilter || q || marketFilter) ? "pb-4" : ""}>
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div className="flex items-center gap-3">
-                        {p.manufacturer_logo ? (
-                          <img src={p.manufacturer_logo} alt={p.manufacturer_name ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
+                        {p.manufacturerLogo ? (
+                          <img src={p.manufacturerLogo} alt={p.manufacturerName ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
                         ) : null}
                         <CardTitle className="text-lg leading-snug">{p.name}</CardTitle>
                       </div>
-                      {vendorMarketBadgeText(p.vendor_market) ? (
+                      {vendorMarketBadgeText(p.vendorMarket) ? (
                         <Badge
                           variant="outline"
-                          className={`shrink-0 text-xs font-medium ${vendorMarketBadgeClass(p.vendor_market)}`}
+                          className={`shrink-0 text-xs font-medium ${vendorMarketBadgeClass(p.vendorMarket)}`}
                         >
-                          {vendorMarketBadgeText(p.vendor_market)}
+                          {vendorMarketBadgeText(p.vendorMarket)}
                         </Badge>
                       ) : null}
                     </div>
                     <CardDescription>
-                      {p.manufacturer_name
-                        ? `${p.manufacturer_name} · ${p.category || "方案"}`
+                      {p.manufacturerName
+                        ? `${p.manufacturerName} · ${p.category || "方案"}`
                         : p.category || "未分类"}
                     </CardDescription>
                   </CardHeader>
                   {(solutionFilter || mfrFilter || q || marketFilter) ? (
                     (() => {
                       const hl = parseJsonArray(p.highlights);
-                      const qs = parseJsonArray(p.discovery_questions);
+                      const qs = parseJsonArray(p.discoveryQuestions);
                       if (hl.length === 0 && qs.length === 0) return null;
                       return (
                         <CardContent className="mt-auto px-6 py-4 border-t bg-muted/10 text-xs flex-1">

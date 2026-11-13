@@ -8,15 +8,18 @@ import { fetchMe, type User } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useFooterConfig } from "@/lib/footer-config";
+import { useViewMode } from "@/lib/view-mode";
 
 const publicLinks = [
   { href: "/", label: "首页" },
   { href: "/products", label: "方案库" },
+  { href: "/scenarios", label: "按场景看" },
 ];
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { footerText, filingNumber } = useFooterConfig();
+  const { mode, setMode } = useViewMode();
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [scrollDir, setScrollDir] = useState("up");
   const clickCount = useRef(0);
@@ -103,6 +106,32 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2">
+            <div className="hidden items-center rounded-full border border-border p-0.5 sm:flex">
+              <button
+                type="button"
+                onClick={() => setMode("sales")}
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[11px] transition-colors",
+                  mode === "sales"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                销售视图
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("customer")}
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[11px] transition-colors",
+                  mode === "customer"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                客户视图
+              </button>
+            </div>
             {user === undefined ? null : user ? (
               <>
                 <span className="hidden max-w-[120px] truncate text-xs text-muted-foreground lg:inline">

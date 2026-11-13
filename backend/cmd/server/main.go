@@ -9,8 +9,10 @@ import (
 	"github.com/6547709/sales-pilot/backend/internal/cache"
 	"github.com/6547709/sales-pilot/backend/internal/config"
 	"github.com/6547709/sales-pilot/backend/internal/database"
-	"github.com/6547709/sales-pilot/backend/internal/handlers"
+	"github.com/6547709/sales-pilot/backend/internal/httpapi"
+	"github.com/6547709/sales-pilot/backend/internal/repository"
 	"github.com/6547709/sales-pilot/backend/internal/seed"
+	"github.com/6547709/sales-pilot/backend/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,18 +27,42 @@ func main() {
 	seed.EnsureTopology(db)
 	seed.FixLegacyTopologyHints(db)
 	seed.Run(db)
+	seed.EnsureServices(db)
+	seed.EnsureScenarios(db)
 
-	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
-	r.Use(corsMiddleware(cfg.FrontendOrigin))
+	userRepo := repository.NewUserRepository(db)
+	apiKeyRepo := repository.NewAPIKeyRepository(db)
+	productRepo := repository.NewProductRepository(db)
+	topologyRepo := repository.NewTopologyRepository(db)
+	settingsRepo := repository.NewSettingsRepository(db)
+	backupRepo := repository.NewBackupRepository(db)
+	serviceRepo := repository.NewServiceRepository(db)
+	scenarioRepo := repository.NewScenarioRepository(db)
 
-	srv := &handlers.Server{
-		DB:          db,
-		Cfg:         cfg,
-		SearchCache: cache.NewSearchCache(30 * time.Second),
-		OidcStates:  auth.NewOidcStateStore(),
-	}
-	srv.RegisterRoutes(r)
+	searchCache := cache.NewSearchCache(30 * time.Second)
+	authSvc := service.NewAuthService(cfg, userRepo, settingsRepo)
+	productSvc := service.NewProductService(productRepo)
+	topologySvc := service.NewTopologyService(topologyRepo, serviceRepo)
+	serviceSvc := service.NewServiceService(serviceRepo)
+	scenarioSvc := service.NewScenarioService(scenarioRepo)
+	userSvc := service.NewUserService(userRepo)
+	apiKeySvc := service.NewAPIKeyService(apiKeyRepo, userRepo)
+	settingsSvc := service.NewSettingsService(settingsRepo)
+	backupSvc := service.NewBackupService(backupRepo, searchCache)
+
+	r := httpapi.NewRouter(httpapi.Deps{
+		Cfg:        cfg,
+		Auth:       authSvc,
+		Products:   productSvc,
+		Topology:   topologySvc,
+		Users:      userSvc,
+		APIKeys:    apiKeySvc,
+		Settings:   settingsSvc,
+		Backup:     backupSvc,
+		Services:   serviceSvc,
+		Scenarios:  scenarioSvc,
+		OidcStates: auth.NewOidcStateStore(),
+	})
 
 	addr := ":8080"
 	if p := os.Getenv("PORT"); p != "" {
@@ -45,19 +71,5 @@ func main() {
 	log.Println("Sales-Pilot API 监听", addr)
 	if err := r.Run(addr); err != nil {
 		log.Fatal(err)
-	}
-}
-
-func corsMiddleware(origin string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
 	}
 }

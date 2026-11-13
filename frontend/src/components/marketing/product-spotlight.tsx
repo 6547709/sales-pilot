@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { apiFetch, fetchTopology, parseJsonArray, type Product } from "@/lib/api";
+import { useViewMode } from "@/lib/view-mode";
+import { withView } from "@/lib/view-mode-shared";
 import {
   vendorMarketBadgeClass,
   vendorMarketBadgeText,
@@ -36,6 +38,7 @@ export function ProductSpotlight({
   keyword = "",
   vendorMarket,
 }: Props) {
+  const { mode } = useViewMode();
   const [list, setList] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolvedLabel, setResolvedLabel] = useState(solutionLabel ?? "");
@@ -79,13 +82,13 @@ export function ProductSpotlight({
       if (vendorMarket) q.set("vendor_market", vendorMarket);
       path = `/api/v1/products/search?${q.toString()}`;
     }
-    const res = await apiFetch(path);
+    const res = await apiFetch(withView(path, mode));
     if (res.ok) {
       const data: Product[] = await res.json();
       setList(data.slice(0, 12));
     } else setList([]);
     setLoading(false);
-  }, [solutionId, keyword, vendorMarket]);
+  }, [solutionId, keyword, vendorMarket, mode]);
 
   useEffect(() => {
     load();
@@ -186,32 +189,32 @@ export function ProductSpotlight({
                     <CardHeader className={(solutionId || keyword || vendorMarket) ? "pb-4" : ""}>
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div className="flex items-center gap-3">
-                          {p.manufacturer_logo ? (
-                            <img src={p.manufacturer_logo} alt={p.manufacturer_name ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
+                          {p.manufacturerLogo ? (
+                            <img src={p.manufacturerLogo} alt={p.manufacturerName ?? "logo"} className="max-h-6 max-w-[80px] object-contain" />
                           ) : null}
                           <CardTitle className="text-lg leading-snug">
                             {p.name}
                           </CardTitle>
                         </div>
-                        {vendorMarketBadgeText(p.vendor_market) ? (
+                        {vendorMarketBadgeText(p.vendorMarket) ? (
                           <Badge
                             variant="outline"
-                            className={`shrink-0 text-xs font-medium ${vendorMarketBadgeClass(p.vendor_market)}`}
+                            className={`shrink-0 text-xs font-medium ${vendorMarketBadgeClass(p.vendorMarket)}`}
                           >
-                            {vendorMarketBadgeText(p.vendor_market)}
+                            {vendorMarketBadgeText(p.vendorMarket)}
                           </Badge>
                         ) : null}
                       </div>
                       <CardDescription className="line-clamp-2">
-                        {p.manufacturer_name
-                          ? `${p.manufacturer_name} · ${p.category || "方案"}`
+                        {p.manufacturerName
+                          ? `${p.manufacturerName} · ${p.category || "方案"}`
                           : p.category || "未分类"}
                       </CardDescription>
                     </CardHeader>
                     {(solutionId || keyword || vendorMarket) ? (
                       (() => {
                         const hl = parseJsonArray(p.highlights);
-                        const qs = parseJsonArray(p.discovery_questions);
+                        const qs = parseJsonArray(p.discoveryQuestions);
                         if (hl.length === 0 && qs.length === 0) return null;
                         return (
                           <CardContent className="mt-auto px-6 py-4 border-t bg-muted/10 text-xs flex-1">
