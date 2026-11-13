@@ -252,7 +252,7 @@ export function SolutionAtlas({
             <Skeleton className="h-10 w-80 mx-auto sm:w-96" />
           </div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,240px)_1fr_minmax(0,240px)] lg:gap-4 xl:gap-6">
-            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background">
+            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-3 shadow-sm dark:from-slate-950/40 dark:to-background">
               <Skeleton className="mb-1 h-5 w-20" />
               <Skeleton className="mb-4 h-3 w-36" />
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
@@ -261,12 +261,12 @@ export function SolutionAtlas({
                 ))}
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {[...Array(2)].map((_, i) => (
                 <Skeleton key={i} className="h-28 w-full rounded-2xl" />
               ))}
             </div>
-            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background">
+            <div className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-3 shadow-sm dark:from-slate-950/40 dark:to-background">
               <Skeleton className="mb-1 h-5 w-20" />
               <Skeleton className="mb-4 h-3 w-36" />
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-1">
@@ -305,15 +305,12 @@ export function SolutionAtlas({
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.05 }}
-            className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background"
+            className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-3 shadow-sm dark:from-slate-950/40 dark:to-background"
           >
-            <h2 className="mb-1 flex items-center gap-2 text-sm font-bold text-primary">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary">
               <span className="h-2 w-2 rounded-full bg-primary" />
               安全体系
             </h2>
-            <p className="mb-4 text-xs text-muted-foreground">
-              身份、边界与数据全生命周期
-            </p>
             <ul className="grid grid-cols-2 gap-2 sm:grid-cols-1">
               {topology.security.map((c) => (
                 <li key={c.id}>
@@ -332,26 +329,19 @@ export function SolutionAtlas({
             </ul>
           </motion.aside>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {centralSorted.map((block, idx) => (
               <motion.section
                 key={block.layer.id}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 + idx * 0.04 }}
-                className="rounded-2xl border border-blue-200/60 bg-gradient-to-r from-[#0052cc]/[0.07] via-background to-[#0052cc]/[0.05] p-4 shadow-sm dark:border-blue-900/40"
+                className="rounded-2xl border border-blue-200/60 bg-gradient-to-r from-[#0052cc]/[0.07] via-background to-[#0052cc]/[0.05] p-3 shadow-sm dark:border-blue-900/40"
               >
-                <div className="mb-3 flex flex-wrap items-end justify-between gap-2 border-b border-primary/10 pb-2">
-                  <div>
-                    <h3 className="text-base font-bold text-foreground sm:text-lg">
-                      {block.layer.title}
-                    </h3>
-                    {block.layer.subtitle ? (
-                      <p className="text-xs text-muted-foreground">
-                        {block.layer.subtitle}
-                      </p>
-                    ) : null}
-                  </div>
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-primary/10 pb-1.5">
+                  <h3 className="text-base font-bold text-foreground sm:text-lg">
+                    {block.layer.title}
+                  </h3>
                   <Sparkles className="hidden h-5 w-5 text-primary/40 sm:block" />
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -388,15 +378,12 @@ export function SolutionAtlas({
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.05 }}
-            className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-4 shadow-sm dark:from-slate-950/40 dark:to-background"
+            className="rounded-2xl border border-primary/15 bg-gradient-to-b from-slate-50/90 to-white p-3 shadow-sm dark:from-slate-950/40 dark:to-background"
           >
-            <h2 className="mb-1 flex items-center gap-2 text-sm font-bold text-primary">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-primary">
               <span className="h-2 w-2 rounded-full bg-primary" />
               运维体系
             </h2>
-            <p className="mb-4 text-xs text-muted-foreground">
-              可观测、自动化与连续性
-            </p>
             <ul className="grid grid-cols-2 gap-2 sm:grid-cols-1">
               {topology.ops.map((c) => (
                 <li key={c.id}>
