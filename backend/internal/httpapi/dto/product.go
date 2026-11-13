@@ -25,18 +25,18 @@ type Product struct {
 	UpdatedAt          time.Time      `json:"updated_at"`
 
 	// 以下仅销售视图
-	CreatedAt            *time.Time      `json:"created_at,omitempty"`
-	SalesContactName     string          `json:"sales_contact_name,omitempty"`
-	SalesContactPhone    string          `json:"sales_contact_phone,omitempty"`
-	SalesContactEmail    string          `json:"sales_contact_email,omitempty"`
-	PresalesContactName  string          `json:"presales_contact_name,omitempty"`
-	PresalesContactPhone string          `json:"presales_contact_phone,omitempty"`
-	PresalesContactEmail string          `json:"presales_contact_email,omitempty"`
-	DiscoveryQuestions   datatypes.JSON  `json:"discovery_questions,omitempty"`
-	TargetPersonas       datatypes.JSON  `json:"target_personas,omitempty"`
-	TriggerEvents        string          `json:"trigger_events,omitempty"`
-	CompetitorAnalysis   string          `json:"competitor_analysis,omitempty"`
-	ROIMetrics           string          `json:"roi_metrics,omitempty"`
+	CreatedAt            *time.Time     `json:"created_at,omitempty"`
+	SalesContactName     string         `json:"sales_contact_name,omitempty"`
+	SalesContactPhone    string         `json:"sales_contact_phone,omitempty"`
+	SalesContactEmail    string         `json:"sales_contact_email,omitempty"`
+	PresalesContactName  string         `json:"presales_contact_name,omitempty"`
+	PresalesContactPhone string         `json:"presales_contact_phone,omitempty"`
+	PresalesContactEmail string         `json:"presales_contact_email,omitempty"`
+	DiscoveryQuestions   datatypes.JSON `json:"discovery_questions,omitempty"`
+	TargetPersonas       datatypes.JSON `json:"target_personas,omitempty"`
+	TriggerEvents        string         `json:"trigger_events,omitempty"`
+	CompetitorAnalysis   string         `json:"competitor_analysis,omitempty"`
+	ROIMetrics           string         `json:"roi_metrics,omitempty"`
 }
 
 func ProjectProduct(p models.Product, mode view.Mode) Product {

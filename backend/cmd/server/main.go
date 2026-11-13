@@ -34,11 +34,15 @@ func main() {
 	topologyRepo := repository.NewTopologyRepository(db)
 	settingsRepo := repository.NewSettingsRepository(db)
 	backupRepo := repository.NewBackupRepository(db)
+	serviceRepo := repository.NewServiceRepository(db)
+	scenarioRepo := repository.NewScenarioRepository(db)
 
 	searchCache := cache.NewSearchCache(30 * time.Second)
 	authSvc := service.NewAuthService(cfg, userRepo, settingsRepo)
 	productSvc := service.NewProductService(productRepo)
-	topologySvc := service.NewTopologyService(topologyRepo)
+	topologySvc := service.NewTopologyService(topologyRepo, serviceRepo)
+	serviceSvc := service.NewServiceService(serviceRepo)
+	scenarioSvc := service.NewScenarioService(scenarioRepo)
 	userSvc := service.NewUserService(userRepo)
 	apiKeySvc := service.NewAPIKeyService(apiKeyRepo, userRepo)
 	settingsSvc := service.NewSettingsService(settingsRepo)
@@ -53,6 +57,8 @@ func main() {
 		APIKeys:    apiKeySvc,
 		Settings:   settingsSvc,
 		Backup:     backupSvc,
+		Services:   serviceSvc,
+		Scenarios:  scenarioSvc,
 		OidcStates: auth.NewOidcStateStore(),
 	})
 

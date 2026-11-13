@@ -9,6 +9,7 @@ import (
 	"github.com/6547709/sales-pilot/backend/internal/apperr"
 	"github.com/6547709/sales-pilot/backend/internal/config"
 	"github.com/6547709/sales-pilot/backend/internal/models"
+	"github.com/6547709/sales-pilot/backend/internal/repository"
 	"github.com/6547709/sales-pilot/backend/internal/service"
 )
 
@@ -161,5 +162,69 @@ func TestBackupImportRollsBackOnFailure(t *testing.T) {
 	}, service.BackupConfirmToken)
 	if err == nil || !repo.restored {
 		t.Fatalf("err=%v restored=%v", err, repo.restored)
+	}
+}
+
+type fakeScenarioRepo struct {
+	service.ScenarioRepo
+	groups int64
+}
+
+func (f *fakeScenarioRepo) CountGroups(ctx context.Context) (int64, error) {
+	return f.groups, nil
+}
+
+type fakeServiceRepo struct {
+	service.ServiceRepo
+	byCat map[uint][]models.Service
+}
+
+func (f *fakeServiceRepo) ListByCategoryIDs(ctx context.Context, ids []uint) (map[uint][]models.Service, error) {
+	return f.byCat, nil
+}
+
+type fakeTopologyRepo struct {
+	service.TopologyRepo
+	snap *repository.TopologySnapshot
+}
+
+func (f *fakeTopologyRepo) Snapshot(ctx context.Context) (*repository.TopologySnapshot, error) {
+	return f.snap, nil
+}
+
+func TestScenarioGroupLimit(t *testing.T) {
+	svc := service.NewScenarioService(&fakeScenarioRepo{groups: 6})
+	_, err := svc.CreateGroup(context.Background(), "新组", "new-group", "")
+	if code := apperr.CodeOf(err); code != "scenario_group_limit" {
+		t.Fatalf("code=%s err=%v", code, err)
+	}
+}
+
+func TestServiceCreateRejectsBadKind(t *testing.T) {
+	svc := service.NewServiceService(&fakeServiceRepo{})
+	_, err := svc.Create(context.Background(), &models.Service{Slug: "s", Name: "S", Kind: "nope"}, nil)
+	if code := apperr.CodeOf(err); code != "invalid_service_kind" {
+		t.Fatalf("code=%s err=%v", code, err)
+	}
+}
+
+func TestTopologyTreeAttachesServices(t *testing.T) {
+	repo := &fakeTopologyRepo{snap: &repository.TopologySnapshot{
+		Layers: nil,
+		Security: []models.SolutionCategory{
+			{ID: 3, Slug: "virtualization", Label: "虚拟化", ColumnType: "security", IsActive: true},
+		},
+		Ops:     []models.SolutionCategory{},
+		Central: map[uint][]models.SolutionCategory{},
+	}}
+	svcs := &fakeServiceRepo{byCat: map[uint][]models.Service{
+		3: {{ID: 9, Slug: "v2v", Name: "V2V 迁移服务", Summary: "迁移"}},
+	}}
+	tree, err := service.NewTopologyService(repo, svcs).Tree(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tree.Security) != 1 || len(tree.Security[0].Services) != 1 {
+		t.Fatalf("services not attached: %+v", tree.Security)
 	}
 }

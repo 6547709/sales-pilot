@@ -87,3 +87,41 @@ type BackupRepo interface {
 	Dump(ctx context.Context) (*models.BackupPayload, error)
 	Restore(ctx context.Context, payload *models.BackupPayload) error
 }
+
+type ServiceRepo interface {
+	List(ctx context.Context, kind string, activeOnly bool) ([]models.Service, error)
+	FindByID(ctx context.Context, id uint) (*models.Service, error)
+	FindBySlug(ctx context.Context, slug string) (*models.Service, error)
+	Create(ctx context.Context, s *models.Service) error
+	Save(ctx context.Context, s *models.Service) error
+	Delete(ctx context.Context, id uint) error
+	SetCategories(ctx context.Context, serviceID uint, categoryIDs []uint) error
+	CategoryIDs(ctx context.Context, serviceID uint) ([]uint, error)
+	ListByCategoryID(ctx context.Context, categoryID uint) ([]models.Service, error)
+	ListByCategoryIDs(ctx context.Context, ids []uint) (map[uint][]models.Service, error)
+	ListByIDs(ctx context.Context, ids []uint) ([]models.Service, error)
+}
+
+type ScenarioRepo interface {
+	Groups(ctx context.Context) ([]models.ScenarioGroup, error)
+	Scenarios(ctx context.Context) ([]models.Scenario, error)
+	FindBySlug(ctx context.Context, slug string) (*models.Scenario, error)
+	FindByID(ctx context.Context, id uint) (*models.Scenario, error)
+	FindGroup(ctx context.Context, id uint) (*models.ScenarioGroup, error)
+	CreateGroup(ctx context.Context, g *models.ScenarioGroup) error
+	SaveGroup(ctx context.Context, g *models.ScenarioGroup) error
+	DeleteGroup(ctx context.Context, id uint) error
+	CountGroups(ctx context.Context) (int64, error)
+	CountScenariosInGroup(ctx context.Context, groupID uint) (int64, error)
+	Create(ctx context.Context, s *models.Scenario) error
+	Save(ctx context.Context, s *models.Scenario) error
+	Delete(ctx context.Context, id uint) error
+	ProductIDs(ctx context.Context, scenarioID uint) ([]uint, error)
+	ServiceIDs(ctx context.Context, scenarioID uint) ([]uint, error)
+	SetLinks(ctx context.Context, scenarioID uint, productIDs, serviceIDs []uint) error
+	CountProducts(ctx context.Context) (map[uint]int64, error)
+	CountServices(ctx context.Context) (map[uint]int64, error)
+	ListProductsByIDs(ctx context.Context, ids []uint) ([]models.Product, error)
+	ListServicesByIDs(ctx context.Context, ids []uint) ([]models.Service, error)
+	ListPublicCasesByProductIDs(ctx context.Context, ids []uint) ([]models.Case, error)
+}

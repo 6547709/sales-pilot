@@ -21,14 +21,22 @@ type VendorsSplit struct {
 	Foreign  []VendorMini `json:"foreign"`
 }
 
+type ServiceMini struct {
+	ID      uint   `json:"id"`
+	Slug    string `json:"slug"`
+	Name    string `json:"name"`
+	Summary string `json:"summary"`
+}
+
 type CategoryNode struct {
-	ID       uint         `json:"id"`
-	Slug     string       `json:"slug"`
-	Label    string       `json:"label"`
-	IconKey  string       `json:"icon_key"`
-	Keywords []string     `json:"keywords"`
-	Hint     string       `json:"hint"`
-	Vendors  VendorsSplit `json:"vendors"`
+	ID       uint          `json:"id"`
+	Slug     string        `json:"slug"`
+	Label    string        `json:"label"`
+	IconKey  string        `json:"icon_key"`
+	Keywords []string      `json:"keywords"`
+	Hint     string        `json:"hint"`
+	Vendors  VendorsSplit  `json:"vendors"`
+	Services []ServiceMini `json:"services"`
 }
 
 type LayerBlock struct {
@@ -43,11 +51,12 @@ type TreeResponse struct {
 }
 
 type TopologyService struct {
-	repo TopologyRepo
+	repo     TopologyRepo
+	services ServiceRepo
 }
 
-func NewTopologyService(repo TopologyRepo) *TopologyService {
-	return &TopologyService{repo: repo}
+func NewTopologyService(repo TopologyRepo, services ServiceRepo) *TopologyService {
+	return &TopologyService{repo: repo, services: services}
 }
 
 func keywordsSlice(j []byte) []string {
@@ -90,13 +99,40 @@ func (s *TopologyService) Tree(ctx context.Context) (*TreeResponse, error) {
 	if err != nil {
 		return nil, apperr.Internal(err)
 	}
+	var all []models.SolutionCategory
+	all = append(all, snap.Security...)
+	all = append(all, snap.Ops...)
+	for _, cats := range snap.Central {
+		all = append(all, cats...)
+	}
+	ids := make([]uint, 0, len(all))
+	for _, c := range all {
+		ids = append(ids, c.ID)
+	}
+	svcMap := map[uint][]models.Service{}
+	if s.services != nil && len(ids) > 0 {
+		if svcMap, err = s.services.ListByCategoryIDs(ctx, ids); err != nil {
+			return nil, apperr.Internal(err)
+		}
+	}
+	withServices := func(cats []models.SolutionCategory) []CategoryNode {
+		nodes := buildNodes(cats)
+		for i, c := range cats {
+			for _, svc := range svcMap[c.ID] {
+				nodes[i].Services = append(nodes[i].Services, ServiceMini{
+					ID: svc.ID, Slug: svc.Slug, Name: svc.Name, Summary: svc.Summary,
+				})
+			}
+		}
+		return nodes
+	}
 	central := make([]LayerBlock, 0, len(snap.Layers))
 	for _, l := range snap.Layers {
-		central = append(central, LayerBlock{Layer: l, Categories: buildNodes(snap.Central[l.ID])})
+		central = append(central, LayerBlock{Layer: l, Categories: withServices(snap.Central[l.ID])})
 	}
 	return &TreeResponse{
-		Security:      buildNodes(snap.Security),
-		Ops:           buildNodes(snap.Ops),
+		Security:      withServices(snap.Security),
+		Ops:           withServices(snap.Ops),
 		CentralLayers: central,
 	}, nil
 }
@@ -180,6 +216,7 @@ func (s *TopologyService) UpdateCategory(ctx context.Context, id uint, c *models
 		"slug": c.Slug, "label": c.Label, "icon_key": c.IconKey,
 		"column_type": c.ColumnType, "layer_id": c.LayerID, "sort_order": c.SortOrder,
 		"keywords": c.Keywords, "hint": c.Hint, "is_active": c.IsActive,
+		"customer_value": c.CustomerValue, "customer_features": c.CustomerFeatures,
 	}
 	if err := s.repo.UpdateCategoryFields(ctx, id, fields); err != nil {
 		return nil, apperr.Internal(err)
