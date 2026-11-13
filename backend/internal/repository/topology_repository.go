@@ -145,3 +145,9 @@ func (r *TopologyRepository) UpdateVendorFields(ctx context.Context, id uint, fi
 func (r *TopologyRepository) DeleteVendor(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&models.SolutionVendor{}, id).Error
 }
+
+func (r *TopologyRepository) CountProductsInCategory(ctx context.Context, categoryID uint) (int64, error) {
+	var n int64
+	err := r.db.WithContext(ctx).Model(&models.Product{}).Where("solution_category_id = ?", categoryID).Count(&n).Error
+	return n, err
+}
