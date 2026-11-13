@@ -25,6 +25,11 @@ sales-pilot/
 └── .env.example           # 环境变量模板（复制为 .env）
 ```
 
+## 开发规范
+
+- 后端：`backend/CLAUDE.md` —— 分层、错误码、分页、新增端点步骤。
+- 前端：`frontend/CLAUDE.md` —— 目录分层、ReUI 组件优先级、设计令牌、API 层。
+
 ### GitHub Actions → GHCR（推荐）
 
 推送到 **`main`** 时由 Actions 构建 **linux/amd64（单架构）** 并推送到 **GitHub Container Registry**（`ghcr.io`），**无需在本地执行 `docker build`**。
