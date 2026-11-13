@@ -94,10 +94,31 @@ export function ArchCardButton({
             compact && "gap-1 py-1.5",
           )}
         >
-          {productChips && productChips.domestic.length > 0 ? (
+          {hasServiceBar ? (
             <div className="flex flex-wrap items-center justify-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-wide text-red-700 dark:text-red-400">
-                国内
+              <span className="text-[9px] font-bold uppercase tracking-wide text-primary">
+                服务
+              </span>
+              {services!.map((chip) => (
+                <Link
+                  key={chip.href}
+                  href={chip.href}
+                  onClick={(e) => e.stopPropagation()}
+                  title={chip.label}
+                  className={cn(
+                    "max-w-[10rem] truncate rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary underline-offset-2 hover:underline",
+                    compact && "max-w-[7rem]",
+                  )}
+                >
+                  {chip.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {hasProductBar ? (
+            <div className="flex flex-wrap items-center justify-center gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                产品
               </span>
               {productChips!.domestic.map((chip) => (
                 <Link
@@ -113,13 +134,6 @@ export function ArchCardButton({
                   {chip.label}
                 </Link>
               ))}
-            </div>
-          ) : null}
-          {productChips && productChips.foreign.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                国外
-              </span>
               {productChips!.foreign.map((chip) => (
                 <Link
                   key={chip.href}
@@ -134,13 +148,6 @@ export function ArchCardButton({
                   {chip.label}
                 </Link>
               ))}
-            </div>
-          ) : null}
-          {productChips && productChips.neutral.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-                不区分
-              </span>
               {productChips!.neutral.map((chip) => (
                 <Link
                   key={chip.href}
@@ -149,27 +156,6 @@ export function ArchCardButton({
                   title={chip.label}
                   className={cn(
                     "max-w-[10rem] truncate rounded-md border border-border bg-background px-1.5 py-0.5 text-[9px] font-medium text-foreground underline-offset-2 hover:underline",
-                    compact && "max-w-[7rem]",
-                  )}
-                >
-                  {chip.label}
-                </Link>
-              ))}
-            </div>
-          ) : null}
-          {hasServiceBar ? (
-            <div className="flex flex-wrap items-center justify-center gap-1">
-              <span className="text-[9px] font-bold uppercase tracking-wide text-primary">
-                服务
-              </span>
-              {services!.map((chip) => (
-                <Link
-                  key={chip.href}
-                  href={chip.href}
-                  onClick={(e) => e.stopPropagation()}
-                  title={chip.label}
-                  className={cn(
-                    "max-w-[10rem] truncate rounded-md border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary underline-offset-2 hover:underline",
                     compact && "max-w-[7rem]",
                   )}
                 >
