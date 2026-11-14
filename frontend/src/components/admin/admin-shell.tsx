@@ -103,9 +103,6 @@ export function AdminShell({
             </div>
             <div className="hidden md:block" />
             <div className="flex items-center gap-2">
-              <span className="hidden text-xs text-muted-foreground sm:inline">
-                {user.username}
-              </span>
               <Link
                 href="/"
                 className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
