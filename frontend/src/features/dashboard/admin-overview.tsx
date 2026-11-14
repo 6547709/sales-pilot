@@ -13,7 +13,8 @@ import {
 import { PageHeader } from "@/components/patterns/page-header";
 import { StatCard } from "@/components/patterns/stat-card";
 import { Frame, FramePanel } from "@/components/reui/frame";
-import { adminProductsApi, apiKeysApi, usersApi } from "@/lib/api";
+import { adminProductsApi, apiKeysApi, usersApi, statsApi, type AdminStats } from "@/lib/api";
+import { AdminCharts } from "@/features/dashboard/admin-charts";
 
 type Load<T> =
   | { status: "loading" }
@@ -39,6 +40,7 @@ export function AdminOverview() {
   const [products, setProducts] = useState<Load<number>>({ status: "loading" });
   const [users, setUsers] = useState<Load<number>>({ status: "loading" });
   const [keys, setKeys] = useState<Load<number>>({ status: "loading" });
+  const [stats, setStats] = useState<AdminStats | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -46,7 +48,8 @@ export function AdminOverview() {
       adminProductsApi.list({ page: 1, pageSize: 1 }),
       usersApi.list({ page: 1, pageSize: 1 }),
       apiKeysApi.list(),
-    ]).then(([p, u, k]) => {
+      statsApi.get(),
+    ]).then(([p, u, k, s]) => {
       if (!alive) return;
       setProducts(
         p.status === "fulfilled"
@@ -67,6 +70,7 @@ export function AdminOverview() {
       } else {
         setKeys({ status: "error" });
       }
+      setStats(s.status === "fulfilled" ? s.value : null);
     });
     return () => {
       alive = false;
@@ -82,6 +86,8 @@ export function AdminOverview() {
         <StatCard label="本地用户" value={valueOf(users)} hint="本地账号" icon={Users} />
         <StatCard label="有效密钥" value={valueOf(keys)} hint="未过期且启用" icon={KeyRound} />
       </div>
+
+      <AdminCharts stats={stats} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {shortcuts.map((item) => {

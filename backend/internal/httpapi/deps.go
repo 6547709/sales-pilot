@@ -16,6 +16,7 @@ type Deps struct {
 	APIKeys    *service.APIKeyService
 	Settings   *service.SettingsService
 	Backup     *service.BackupService
+	Stats      *service.StatsService
 	Services   *service.ServiceService
 	Scenarios  *service.ScenarioService
 	OidcStates *auth.OidcStateStore

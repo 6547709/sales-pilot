@@ -36,6 +36,7 @@ func main() {
 	topologyRepo := repository.NewTopologyRepository(db)
 	settingsRepo := repository.NewSettingsRepository(db)
 	backupRepo := repository.NewBackupRepository(db)
+	statsRepo := repository.NewStatsRepository(db)
 	serviceRepo := repository.NewServiceRepository(db)
 	scenarioRepo := repository.NewScenarioRepository(db)
 
@@ -49,6 +50,7 @@ func main() {
 	apiKeySvc := service.NewAPIKeyService(apiKeyRepo, userRepo)
 	settingsSvc := service.NewSettingsService(settingsRepo)
 	backupSvc := service.NewBackupService(backupRepo, searchCache)
+	statsSvc := service.NewStatsService(statsRepo)
 
 	r := httpapi.NewRouter(httpapi.Deps{
 		Cfg:        cfg,
@@ -59,6 +61,7 @@ func main() {
 		APIKeys:    apiKeySvc,
 		Settings:   settingsSvc,
 		Backup:     backupSvc,
+		Stats:      statsSvc,
 		Services:   serviceSvc,
 		Scenarios:  scenarioSvc,
 		OidcStates: auth.NewOidcStateStore(),

@@ -74,3 +74,12 @@ func (h *Handlers) patchSystemSettings(c *gin.Context) {
 	}
 	OK(c, st)
 }
+
+func (h *Handlers) adminStats(c *gin.Context) {
+	data, err := h.Stats.Overview(c.Request.Context())
+	if err != nil {
+		Fail(c, err)
+		return
+	}
+	OK(c, data)
+}
