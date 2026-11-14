@@ -54,6 +54,7 @@ func NewRouter(d Deps) *gin.Engine {
 		admin.GET("/auth-settings", h.getAuthSettings)
 		admin.PATCH("/auth-settings", h.patchAuthSettings)
 		admin.GET("/system-settings", h.getSystemSettings)
+		admin.GET("/stats", h.adminStats)
 		admin.PATCH("/system-settings", h.patchSystemSettings)
 
 		admin.GET("/users/local", h.adminListLocalUsers)

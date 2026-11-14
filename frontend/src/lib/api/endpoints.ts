@@ -620,3 +620,17 @@ export const adminScenariosApi = {
       service_ids: serviceIds,
     }),
 };
+
+
+export type LabelCount = { label: string; count: number };
+
+export type AdminStats = {
+  products: { total: number; by_category: LabelCount[]; by_market: LabelCount[] };
+  users: { total: number; admins: number; active: number };
+  scenarios: { total: number; groups: LabelCount[] };
+  services: { total: number; active: number };
+};
+
+export const statsApi = {
+  get: () => apiJson<AdminStats>("/api/v1/admin/stats"),
+};

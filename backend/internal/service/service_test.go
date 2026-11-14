@@ -367,3 +367,35 @@ func TestProductScenariosFilteredForCustomer(t *testing.T) {
 		t.Fatalf("sales=%+v", sales)
 	}
 }
+
+type fakeStatsRepo struct{ service.StatsRepo }
+
+func (f *fakeStatsRepo) ProductsByCategory(ctx context.Context) ([]repository.LabelCount, error) {
+	return []repository.LabelCount{{Label: "虚拟化", Count: 3}}, nil
+}
+func (f *fakeStatsRepo) ProductsByMarket(ctx context.Context) ([]repository.LabelCount, error) {
+	return []repository.LabelCount{{Label: "国内", Count: 2}, {Label: "国外", Count: 1}}, nil
+}
+func (f *fakeStatsRepo) UsersSummary(ctx context.Context) (int64, int64, int64, error) {
+	return 5, 2, 4, nil
+}
+func (f *fakeStatsRepo) ScenariosByGroup(ctx context.Context) ([]repository.LabelCount, error) {
+	return []repository.LabelCount{{Label: "数据保护", Count: 3}, {Label: "容灾与迁移", Count: 2}}, nil
+}
+func (f *fakeStatsRepo) ServicesSummary(ctx context.Context) (int64, int64, error) {
+	return 6, 5, nil
+}
+
+func TestStatsOverviewAggregates(t *testing.T) {
+	svc := service.NewStatsService(&fakeStatsRepo{})
+	data, err := svc.Overview(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if data.Products.Total != 3 || data.Scenarios.Total != 5 {
+		t.Fatalf("totals: %+v", data)
+	}
+	if data.Users.Admins != 2 || data.Services.Active != 5 {
+		t.Fatalf("users/services: %+v", data)
+	}
+}

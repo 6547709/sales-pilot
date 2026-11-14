@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/reui/badge";
 import { cn } from "@/lib/utils";
 import { useFooterConfig } from "@/lib/footer-config";
 import type { User } from "@/lib/api";
@@ -75,11 +74,11 @@ export function AdminShell({
             })}
           </nav>
           <div className="border-t p-3">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-center gap-1.5">
               <p className="truncate text-xs text-muted-foreground">{user.username}</p>
-              <Badge variant={user.role === "admin" ? "info-light" : "secondary"}>
+              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                 {user.role === "admin" ? "管理员" : "用户"}
-              </Badge>
+              </span>
             </div>
             <Button
               variant="outline"
